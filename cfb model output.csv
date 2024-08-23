@@ -1,9 +1,11 @@
 ﻿week,Team,Opponent,Model Prediction,Opening Spread,Cover Probability (%),Edge (%)
-1,SMU,Nevada,-28,-27,0.523883125,0.000074
+0,Florida State,Georgia Tech,-9,-10.5,0.410067595,-0.11374
+0,Georgia Tech,Florida State,9,10.5,0.589932405,0.066123
+0,Nevada,SMU,27,26,0.466571624,-0.05724
+1,SMU,Nevada,-27,-26,0.521409108,-0.0024
 1,UCLA,Hawai'i,-16,-13.5,0.543493587,0.019684
 1,Boise State,Georgia Southern,-13,-13,0.467788935,-0.05602
 1,Virginia Tech,Vanderbilt,-13,-13,0.467788935,-0.05602
-1,Florida State,Georgia Tech,-9,-11,0.392199271,-0.13161
 1,Penn State,West Virginia,-9,-10,0.410067595,-0.11374
 1,TCU,Stanford,-10,-8,0.477659642,-0.04615
 1,James Madison,Charlotte,-10,-7,0.495016739,-0.02879
@@ -60,8 +62,6 @@
 1,Charlotte,James Madison,10,7,0.445724516,-0.07809
 1,Stanford,TCU,10,8,0.504983261,-0.01883
 1,West Virginia,Penn State,9,10,0.555023,0.031213
-1,Georgia Tech,Florida State,9,11,0.589932405,0.066123
 1,Georgia Southern,Boise State,13,13,0.51888568,-0.00492
 1,Vanderbilt,Virginia Tech,13,13,0.51888568,-0.00492
 1,Hawai'i,UCLA,16,13.5,0.456506413,-0.0673
-1,Nevada,SMU,28,27,0.453981117,-0.06983
