@@ -1,92 +1,92 @@
 ﻿week,Team,Opponent,Model Prediction,Opening Spread,Cover Probability (%),Edge (%)
-2,Air Force,San José State,-4,-6,0.41,-0.11
-2,Akron,Rutgers,25,22,0.42,-0.10
-2,Alabama,South Florida,-27,-29,0.46,-0.07
-2,Appalachian State,Clemson,15,17,0.55,0.02
-2,Arizona State,Mississippi State,-6,-4,0.50,-0.02
-2,Arkansas,Oklahoma State,4,9,0.66,0.14
-2,Arkansas State,Tulsa,-9,-7,0.53,0.01
-2,Army,Florida Atlantic,1,4,0.59,0.07
-2,Baylor,Utah,14,18,0.60,0.08
-2,Boise State,Oregon,20,20,0.49,-0.03
-2,Bowling Green,Penn State,33,32,0.47,-0.06
-2,Buffalo,Missouri,32,34,0.53,0.01
-2,BYU,SMU,17,11,0.39,-0.13
-2,Charlotte,North Carolina,22,23,0.51,-0.01
-2,Cincinnati,Pittsburgh,1,-2,0.43,-0.10
-2,Clemson,Appalachian State,-15,-17,0.42,-0.10
-2,Colorado,Nebraska,18,7,0.27,-0.26
-2,East Carolina,Old Dominion,-4,2,0.62,0.10
-2,Eastern Michigan,Washington,24,24,0.48,-0.04
-2,Eastern Michigan,Washington,24,24,0.48,-0.04
-2,Florida Atlantic,Army,-1,-4,0.38,-0.14
-2,Georgia Southern,Nevada,1,-3,0.36,-0.16
-2,Georgia Tech,Syracuse,-5,-3,0.50,-0.02
-2,Houston,Oklahoma,34,28,0.34,-0.19
-2,Illinois,Kansas,4,6,0.57,0.04
-2,Iowa,Iowa State,1,-3,0.43,-0.10
-2,Iowa State,Iowa,-1,3,0.57,0.05
-2,Kansas,Illinois,-4,-6,0.43,-0.09
-2,Kansas State,Tulane,-12,-10,0.48,-0.04
-2,Kentucky,South Carolina,-9,-9,0.45,-0.07
-2,Liberty,New Mexico State,-23,-21,0.53,0.00
-2,Marshall,Virginia Tech,17,17,0.50,-0.03
-2,Maryland,Michigan State,-11,-10,0.49,-0.03
-2,Memphis,Troy,-16,-17,0.45,-0.08
-2,Michigan,Texas,11,7,0.42,-0.10
-2,Michigan State,Maryland,11,10,0.51,-0.02
-2,Middle Tennessee,Ole Miss,37,38,0.52,0.00
-2,Mississippi State,Arizona State,6,4,0.48,-0.05
-2,Missouri,Buffalo,-32,-34,0.44,-0.09
-2,Navy,Temple,-12,-13,0.46,-0.07
-2,NC State,Tennessee,8,7,0.49,-0.03
-2,Nebraska,Colorado,-18,-7,0.73,0.21
-2,Nevada,Georgia Southern,-1,3,0.57,0.05
-2,New Mexico State,Liberty,23,21,0.43,-0.09
-2,North Carolina,Charlotte,-22,-23,0.47,-0.06
-2,Northern Illinois,Notre Dame,28,31,0.55,0.03
-2,Notre Dame,Northern Illinois,-28,-31,0.45,-0.07
-2,Ohio,South Alabama,-1,0,0.51,-0.01
-2,Ohio State,Western Michigan,-38,-39,0.43,-0.10
-2,Oklahoma,Houston,-34,-28,0.62,0.10
-2,Oklahoma State,Arkansas,-4,-9,0.33,-0.19
-2,Old Dominion,East Carolina,4,-2,0.36,-0.16
-2,Ole Miss,Middle Tennessee,-37,-38,0.43,-0.09
-2,Oregon,Boise State,-20,-20,0.51,-0.02
-2,Oregon State,San Diego State,-9,-4,0.57,0.05
-2,Penn State,Bowling Green,-33,-32,0.51,-0.02
-2,Pittsburgh,Cincinnati,-1,2,0.56,0.03
-2,Rutgers,Akron,-25,-22,0.56,0.04
-2,Sam Houston State,UCF,22,24,0.53,0.01
-2,San Diego State,Oregon State,9,4,0.41,-0.12
-2,San José State,Air Force,4,6,0.57,0.04
-2,SMU,BYU,-17,-11,0.59,0.07
-2,South Alabama,Ohio,1,0,0.47,-0.06
-2,South Carolina,Kentucky,9,9,0.55,0.02
-2,South Florida,Alabama,27,29,0.54,0.02
-2,Syracuse,Georgia Tech,5,3,0.44,-0.09
-2,Temple,Navy,12,13,0.54,0.02
-2,Tennessee,NC State,-8,-7,0.45,-0.08
-2,Texas,Michigan,-11,-7,0.58,0.05
-2,Texas State,UT San Antonio,-2,-2,0.49,-0.03
-2,Texas Tech,Washington State,3,-1,0.40,-0.13
-2,Toledo,UMass,-18,-19,0.46,-0.07
-2,Troy,Memphis,16,17,0.52,0.00
-2,Tulane,Kansas State,12,10,0.48,-0.04
-2,Tulsa,Arkansas State,9,7,0.47,-0.05
-2,UCF,Sam Houston State,-22,-24,0.47,-0.06
-2,UMass,Toledo,18,19,0.53,0.00
-1,USC,LSU,14,6,0.33,-0.19
-2,UT San Antonio,Texas State,2,2,0.49,-0.04
-2,Utah,Baylor,-14,-18,0.40,-0.13
-2,Virginia,Wake Forest,1,2,0.51,-0.01
-2,Virginia Tech,Marshall,-17,-17,0.47,-0.05
-2,Wake Forest,Virginia,-1,-2,0.47,-0.05
-2,Washington,Eastern Michigan,-24,-24,0.48,-0.04
-2,Washington,Eastern Michigan,-24,-24,0.48,-0.04
-2,Washington State,Texas Tech,-3,1,0.58,0.06
-2,Western Michigan,Ohio State,38,39,0.55,0.02
-2,Auburn,California,-22,-13,0.69,0.17
-2,USC,Utah State,-26,-28,0.43,-0.09
-2,Utah State,USC,26,28,0.53,0.00
-2,California,Auburn,22,13,0.30,-0.22
+2,Air Force,San José State,-4,-6,41.00%,-11.00%
+2,Akron,Rutgers,25,22,42.00%,-10.00%
+2,Alabama,South Florida,-27,-29,46.00%,-7.00%
+2,Appalachian State,Clemson,15,17,55.00%,2.00%
+2,Arizona State,Mississippi State,-6,-4,50.00%,-2.00%
+2,Arkansas,Oklahoma State,4,9,66.00%,14.00%
+2,Arkansas State,Tulsa,-9,-7,53.00%,1.00%
+2,Army,Florida Atlantic,1,4,59.00%,7.00%
+2,Baylor,Utah,14,18,60.00%,8.00%
+2,Boise State,Oregon,20,20,49.00%,-3.00%
+2,Bowling Green,Penn State,33,32,47.00%,-6.00%
+2,Buffalo,Missouri,32,34,53.00%,1.00%
+2,BYU,SMU,17,11,39.00%,-13.00%
+2,Charlotte,North Carolina,22,23,51.00%,-1.00%
+2,Cincinnati,Pittsburgh,1,-2,43.00%,-10.00%
+2,Clemson,Appalachian State,-15,-17,42.00%,-10.00%
+2,Colorado,Nebraska,18,7,27.00%,-26.00%
+2,East Carolina,Old Dominion,-4,2,62.00%,10.00%
+2,Eastern Michigan,Washington,24,24,48.00%,-4.00%
+2,Eastern Michigan,Washington,24,24,48.00%,-4.00%
+2,Florida Atlantic,Army,-1,-4,38.00%,-14.00%
+2,Georgia Southern,Nevada,1,-3,36.00%,-16.00%
+2,Georgia Tech,Syracuse,-5,-3,50.00%,-2.00%
+2,Houston,Oklahoma,34,28,34.00%,-19.00%
+2,Illinois,Kansas,4,6,57.00%,4.00%
+2,Iowa,Iowa State,1,-3,43.00%,-10.00%
+2,Iowa State,Iowa,-1,3,57.00%,5.00%
+2,Kansas,Illinois,-4,-6,43.00%,-9.00%
+2,Kansas State,Tulane,-12,-10,48.00%,-4.00%
+2,Kentucky,South Carolina,-9,-9,45.00%,-7.00%
+2,Liberty,New Mexico State,-23,-21,53.00%,0.00%
+2,Marshall,Virginia Tech,17,17,50.00%,-3.00%
+2,Maryland,Michigan State,-11,-10,49.00%,-3.00%
+2,Memphis,Troy,-16,-17,45.00%,-8.00%
+2,Michigan,Texas,11,7,42.00%,-10.00%
+2,Michigan State,Maryland,11,10,51.00%,-2.00%
+2,Middle Tennessee,Ole Miss,37,38,52.00%,0.00%
+2,Mississippi State,Arizona State,6,4,48.00%,-5.00%
+2,Missouri,Buffalo,-32,-34,44.00%,-9.00%
+2,Navy,Temple,-12,-13,46.00%,-7.00%
+2,NC State,Tennessee,8,7,49.00%,-3.00%
+2,Nebraska,Colorado,-18,-7,73.00%,21.00%
+2,Nevada,Georgia Southern,-1,3,57.00%,5.00%
+2,New Mexico State,Liberty,23,21,43.00%,-9.00%
+2,North Carolina,Charlotte,-22,-23,47.00%,-6.00%
+2,Northern Illinois,Notre Dame,28,31,55.00%,3.00%
+2,Notre Dame,Northern Illinois,-28,-31,45.00%,-7.00%
+2,Ohio,South Alabama,-1,0,51.00%,-1.00%
+2,Ohio State,Western Michigan,-38,-39,43.00%,-10.00%
+2,Oklahoma,Houston,-34,-28,62.00%,10.00%
+2,Oklahoma State,Arkansas,-4,-9,33.00%,-19.00%
+2,Old Dominion,East Carolina,4,-2,36.00%,-16.00%
+2,Ole Miss,Middle Tennessee,-37,-38,43.00%,-9.00%
+2,Oregon,Boise State,-20,-20,51.00%,-2.00%
+2,Oregon State,San Diego State,-9,-4,57.00%,5.00%
+2,Penn State,Bowling Green,-33,-32,51.00%,-2.00%
+2,Pittsburgh,Cincinnati,-1,2,56.00%,3.00%
+2,Rutgers,Akron,-25,-22,56.00%,4.00%
+2,Sam Houston State,UCF,22,24,53.00%,1.00%
+2,San Diego State,Oregon State,9,4,41.00%,-12.00%
+2,San José State,Air Force,4,6,57.00%,4.00%
+2,SMU,BYU,-17,-11,59.00%,7.00%
+2,South Alabama,Ohio,1,0,47.00%,-6.00%
+2,South Carolina,Kentucky,9,9,55.00%,2.00%
+2,South Florida,Alabama,27,29,54.00%,2.00%
+2,Syracuse,Georgia Tech,5,3,44.00%,-9.00%
+2,Temple,Navy,12,13,54.00%,2.00%
+2,Tennessee,NC State,-8,-7,45.00%,-8.00%
+2,Texas,Michigan,-11,-7,58.00%,5.00%
+2,Texas State,UT San Antonio,-2,-2,49.00%,-3.00%
+2,Texas Tech,Washington State,3,-1,40.00%,-13.00%
+2,Toledo,UMass,-18,-19,46.00%,-7.00%
+2,Troy,Memphis,16,17,52.00%,0.00%
+2,Tulane,Kansas State,12,10,48.00%,-4.00%
+2,Tulsa,Arkansas State,9,7,47.00%,-5.00%
+2,UCF,Sam Houston State,-22,-24,47.00%,-6.00%
+2,UMass,Toledo,18,19,53.00%,0.00%
+1,USC,LSU,14,6,33.00%,-19.00%
+2,UT San Antonio,Texas State,2,2,49.00%,-4.00%
+2,Utah,Baylor,-14,-18,40.00%,-13.00%
+2,Virginia,Wake Forest,1,2,51.00%,-1.00%
+2,Virginia Tech,Marshall,-17,-17,47.00%,-5.00%
+2,Wake Forest,Virginia,-1,-2,47.00%,-5.00%
+2,Washington,Eastern Michigan,-24,-24,48.00%,-4.00%
+2,Washington,Eastern Michigan,-24,-24,48.00%,-4.00%
+2,Washington State,Texas Tech,-3,1,58.00%,6.00%
+2,Western Michigan,Ohio State,38,39,55.00%,2.00%
+2,Auburn,California,-22,-13,69.00%,17.00%
+2,USC,Utah State,-26,-28,43.00%,-9.00%
+2,Utah State,USC,26,28,53.00%,0.00%
+2,California,Auburn,22,13,30.00%,-22.00%
