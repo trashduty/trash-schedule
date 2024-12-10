@@ -1,17 +1,11 @@
-﻿week,Team,Opponent,Model Prediction,Opening Spread,Cover Probability (%),Edge (%)
-15,Boise State,UNLV,-5,-4,0.476103294,-0.04771
-15,Oregon,Penn State,-8,-3.5,0.570202105,0.046393
-15,Jacksonville State,Western Kentucky,-4,-3,0.476725978,-0.04708
-15,Texas,Georgia,-7,-2.5,0.609567739,0.085758
-15,Miami (OH),Ohio,-5,-2.5,0.564029009,0.040219
-15,SMU,Clemson,-1,-2.5,0.471540009,-0.05227
-15,Arizona State,Iowa State,-1,-2.5,0.471540009,-0.05227
-15,Army,Tulane,5,4,0.499926225,-0.02388
-15,Tulane,Army,-5,-4,0.476103294,-0.04771
-15,Clemson,SMU,1,2.5,0.528459991,0.00465
-15,Iowa State,Arizona State,1,2.5,0.528459991,0.00465
-15,Ohio,Miami (OH),5,2.5,0.435970991,-0.08784
-15,Georgia,Texas,7,2.5,0.390432261,-0.13338
-15,Western Kentucky,Jacksonville State,4,3,0.459022508,-0.06479
-15,Penn State,Oregon,8,3.5,0.429797895,-0.09401
-15,UNLV,Boise State,5,4,0.499926225,-0.02388
+﻿week,Team,Opponent,Model Prediction,Opening Spread,Cover Probability (%),Edge (%),
+16,Navy,Army,7,6.5,0.517299437,-0.00651,
+16,Tennessee,Ohio State,8,7.5,0.553417654,0.029608,
+16,Indiana,Notre Dame,8,7.5,0.553417654,0.029608,
+16,SMU,Penn State,9,8,0.529300292,0.005491,
+16,Clemson,Texas,11,11,0.541110726,0.017301,
+16,Texas,Clemson,-11,-11,0.440807641,-0.083,
+16,Penn State,SMU,-9,-8,0.453277721,-0.07053,
+16,Ohio State,Tennessee,-8,-7.5,0.446582346,-0.07723,
+16,Notre Dame,Indiana,-8,-7.5,0.446582346,-0.07723,
+16,Army,Navy,-7,-6.5,0.482700563,-0.04111,
