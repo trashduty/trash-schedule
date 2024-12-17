@@ -1,11 +1,81 @@
-﻿week,Team,Opponent,Model Prediction,Opening Spread,Cover Probability (%),Edge (%),
-16,Navy,Army,7,6.5,0.517299437,-0.00651,
-16,Tennessee,Ohio State,8,7.5,0.553417654,0.029608,
-16,Indiana,Notre Dame,8,7.5,0.553417654,0.029608,
-16,SMU,Penn State,9,8,0.529300292,0.005491,
-16,Clemson,Texas,11,11,0.541110726,0.017301,
-16,Texas,Clemson,-11,-11,0.440807641,-0.083,
-16,Penn State,SMU,-9,-8,0.453277721,-0.07053,
-16,Ohio State,Tennessee,-8,-7.5,0.446582346,-0.07723,
-16,Notre Dame,Indiana,-8,-7.5,0.446582346,-0.07723,
-16,Army,Navy,-7,-6.5,0.482700563,-0.04111,
+﻿week,Team,Opponent,Model Prediction,Opening Spread,Cover Probability (%),Edge (%)
+16,Ole Miss,Duke,-18,-15,0.543840093,0.020031
+16,Florida,Tulane,-12,-14,0.405552117,-0.11826
+16,TCU,Louisiana,-13,-13,0.467788935,-0.05602
+16,Texas,Clemson,-11,-11,0.440807641,-0.083
+16,Texas State,North Texas,-11,-10,0.458889274,-0.06492
+16,James Madison,Western Kentucky,-10,-9.5,0.46935798,-0.05445
+16,UT San Antonio,Coastal Carolina,-9,-9,0.444977,-0.07883
+16,Penn State,SMU,-9,-8,0.453277721,-0.07053
+16,Ohio State,Tennessee,-8,-7.5,0.446582346,-0.07723
+16,Notre Dame,Indiana,-8,-7.5,0.446582346,-0.07723
+16,Kansas State,Rutgers,-7,-7,0.422749524,-0.10106
+16,Army,Navy,-7,-6.5,0.482700563,-0.04111
+16,Bowling Green,Arkansas State,-6,-6.5,0.459023359,-0.06479
+16,Army,Marshall,-4,-6.5,0.412412089,-0.1114
+16,NC State,East Carolina,-7,-5.5,0.5050336,-0.01878
+16,Miami,Iowa State,-6,-4,0.499620641,-0.02419
+16,San José State,South Florida,-1,-3.5,0.407783419,-0.11603
+16,Colorado,BYU,-4,-3,0.476725978,-0.04708
+16,Missouri,Iowa,-1,-3,0.407783419,-0.11603
+16,North Carolina,Connecticut,-5,-2.5,0.564029009,0.040219
+16,Nebraska,Boston College,-3,-2.5,0.517831961,-0.00598
+16,LSU,Baylor,-1,-1.5,0.489066203,-0.03474
+16,Liberty,Buffalo,-6,-1,0.604020307,0.080211
+16,UNLV,California,1,1.5,0.510933798,-0.01288
+16,Vanderbilt,Georgia Tech,2,2.5,0.505337139,-0.01847
+16,Washington,Louisville,5,2.5,0.435970991,-0.08784
+16,Washington,Louisville,5,2.5,0.435970991,-0.08784
+16,Fresno State,Northern Illinois,1,3,0.528459991,0.00465
+16,Arkansas,Texas Tech,1,3,0.528459991,0.00465
+16,Colorado State,Miami (OH),3,3,0.482168039,-0.04164
+16,USC,Texas A&M,4,3.5,0.523274022,-0.00054
+16,West Virginia,Memphis,4,4.5,0.54726314,0.023454
+16,Sam Houston State,Georgia Southern,4,6,0.565473669,0.041664
+16,Virginia Tech,Minnesota,4,6.5,0.587587911,0.063778
+16,Toledo,Pittsburgh,9,7,0.469590883,-0.05422
+16,Washington State,Syracuse,4,7.5,0.646270834,0.122461
+16,Western Michigan,South Alabama,9,8,0.529300292,0.005491
+16,Navy,Oklahoma,12,8.5,0.473145227,-0.05066
+16,Michigan,Alabama,9,10,0.555023,0.031213
+16,Illinois,South Carolina,10,10,0.53064202,0.006832
+16,South Carolina,Illinois,-10,-10,0.434310132,-0.0895
+16,Alabama,Michigan,-9,-10,0.410067595,-0.11374
+16,Oklahoma,Navy,-12,-8.5,0.526854773,0.003045
+16,South Alabama,Western Michigan,-9,-8,0.453277721,-0.07053
+16,Syracuse,Washington State,-4,-7.5,0.353729166,-0.17008
+16,Pittsburgh,Toledo,-9,-7,0.470699708,-0.05311
+16,Minnesota,Virginia Tech,-4,-6.5,0.412412089,-0.1114
+16,Georgia Southern,Sam Houston State,-4,-6,0.412412089,-0.1114
+16,Memphis,West Virginia,-4,-4.5,0.45273686,-0.07107
+16,Texas A&M,USC,-4,-3.5,0.476725978,-0.04708
+16,Miami (OH),Colorado State,-3,-3,0.45351526,-0.07029
+16,Northern Illinois,Fresno State,-1,-3,0.407783419,-0.11603
+16,Texas Tech,Arkansas,-1,-3,0.407783419,-0.11603
+16,Louisville,Washington,-5,-2.5,0.564029009,0.040219
+16,Louisville,Washington,-5,-2.5,0.564029009,0.040219
+16,Georgia Tech,Vanderbilt,-2,-2.5,0.494662861,-0.02915
+16,California,UNLV,-1,-1.5,0.489066203,-0.03474
+16,Buffalo,Liberty,6,1,0.374206415,-0.1496
+16,Baylor,LSU,1,1.5,0.510933798,-0.01288
+16,Boston College,Nebraska,3,2.5,0.482168039,-0.04164
+16,Connecticut,North Carolina,5,2.5,0.435970991,-0.08784
+16,Iowa,Missouri,1,3,0.528459991,0.00465
+16,BYU,Colorado,4,3,0.459022508,-0.06479
+16,South Florida,San José State,1,3.5,0.592216581,0.068407
+16,Iowa State,Miami,6,4,0.476514148,-0.0473
+16,East Carolina,NC State,7,5.5,0.494966401,-0.02884
+16,Marshall,Army,4,6.5,0.587587911,0.063778
+16,Arkansas State,Bowling Green,6,6.5,0.540976641,0.017167
+16,Navy,Army,7,6.5,0.517299437,-0.00651
+16,Rutgers,Kansas State,7,7,0.517299437,-0.00651
+16,Tennessee,Ohio State,8,7.5,0.553417654,0.029608
+16,Indiana,Notre Dame,8,7.5,0.553417654,0.029608
+16,SMU,Penn State,9,8,0.529300292,0.005491
+16,Coastal Carolina,UT San Antonio,9,9,0.546722279,0.022913
+16,Western Kentucky,James Madison,10,9.5,0.53064202,0.006832
+16,North Texas,Texas State,11,10,0.506055176,-0.01775
+16,Clemson,Texas,11,11,0.541110726,0.017301
+16,Louisiana,TCU,13,13,0.51888568,-0.00492
+16,Tulane,Florida,12,14,0.557184702,0.033375
+16,Duke,Ole Miss,18,15,0.443374467,-0.08044
