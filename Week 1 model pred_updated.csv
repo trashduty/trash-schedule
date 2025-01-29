@@ -1,5 +1,3 @@
-﻿week,home_team,Model Prediction,Opening Spread,Cover Probability (%),Edge,Offensive Expected Points (Season),Defensive Expected Points (Season),Offensive Succsess Rate (%),Defensive Succsess Rate (%),Offensive Eckel Rate Over Expected (%),Defensive Eckel Rate Over Expected (%),QB Expected Points Added (Career),QB Expected Points Added (Last 10 games)
-21,BUF,0,1.5,0.5084,-0.01541,11.16221,0.79265,0.484544695,0.551839465,0.597826087,5.559342896,0.516304348,6.434423
-21,KC,0,-1.5,0.4916,-0.03221,3.39444,-0.25741,0.472293265,0.55887522,0.50877193,5.062952714,0.502923977,10.12013
-21,PHI,-4,-6,0.4442,-0.07961,7.560713,-7.3322,0.4456,0.597103918,0.570680628,4.904386499,0.425641026,3.858613
-21,WAS,4,6,0.5279,0.00409,7.71577,-0.7822,0.482490272,0.546374368,0.634408602,5.72362488,0.508108108,8.081972
+﻿week,home_team,Model Prediction,Opening Spread,Cover Probability (%),Edge,Offensive Expected Points (Season),Defensive Expected Points (Season),Offensive Succsess Rate (%),Defensive Succsess Rate (%),Offensive Eckel Rate Over Expected (%),Defensive Eckel Rate Over Expected (%),QB Expected Points Added (Career),QB Expected Points Added (Last 10 games),
+22,PHI,0,1.5,0.5084,-0.01541,8.2931,-8.74317,0.453373768,0.597288676,0.584158416,5.014681946,0.427184466,3.813262,5.723852
+22,KC,0,-1.5,0.4916,-0.03221,3.210675,0.079289,0.476537217,0.55821635,0.527777778,5.115010896,0.505555556,10.02023,7.330614
