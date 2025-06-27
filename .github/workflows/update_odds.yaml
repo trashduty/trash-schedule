@@ -28,7 +28,7 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v3
 
-      - name: Import data
+      #- name: Import data
         #run: Rscript -e 'source("test_script.R")'
 
       - name: Commit results
