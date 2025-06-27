@@ -9,7 +9,7 @@ library(glue)
 library(lubridate)
 
 sport = "americanfootball_nfl"
-apiKey = "8342176adcb29b0cc5d8489dbc1fb8e9"
+apiKey = Sys.getenv("ODDS_API_KEY")
 regions = "us"
 markets = "spreads,totals"
 year = nflreadr::get_current_season(roster = TRUE)
