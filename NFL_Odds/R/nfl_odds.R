@@ -170,10 +170,12 @@ update_nfl_odds <- function(){
     ) 
 
   
-write_csv(margin, "NFL_Odds/Data/margins.csv")
-write_csv(lookup, "NFL_Odds/Data/lookups.csv")
-write_csv(model_raw, "NFL_Odds/Data/model.csv")
-write_csv(api_odds, "NFL_Odds/Data/odds.csv")
+  write_csv(margin, "NFL_Odds/Data/margins.csv")
+  write_csv(lookup, "NFL_Odds/Data/lookups.csv")
+  write_csv(model_raw, "NFL_Odds/Data/model.csv")
+  write_csv(api_odds, "NFL_Odds/Data/odds.csv")
+  write_csv(nfl_odds, "NFL_Odds/Data/odds_btb.csv")
+
 
   return(nfl_odds)
   
