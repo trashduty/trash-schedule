@@ -52,6 +52,9 @@ get_odds_api <- function(sport = "americanfootball_nfl",
   extracted_data <- httr::content(response, "text", encoding = "UTF-8")
   api_data <- jsonlite::fromJSON(extracted_data, flatten = TRUE)
   
+  teams <- nflreadr::load_teams() |> 
+    select(team_abbr, team_name)
+  
   # Unnest the data, which has multiple nested list columns
   api_unnested <- api_data |> 
     unnest(bookmakers, names_repair = "unique") |>
@@ -62,8 +65,12 @@ get_odds_api <- function(sport = "americanfootball_nfl",
            last_update_api = last_update_9, last_update_markets = last_update_11) |> 
     mutate(commence_ny = lubridate::as_date(lubridate::ymd_hms(commence_time, tz = "America/New_York")), 
            .after = commence_time) |> 
-    mutate(home_abbr = nflreadr::clean_team_abbrs(home_team)) |>     
-    mutate(away_abbr = nflreadr::clean_team_abbrs(away_team)) |> 
+    left_join(teams, by = c("home_team" = "team_name")) |> 
+    rename(home_abbr = team_abbr) |> 
+    left_join(teams, by = c("away_team" = "team_name")) |> 
+    rename(away_abbr = team_abbr) |> 
+    # mutate(home_abbr = nflreadr::clean_team_abbrs(home_team)) |>     
+    # mutate(away_abbr = nflreadr::clean_team_abbrs(away_team)) |> 
     mutate(week = case_when(
       commence_ny < week_one_wednesday ~ 0,  # Pre-season or invalid
       TRUE ~ as.numeric(floor((commence_ny - week_one_wednesday) / 7) + 1)
@@ -103,7 +110,6 @@ get_odds_api <- function(sport = "americanfootball_nfl",
   
   
   return(api_odds)
-  # write_csv(api_odds, "nfl_api_spreads_totals.csv")
   
 }
 
@@ -111,20 +117,19 @@ update_nfl_odds <- function(){
   
   api_odds <- get_odds_api()
   
-  margin <- read_csv("NFL_Odds/Data/interpolated_2d_margin_probs.csv", 
-                     show_col_types = FALSE) |> 
-    janitor::clean_names()
+   margin <- read_csv("NFL_Odds/Data/interpolated_2d_margin_probs.csv", 
+                      show_col_types = FALSE) |> 
+     janitor::clean_names()
+   
+   lookup <- read_csv("NFL_Odds/Data/NFL_Totals_Lookup_Stratified_By_Spread.csv", 
+                      show_col_types = FALSE) |> 
+     janitor::clean_names()
+   
+   model_raw <- read_csv("Week 1 model pred_updated.csv", 
+                         show_col_types = FALSE) |> 
+     janitor::clean_names()
   
-  lookup <- read_csv("NFL_Odds/Data/NFL_Totals_Lookup_Stratified_By_Spread.csv", 
-                     show_col_types = FALSE) |> 
-    janitor::clean_names()
-  
-  model_raw <- read_csv("Week 1 model pred_updated.csv", 
-                        show_col_types = FALSE) |> 
-    janitor::clean_names()
-  
-  # implied_odds <- 0.523805237
-  
+    
   calc_implied_odds <- function(odds) {
     ifelse(odds < 0,
            abs(odds) / (abs(odds) + 100),  # Negative odds (favorites)
@@ -173,10 +178,6 @@ update_nfl_odds <- function(){
            last_update_api
     ) 
   
-  write_csv(nfl_spread, "NFL_Odds/Data/nfl_spread.csv")
-  write_csv(nfl_margin, "NFL_Odds/Data/nfl_margin.csv")
-  write_csv(nfl_odds, "NFL_Odds/Data/nfl_odds.csv")
-
   return(nfl_odds)
   
 }
@@ -185,6 +186,3 @@ update_nfl_odds <- function(){
 nfl_odds_btb <- update_nfl_odds()
 
 write_csv(nfl_odds_btb, "NFL_Odds/Data/Odds API.csv")
-
-
-
