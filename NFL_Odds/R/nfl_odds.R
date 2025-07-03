@@ -178,6 +178,12 @@ update_nfl_odds <- function(){
            last_update_api
     ) 
   
+  write_csv(nfl_spread, "NFL_Odds/Data/nfl_spread.csv")
+  write_csv(nfl_margin, "NFL_Odds/Data/nfl_margin.csv")
+  write_csv(nfl_odds, "NFL_Odds/Data/nfl_odds.csv")
+  write_csv(api_odds, "NFL_Odds/Data/api_odds_now.csv")
+
+  
   return(nfl_odds)
   
 }
