@@ -131,14 +131,16 @@ update_nfl_odds <- function(){
            100 / (odds + 100))             # Positive odds (underdogs)
   }
   
-  nfl_odds <- model_raw |> 
+  nfl_spread <- model_raw |> 
     left_join(select(api_odds, week, team, game, median_spread, median_spread_price,
                      median_total, median_total_price, last_update_api), 
               by = c("week", "home_team" = "team")) |> 
     mutate(true_spread = ((model_prediction * 0.35) + (median_spread * 0.65)),  
            .after = median_spread) |> 
     mutate(true_spread = round(true_spread * 2) / 2) |> 
-    mutate(median_spread = round(median_spread * 2) / 2) |> 
+    mutate(median_spread = round(median_spread * 2) / 2)
+  
+  nfl_margin <- nfl_spread |> 
     left_join(margin, by = 
                 c("median_spread" = "market_line", "true_spread" = "true_line")) |> 
     rename(spread_cover_probability = cover_probability, 
@@ -154,7 +156,9 @@ update_nfl_odds <- function(){
     )) |> 
     mutate(true_total = (raw_model * 0.35) + (median_total * 0.65)) |> 
     mutate(true_total = round(true_total * 2) / 2) |> 
-    mutate(median_total = round(median_total * 2) / 2) |> 
+    mutate(median_total = round(median_total * 2) / 2) 
+  
+  nfl_odds <- nfl_margin |> 
     left_join(lookup, 
               by = c("bin_cat" = "spread_bin", 
                      "median_total" = "market_total", 
@@ -168,14 +172,10 @@ update_nfl_odds <- function(){
            total_over_probability, under_probability, total_under_probability, 
            last_update_api
     ) 
-
   
-  write_csv(margin, "NFL_Odds/Data/margins.csv")
-  write_csv(lookup, "NFL_Odds/Data/lookups.csv")
-  write_csv(model_raw, "NFL_Odds/Data/model.csv")
-  write_csv(api_odds, "NFL_Odds/Data/odds.csv")
-  write_csv(nfl_odds, "NFL_Odds/Data/odds_btb.csv")
-
+  write_csv(nfl_spread, "NFL_Odds/Data/nfl_spread.csv")
+  write_csv(nfl_margin, "NFL_Odds/Data/nfl_margin.csv")
+  write_csv(nfl_odds, "NFL_Odds/Data/nfl_odds.csv")
 
   return(nfl_odds)
   
