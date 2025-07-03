@@ -135,7 +135,8 @@ update_nfl_odds <- function(){
            100 / (odds + 100))             # Positive odds (underdogs)
   }
   
-  nfl_spread <- model_raw |> 
+  nfl_odds <- model_raw |> 
+    mutate(home_team = clean_team_abbrs(home_team)) |> 
     left_join(select(api_odds, week, team, game, median_spread, median_spread_price,
                      median_total, median_total_price, last_update_api), 
               by = c("week", "home_team" = "team")) |> 
@@ -143,8 +144,6 @@ update_nfl_odds <- function(){
            .after = median_spread) |> 
     mutate(true_spread = round(true_spread * 2) / 2) |> 
     mutate(median_spread = round(median_spread * 2) / 2)
-  
-  nfl_margin <- nfl_spread |> 
     left_join(margin, by = 
                 c("median_spread" = "market_line", "true_spread" = "true_line")) |> 
     rename(spread_cover_probability = cover_probability, 
@@ -161,8 +160,6 @@ update_nfl_odds <- function(){
     mutate(true_total = (raw_model * 0.35) + (median_total * 0.65)) |> 
     mutate(true_total = round(true_total * 2) / 2) |> 
     mutate(median_total = round(median_total * 2) / 2) 
-  
-  nfl_odds <- nfl_margin |> 
     left_join(lookup, 
               by = c("bin_cat" = "spread_bin", 
                      "median_total" = "market_total", 
