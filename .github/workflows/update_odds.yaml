@@ -3,6 +3,11 @@ on:
     # Every day at 9:30 UTC/5:30 ET
     - cron:  '30 9 * 1,2,9-12 *'
   workflow_dispatch:
+  push:
+    paths:
+      - 'Week 1 model pred_updated.csv'
+    branches:
+      - main 
   
 jobs:
   update-data:
