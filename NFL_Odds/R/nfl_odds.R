@@ -127,7 +127,9 @@ update_nfl_odds <- function(){
    model_raw <- read_csv("Week 1 model pred_updated.csv", 
                          show_col_types = FALSE) |> 
      janitor::clean_names()
-  
+
+  teams <- nflreadr::load_teams() |> 
+    select(team_abbr, team_logo_espn)
     
   calc_implied_odds <- function(odds) {
     ifelse(odds < 0,
@@ -167,7 +169,8 @@ update_nfl_odds <- function(){
     mutate(implied_odds_total = calc_implied_odds(median_total_price)) |> 
     mutate(total_over_probability = over_probability - implied_odds_total) |> 
     mutate(total_under_probability = under_probability - implied_odds_total) |> 
-    select(week, team = home_team, game, true_spread, median_spread, 
+    left_join(teams, by = c("home_team" = "team_abbr")) |> 
+    select(week, team_logo_espn, team = home_team, game, true_spread, median_spread, 
            spread_cover_probability, spread_edge, bin_cat, 
            true_total, median_total, over_probability,
            total_over_probability, under_probability, total_under_probability, 
