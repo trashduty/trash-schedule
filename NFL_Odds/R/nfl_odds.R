@@ -54,7 +54,6 @@ get_odds_api <- function(sport = "americanfootball_nfl",
   
   teams <- nflreadr::load_teams() |> 
     select(team_abbr, team_name)
-  
   # Unnest the data, which has multiple nested list columns
   api_unnested <- api_data |> 
     unnest(bookmakers, names_repair = "unique") |>
@@ -69,8 +68,6 @@ get_odds_api <- function(sport = "americanfootball_nfl",
     rename(home_abbr = team_abbr) |> 
     left_join(teams, by = c("away_team" = "team_name")) |> 
     rename(away_abbr = team_abbr) |> 
-    # mutate(home_abbr = nflreadr::clean_team_abbrs(home_team)) |>     
-    # mutate(away_abbr = nflreadr::clean_team_abbrs(away_team)) |> 
     mutate(week = case_when(
       commence_ny < week_one_wednesday ~ 0,  # Pre-season or invalid
       TRUE ~ as.numeric(floor((commence_ny - week_one_wednesday) / 7) + 1)
@@ -82,7 +79,8 @@ get_odds_api <- function(sport = "americanfootball_nfl",
   
   api_spreads_median <- api_unnested |> 
     filter(market == "spreads") |> 
-    mutate(team = nflreadr::clean_team_abbrs(name)) |> 
+    left_join(teams, by = c("name" = "team_name")) |> 
+    rename(team = team_abbr) |> 
     summarize(last_update_api = max(last_update_api, na.rm = TRUE), 
               median_spread = median(point), 
               median_spread_price = median(price), 
@@ -110,6 +108,7 @@ get_odds_api <- function(sport = "americanfootball_nfl",
   
   
   return(api_odds)
+  # write_csv(api_odds, "nfl_api_spreads_totals.csv")
   
 }
 
