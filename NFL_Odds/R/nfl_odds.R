@@ -143,7 +143,7 @@ update_nfl_odds <- function(){
     mutate(true_spread = ((model_prediction * 0.35) + (median_spread * 0.65)),  
            .after = median_spread) |> 
     mutate(true_spread = round(true_spread * 2) / 2) |> 
-    mutate(median_spread = round(median_spread * 2) / 2)
+    mutate(median_spread = round(median_spread * 2) / 2) |> 
     left_join(margin, by = 
                 c("median_spread" = "market_line", "true_spread" = "true_line")) |> 
     rename(spread_cover_probability = cover_probability, 
@@ -159,7 +159,7 @@ update_nfl_odds <- function(){
     )) |> 
     mutate(true_total = (raw_model * 0.35) + (median_total * 0.65)) |> 
     mutate(true_total = round(true_total * 2) / 2) |> 
-    mutate(median_total = round(median_total * 2) / 2) 
+    mutate(median_total = round(median_total * 2) / 2) |> 
     left_join(lookup, 
               by = c("bin_cat" = "spread_bin", 
                      "median_total" = "market_total", 
