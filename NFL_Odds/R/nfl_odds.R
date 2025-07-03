@@ -168,7 +168,13 @@ update_nfl_odds <- function(){
            total_over_probability, under_probability, total_under_probability, 
            last_update_api
     ) 
+
   
+write_csv(margins, "NFL_Odds/Data/margins.csv")
+write_csv(lookups, "NFL_Odds/Data/lookups.csv")
+write_csv(model_raw, "NFL_Odds/Data/model.csv")
+write_csv(api_odds, "NFL_Odds/Data/odds.csv")
+
   return(nfl_odds)
   
 }
