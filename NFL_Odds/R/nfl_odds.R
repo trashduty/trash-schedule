@@ -156,7 +156,7 @@ api_data <- get_odds_api()
     ) |> 
     mutate(implied_odds_spread = calc_implied_odds(spread_price)) |> 
     mutate(spread_edge = spread_cover_probability - implied_odds_spread) |> 
-    select(week, team = home_team, game, team_logo_espn, true_spread, spread, 
+    select(week, team = home_team, game, team_logo_espn, true_spread, spread, spread_price,
            spread_cover_probability, spread_edge, bookmaker, raw_model, last_update_api) |> 
     group_by(week, game, team) |> 
     mutate(
@@ -172,10 +172,12 @@ api_data <- get_odds_api()
       last_update_api = max(last_update_api, na.rm = TRUE), 
       model_prediction = true_spread[median_edge_row],
       market_line = spread[median_edge_row],
+      market_price = spread_price[median_edge_row], 
       cover_probability = spread_cover_probability[median_edge_row],
       edge = spread_edge[median_edge_row],
       best_book = bookmaker[highest_edge_row],
       best_line = spread[highest_edge_row],
+      best_price = spread_price[highest_edge_row], 
       best_cover_probability = spread_cover_probability[highest_edge_row], 
       best_edge = spread_edge[highest_edge_row],
       .by = c(week, game, team, team_logo_espn)
