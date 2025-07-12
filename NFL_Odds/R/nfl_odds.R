@@ -178,7 +178,7 @@ api_data <- get_odds_api()
       best_line = spread[highest_edge_row],
       best_cover_probability = spread_cover_probability[highest_edge_row], 
       best_edge = spread_edge[highest_edge_row],
-      .by = c(week, game, team)
+      .by = c(week, game, team, team_logo_espn)
     )
 
    
