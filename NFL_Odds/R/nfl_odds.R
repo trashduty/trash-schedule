@@ -169,6 +169,7 @@ api_data <- get_odds_api()
   
   spread_summary <- odds_calculated |> 
     summarise(
+      last_update_api = max(last_update_api, na.rm = TRUE), 
       model_prediction = true_spread[median_edge_row],
       market_line = spread[median_edge_row],
       cover_probability = spread_cover_probability[median_edge_row],
