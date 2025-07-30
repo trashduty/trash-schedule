@@ -1,4 +1,4 @@
-﻿week,team,Model Prediction,Spread,Cover Probability (%),Edge,PR,Offensive Expected Points (Season),Defensive Expected Points (Season),Offensive Success Rate (%),Defensive Succsess Rate (%),Offensive Eckel Rate Over Expected (%),Defensive Eckel Rate Over Expected (%),QB Expected Points Added (Career),QB Expected Points Added (Last 10 games),PROE,Raw_model,bin_cat
+﻿week,team,Model Prediction,Spread,Cover Probability (%),Edge,PR,Offensive Expected Points (Season),Defensive Expected Points (Season),Offensive Success Rate (%),Defensive Success Rate (%),Offensive Eckel Rate Over Expected (%),Defensive Eckel Rate Over Expected (%),QB Expected Points Added (Career),QB Expected Points Added (Last 10 games),PROE,Raw_model,bin_cat
 1,BAL,-0.5,1,0.498136864,-0.02567,5.655147324,14.80414,-2.15931,0.49,0.581223629,0.582191781,0.531034483,5.711341,11.65923,-0.080842298,51.5,1
 1,BUF,0.5,-1,0.494032561,-0.02978,5.303015814,12.17951,0.33036,0.48564868,0.559643255,0.605839416,0.517985612,6.613427,12.57951,-0.028532588,51.5,1
 1,DET,1,1.5,0.500192181,-0.02362,4.890054505,11.63269,-3.6644,0.488648649,0.581939799,0.583892617,0.456375839,3.447011,11.97007,-0.048801841,49.5,1
