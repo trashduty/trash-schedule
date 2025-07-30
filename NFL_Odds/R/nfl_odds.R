@@ -108,16 +108,16 @@ api_data <- get_odds_api()
   teams <- nflreadr::load_teams() |> 
     select(team_abbr, team_logo_espn, team_name)
   
-  # margin <- read_csv("https://github.com/trashduty/trash-schedule/raw/refs/heads/main/NFL_Odds/Data/interpolated_2d_margin_probs.csv", 
-  #                    show_col_types = FALSE) |> 
+  # margin <- read_csv("https://github.com/trashduty/trash-schedule/raw/refs/heads/main/NFL_Odds/Data/interpolated_2d_margin_probs.csv",
+  #                    show_col_types = FALSE) |>
   #   janitor::clean_names()
   # 
-  # lookup <- read_csv("https://github.com/trashduty/trash-schedule/raw/refs/heads/main/NFL_Odds/Data/NFL_Totals_Lookup_Stratified_By_Spread.csv", 
-  #                    show_col_types = FALSE) |> 
+  # lookup <- read_csv("https://github.com/trashduty/trash-schedule/raw/refs/heads/main/NFL_Odds/Data/NFL_Totals_Lookup_Stratified_By_Spread.csv",
+  #                    show_col_types = FALSE) |>
   #   janitor::clean_names()
   # 
-  # model_raw <- read_csv("https://github.com/trashduty/trash-schedule/raw/refs/heads/main/Week%201%20model%20pred_updated.csv", 
-  #                       show_col_types = FALSE) |> 
+  # model_raw <- read_csv("https://github.com/trashduty/trash-schedule/raw/refs/heads/main/Week%201%20model%20pred_updated.csv",
+  #                       show_col_types = FALSE) |>
   #   janitor::clean_names()
   
   calc_implied_odds <- function(odds) {
@@ -140,10 +140,11 @@ api_data <- get_odds_api()
     select(week, game, bookmaker, name, total_price = price, total = point)
     
   odds_calculated <- model_raw |> 
-    mutate(home_team = clean_team_abbrs(home_team)) |> 
+    mutate(team = clean_team_abbrs(team)) |> 
+    select(-spread) |> 
     left_join(select(api_spreads, week, team, game, spread, spread_price,
                      last_update_api, team_logo_espn, bookmaker), 
-              by = c("week", "home_team" = "team")) |> 
+              by = c("week", "team")) |> 
     mutate(true_spread = ((model_prediction * 0.35) + (spread * 0.65)),  
            .after = spread) |> 
     mutate(true_spread = round(true_spread * 2) / 2) |> 
@@ -156,7 +157,7 @@ api_data <- get_odds_api()
     ) |> 
     mutate(implied_odds_spread = calc_implied_odds(spread_price)) |> 
     mutate(spread_edge = spread_cover_probability - implied_odds_spread) |> 
-    select(week, team = home_team, game, team_logo_espn, true_spread, spread, spread_price,
+    select(week, team, game, team_logo_espn, true_spread, spread, spread_price,
            spread_cover_probability, spread_edge, bookmaker, raw_model, last_update_api) |> 
     group_by(week, game, team) |> 
     mutate(
@@ -256,14 +257,3 @@ api_data <- get_odds_api()
 
 write_csv(total_summary, "NFL_Odds/Data/totals_odds.csv")
 write_csv(spread_summary, "NFL_Odds/Data/spreads_odds.csv")
-
-
-
-
-
-
-
-
-
-
-
