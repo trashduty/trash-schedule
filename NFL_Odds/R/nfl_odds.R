@@ -188,40 +188,42 @@ api_data <- get_odds_api()
 
    
   totals_odds <- odds_calculated |> 
-    # select(week, game, bookmaker, spread, raw_model, last_update_api) |> 
-    left_join(api_totals, by = c("week", "game", "bookmaker"), 
-              relationship = "many-to-many") |> 
-    mutate(bin_cat = case_when(
-      abs(spread) <= 3 ~ 1, 
-      abs(spread) <= 7 ~ 2, 
-      abs(spread) > 7 ~ 3
-    )) |> 
-    mutate(true_total = (raw_model * 0.35) + (total * 0.65)) |> 
-    mutate(true_total = round(true_total * 2) / 2) |> 
-    mutate(total = round(total * 2) / 2) |>
-    left_join(lookup, 
-              by = c("bin_cat" = "spread_bin", 
-                     "total" = "market_total", 
-                     "true_total")) |> 
-    mutate(implied_odds_total = calc_implied_odds(total_price)) |> 
-    mutate(probability = case_when(
-      name == "Over" ~ over_probability, 
-      name == "Under" ~ under_probability, 
-      TRUE ~ over_probability)) |> 
-    mutate(total_probability = probability - implied_odds_total) |> 
-    # select(week, team_logo_espn, team, game, true_total, name, total, probability,
-    #        edge = total_probability, last_update_api, bookmaker
-    # ) 
-    select(week, team, game, name, true_total, total, total_price, probability,
-           edge = total_probability, last_update_api, bookmaker
-    ) |> 
-    arrange(week, team, game, name, -edge) |> 
-    group_by(week, team, game, name) |> 
-    mutate(
-      median_edge_row = row_number(-edge) == ceiling(n()/2),
-      highest_edge_row = row_number(-edge) == 1
-    ) |> 
-    ungroup()
+  # select(week, game, bookmaker, spread, raw_model, last_update_api) |> 
+  left_join(api_totals, by = c("week", "game", "bookmaker"), 
+            relationship = "many-to-many") |> 
+  mutate(bin_cat = case_when(
+    abs(spread) <= 3 ~ 1, 
+    abs(spread) <= 7 ~ 2, 
+    abs(spread) > 7 ~ 3
+  )) |> 
+  mutate(median_total = median(total), 
+         .by = c(game, team), .after = total) |> 
+  mutate(true_total = (raw_model * 0.35) + (median_total * 0.65)) |> 
+  mutate(true_total = round(true_total * 2) / 2) |> 
+  mutate(total = round(total * 2) / 2) |>
+  left_join(lookup, 
+            by = c("bin_cat" = "spread_bin", 
+                   "total" = "market_total", 
+                   "true_total")) |> 
+  mutate(implied_odds_total = calc_implied_odds(total_price)) |> 
+  mutate(probability = case_when(
+    name == "Over" ~ over_probability, 
+    name == "Under" ~ under_probability, 
+    TRUE ~ over_probability)) |> 
+  mutate(total_probability = probability - implied_odds_total) |> 
+  # select(week, team_logo_espn, team, game, true_total, name, total, probability,
+  #        edge = total_probability, last_update_api, bookmaker
+  # ) 
+  select(week, team, game, name, true_total, total, total_price, probability,
+         edge = total_probability, last_update_api, bookmaker
+  ) |> 
+  arrange(week, team, game, name, -edge) |> 
+  group_by(week, team, game, name) |> 
+  mutate(
+    median_edge_row = row_number(-edge) == ceiling(n()/2),
+    highest_edge_row = row_number(-edge) == 1
+  ) |> 
+  ungroup()
   
   
   total_summary <- totals_odds |> 
