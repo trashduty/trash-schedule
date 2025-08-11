@@ -140,32 +140,34 @@ api_data <- get_odds_api()
     select(week, game, bookmaker, name, total_price = price, total = point)
     
   odds_calculated <- model_raw |> 
-    mutate(team = clean_team_abbrs(team)) |> 
-    select(-spread) |> 
-    left_join(select(api_spreads, week, team, game, spread, spread_price,
-                     last_update_api, team_logo_espn, bookmaker), 
-              by = c("week", "team")) |> 
-    mutate(true_spread = ((model_prediction * 0.35) + (spread * 0.65)),  
-           .after = spread) |> 
-    mutate(true_spread = round(true_spread * 2) / 2) |> 
-    mutate(spread = round(spread * 2) / 2) |> 
-    left_join(margin, by = 
-                c("spread" = "market_line", "true_spread" = "true_line")) |> 
-    rename(spread_cover_probability = cover_probability, 
-           spread_push_probability = push_probability, 
-           spread_loss_probability = loss_probability
-    ) |> 
-    mutate(implied_odds_spread = calc_implied_odds(spread_price)) |> 
-    mutate(spread_edge = spread_cover_probability - implied_odds_spread) |> 
-    select(week, team, game, team_logo_espn, true_spread, spread, spread_price,
-           spread_cover_probability, spread_edge, bookmaker, raw_model, last_update_api) |> 
-    group_by(week, game, team) |> 
-    mutate(
-      median_edge_row = row_number(-spread_edge) == ceiling(n()/2),
-      highest_edge_row = row_number(-spread_edge) == 1
-    ) |> 
-    ungroup() |> 
-    arrange(week, game, team, -spread_edge)
+  mutate(team = clean_team_abbrs(team)) |> 
+  select(-spread) |> 
+  left_join(select(api_spreads, week, team, game, spread, spread_price,
+                   last_update_api, team_logo_espn, bookmaker), 
+            by = c("week", "team")) |> 
+  mutate(median_spread = median(spread, na.rm = TRUE), 
+         .by = c(game, team), .after = spread) |> 
+  mutate(true_spread = ((model_prediction * 0.35) + (median_spread * 0.65)),  
+         .after = spread) |> 
+  mutate(true_spread = round(true_spread * 2) / 2) |> 
+  mutate(spread = round(spread * 2) / 2, .after = spread) |> 
+  left_join(margin, by = 
+              c("spread" = "market_line", "true_spread" = "true_line")) |> 
+  rename(spread_cover_probability = cover_probability, 
+         spread_push_probability = push_probability, 
+         spread_loss_probability = loss_probability
+  ) |> 
+  mutate(implied_odds_spread = calc_implied_odds(spread_price)) |> 
+  mutate(spread_edge = spread_cover_probability - implied_odds_spread) |> 
+  select(week, team, game, team_logo_espn, true_spread, spread, spread_price,
+         spread_cover_probability, spread_edge, bookmaker, raw_model, last_update_api) |> 
+  group_by(week, game, team) |> 
+  mutate(
+    median_edge_row = row_number(-spread_edge) == ceiling(n()/2),
+    highest_edge_row = row_number(-spread_edge) == 1
+  ) |> 
+  ungroup() |> 
+  arrange(week, game, team, -spread_edge)
   
   
   spread_summary <- odds_calculated |> 
