@@ -1,91 +1,93 @@
 ﻿week,Team,Opponent,Model Prediction,Opening Spread,Cover Probability (%),Edge (%)
-1,Akron,Wyoming,0,0,0,0
-1,Alabama,Florida State,0,0,0,0
-1,App State,Charlotte,0,0,0,0
-1,Auburn,Baylor,0,0,0,0
-1,Ball State,Purdue,0,0,0,0
-1,Baylor,Auburn,0,0,0,0
-1,Boise State,South Florida,0,0,0,0
-1,Buffalo,Minnesota,0,0,0,0
-1,California,Oregon State,0,0,0,0
-1,Central Michigan,San JosÃ© State,0,0,0,0
-1,Charlotte,App State,0,0,0,0
-1,Cincinnati,Nebraska,0,0,0,0
-1,Clemson,LSU,0,0,0,0
-1,Coastal Carolina,Virginia,0,0,0,0
-1,Colorado,Georgia Tech,0,0,0,0
-1,Colorado State,Washington,0,0,0,0
-1,East Carolina,NC State,0,0,0,0
-1,Eastern Michigan,Texas State,0,0,0,0
-1,Florida Atlantic,Maryland,0,0,0,0
-1,Florida State,Alabama,0,0,0,0
-1,Fresno State,Kansas,0,0,0,0
-1,Fresno State,Georgia Southern,0,0,0,0
-1,Georgia,Marshall,0,0,0,0
-1,Georgia Southern,Fresno State,0,0,0,0
-1,Georgia State,Ole Miss,0,0,0,0
-1,Georgia Tech,Colorado,0,0,0,0
-1,Hawai'i,Stanford,0,0,0,0
-1,Indiana,Old Dominion,0,0,0,0
-1,Iowa State,Kansas State,0,0,0,0
-1,Jacksonville Stat,UCF,0,0,0,0
-1,Kansas,Fresno State,0,0,0,0
-1,Kansas State,Iowa State,0,0,0,0
-1,Kentucky,Toledo,0,0,0,0
-1,Louisiana,Rice,0,0,0,0
-1,LSU,Clemson,0,0,0,0
-1,Marshall,Georgia,0,0,0,0
-1,Maryland,Florida Atlantic,0,0,0,0
-1,Miami,Notre Dame,0,0,0,0
-1,Miami (OH),Wisconsin,0,0,0,0
-1,Michigan,New Mexico,0,0,0,0
-1,Michigan State,Western Michigan,0,0,0,0
-1,Minnesota,Buffalo,0,0,0,0
-1,Mississippi State,Southern Mississippi,0,0,0,0
-1,NC State,East Carolina,0,0,0,0
-1,Nebraska,Cincinnati,0,0,0,0
-1,Nevada,Penn State,0,0,0,0
-1,New Mexico,Michigan,0,0,0,0
-1,North Carolina,TCU,0,0,0,0
-1,Northwestern,Tulane,0,0,0,0
-1,Notre Dame,Miami,0,0,0,0
-1,Ohio,Rutgers,0,0,0,0
-1,Ohio State,Texas,0,0,0,0
-1,Old Dominion,Indiana,0,0,0,0
-1,Ole Miss,Georgia State,0,0,0,0
-1,Oregon State,California,0,0,0,0
-1,Penn State,Nevada,0,0,0,0
-1,Purdue,Ball State,0,0,0,0
-1,Rice,Louisiana,0,0,0,0
-1,Rutgers,Ohio,0,0,0,0
-1,Sam Houston State,Western Kentucky,0,0,0,0
-1,Sam Houston State,UNLV,0,0,0,0
-1,San JosÃ© State,Central Michigan,0,0,0,0
-1,South Carolina,Virginia Tech,0,0,0,0
-1,South Florida,Boise State,0,0,0,0
-1,Southern Mississippi,Mississippi State,0,0,0,0
-1,Stanford,Hawai'i,0,0,0,0
-1,Syracuse,Tennessee,0,0,0,0
-1,TCU,North Carolina,0,0,0,0
-1,Temple,UMass,0,0,0,0
-1,Tennessee,Syracuse,0,0,0,0
-1,Texas,Ohio State,0,0,0,0
-1,Texas A&M,UT San Antonio,0,0,0,0
-1,Texas State,Eastern Michigan,0,0,0,0
-1,Toledo,Kentucky,0,0,0,0
-1,Tulane,Northwestern,0,0,0,0
-1,UCF,Jacksonville Stat,0,0,0,0
-1,UCLA,Utah,0,0,0,0
-1,UMass,Temple,0,0,0,0
-1,UNLV,Sam Houston State,0,0,0,0
-1,UT San Antonio,Texas A&M,0,0,0,0
-1,Utah,UCLA,0,0,0,0
-1,Utah State,UTEP,0,0,0,0
-1,UTEP,Utah State,0,0,0,0
-1,Virginia,Coastal Carolina,0,0,0,0
-1,Virginia Tech,South Carolina,0,0,0,0
-1,Washington,Colorado State,0,0,0,0
-1,Western Kentucky,Sam Houston State,0,0,0,0
-1,Western Michigan,Michigan State,0,0,0,0
-1,Wisconsin,Miami (OH),0,0,0,0
-1,Wyoming,Akron,0,0,0,0
+0,Sam Houston State,Western Kentucky,8,10.5,0.56720761,0.043398
+0,Fresno State,Kansas,12,12.5,0.53209773,0.008288
+0,Stanford,Hawai'i,0,2,0.52321624,-0.00059
+0,Iowa State,Kansas State,3,3,0.4825413,-0.04127
+0,Kansas State,Iowa State,-3,-3,0.47550112,-0.04831
+0,Kansas,Fresno State,-12,-12.5,0.47277574,-0.05103
+0,Hawai'i,Stanford,0,-2,0.45883524,-0.06497
+0,Western Kentucky,Sam Houston State,-8,-10.5,0.43397683,-0.08983
+1,Ohio,Rutgers,11,14.5,0.58587274,0.062063
+1,Marshall,Georgia,35,39.5,0.58151517,0.057706
+1,Colorado,Georgia Tech,0,4,0.57757252,0.053763
+1,Sam Houston State,UNLV,10,13,0.5670562,0.043247
+1,Ohio State,Texas,-5,-2.5,0.55351199,0.029702
+1,Eastern Michigan,Texas State,12,13.5,0.54568869,0.021879
+1,Kennesaw State,Wake Forest,16,17.5,0.54389093,0.020081
+1,Ball State,Purdue,15,17,0.54311328,0.019304
+1,Western Michigan,Michigan State,18,19.5,0.54101799,0.017208
+1,Rice,Louisiana,12,13.5,0.54057613,0.016767
+1,UT San Antonio,Texas A&M,20,21.5,0.53950179,0.015692
+1,Cincinnati,Nebraska,5,6.5,0.53855211,0.014743
+1,East Carolina,NC State,11,11.5,0.53628657,0.012477
+1,Virginia Tech,South Carolina,7,7.5,0.53594112,0.012132
+1,Nevada,Penn State,42,44,0.52956909,0.00576
+1,Georgia State,Ole Miss,37,39,0.52838494,0.004575
+1,Hawai'i,Arizona,13,13.5,0.52809016,0.004281
+1,Alabama,Florida State,-16,-13.5,0.52780884,0.003999
+1,Utah State,UTEP,-7,-4,0.5272791,0.00347
+1,Florida Atlantic,Maryland,13,14,0.52626846,0.002459
+1,Miami (OH),Wisconsin,17,17.5,0.52426547,0.000456
+1,Mississippi State,Southern Mississippi,-14,-11,0.51877029,-0.00504
+1,Central Michigan,San JosÃ© State,12,12,0.51872431,-0.00509
+1,Coastal Carolina,Virginia,12,12,0.51872431,-0.00509
+1,Minnesota,Buffalo,-18,-16.5,0.51865242,-0.00516
+1,Temple,UMass,-6,-4,0.51648638,-0.00732
+1,Toledo,Kentucky,8,8,0.51594024,-0.00787
+1,Syracuse,Tennessee,15,14.5,0.51536568,-0.00844
+1,UCF,Jacksonville Stat,-18,-16.5,0.51210609,-0.0117
+1,Fresno State,Georgia Southern,-3,-2.5,0.51017946,-0.01363
+1,Wyoming,Akron,-9,-7.5,0.50477739,-0.01903
+1,UCLA,Utah,7,6.5,0.50409995,-0.01971
+1,Miami,Notre Dame,2,2.5,0.50235622,-0.02145
+1,Colorado State,Washington,20,20,0.50181288,-0.022
+1,Indiana,Old Dominion,-24,-23,0.50037636,-0.02343
+1,Tulane,Northwestern,-7,-6,0.4998792,-0.02393
+1,Michigan,New Mexico,-37,-36.5,0.49931134,-0.0245
+1,Boise State,South Florida,-7,-6,0.49726834,-0.02654
+1,Akron,Wyoming,9,7.5,0.4958796,-0.02793
+1,Notre Dame,Miami,-2,-2.5,0.49415058,-0.02966
+1,Utah,UCLA,-7,-6.5,0.49347663,-0.03033
+1,Auburn,Baylor,-2,-2,0.49303829,-0.03077
+1,South Florida,Boise State,7,6,0.49265656,-0.03115
+1,LSU,Clemson,5,4,0.49230474,-0.0315
+1,New Mexico,Michigan,37,36.5,0.49228866,-0.03152
+1,Tennessee,Syracuse,-15,-14.5,0.49015388,-0.03366
+1,Clemson,LSU,-5,-4,0.49002662,-0.03378
+1,Jacksonville Stat,UCF,18,16.5,0.48969577,-0.03411
+1,Baylor,Auburn,2,2,0.48896173,-0.03485
+1,TCU,North Carolina,-4,-3,0.48871327,-0.0351
+1,California,Oregon State,3,3,0.48669817,-0.03711
+1,Georgia Southern,Fresno State,3,2.5,0.48669817,-0.03711
+1,Old Dominion,Indiana,24,23,0.48364355,-0.04017
+1,Northwestern,Tulane,7,6,0.48302169,-0.04079
+1,Washington,Colorado State,-20,-20,0.48065313,-0.04316
+1,Buffalo,Minnesota,18,16.5,0.4790554,-0.04475
+1,Wisconsin,Miami (OH),-17,-17.5,0.47642495,-0.04738
+1,Arizona,Hawai'i,-13,-13.5,0.47496455,-0.04884
+1,Florida State,Alabama,16,13.5,0.47496883,-0.04884
+1,San JosÃ© State,Central Michigan,-12,-12,0.47277574,-0.05103
+1,Virginia,Coastal Carolina,-12,-12,0.47277574,-0.05103
+1,Oregon State,California,-3,-3,0.47155707,-0.05225
+1,NC State,East Carolina,-11,-11.5,0.47025742,-0.05355
+1,North Carolina,TCU,4,3,0.46958229,-0.05423
+1,Kentucky,Toledo,-8,-8,0.46739892,-0.05641
+1,Southern Mississippi,Mississippi State,14,11,0.46714195,-0.05667
+1,UMass,Temple,6,4,0.46641259,-0.0574
+1,South Carolina,Virginia Tech,-7,-7.5,0.46477303,-0.05904
+1,UTEP,Utah State,7,4,0.46291302,-0.0609
+1,Texas A&M,UT San Antonio,-20,-21.5,0.46128277,-0.06253
+1,Nebraska,Cincinnati,-5,-6.5,0.45899699,-0.06481
+1,Michigan State,Western Michigan,-18,-19.5,0.45895831,-0.06485
+1,Wake Forest,Kennesaw State,-16,-17.5,0.45763454,-0.06617
+1,Texas State,Eastern Michigan,-12,-13.5,0.45743794,-0.06637
+1,Maryland,Florida Atlantic,-13,-14,0.45419476,-0.06961
+1,Louisiana,Rice,-12,-13.5,0.45294609,-0.07086
+1,Ole Miss,Georgia State,-37,-39,0.4487527,-0.07506
+1,Penn State,Nevada,-42,-44,0.44642416,-0.07739
+1,Texas,Ohio State,5,2.5,0.44306504,-0.08074
+1,Purdue,Ball State,-15,-17,0.44007851,-0.08373
+1,UNLV,Sam Houston State,-10,-13,0.42271739,-0.10109
+1,Rutgers,Ohio,-11,-14.5,0.41318389,-0.11063
+1,Georgia,Marshall,-35,-39.5,0.41195411,-0.11186
+1,Georgia Tech,Colorado,0,-4,0.40494085,-0.11887
