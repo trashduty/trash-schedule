@@ -36,7 +36,6 @@ jobs:
             any::httr
             any::jsonlite
             any::stringr
-            #any::cfbfastR
 
       - name: Check out repository
         uses: actions/checkout@v3
