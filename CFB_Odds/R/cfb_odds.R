@@ -25,9 +25,9 @@ get_odds_api <- function(sport = "americanfootball_ncaaf",
   # here, and regressing that to Wednesday of that week. Later, I will use that 
   # to calculate the CFB week by using a Wednesday to following Tuesday CFB week.
   
-  week_one_wednesday <- cfbfastR::espn_cfb_schedule(year = year) |> 
+  
+  week_one_wednesday <- cfbfastR::espn_cfb_schedule(year = 2025) |> 
     filter(type == "regular") |> 
-    mutate(game_date = as_date(with_tz(ymd_hm(game_date), "America/New_York"))) |>
     summarise(first_game_date = min(game_date)) |>
     mutate(
       first_game_weekday = wday(first_game_date, week_start = 1),  # Monday = 1, Sunday = 7
