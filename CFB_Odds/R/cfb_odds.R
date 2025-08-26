@@ -1,3 +1,4 @@
+
 library(dplyr)
 library(tidyr)
 library(readr)
@@ -69,7 +70,7 @@ get_odds_api <- function(sport = "americanfootball_ncaaf",
       str_squish()
   }
   
-  cfb_crosswalk <- read_csv("https://github.com/trashduty/trash-schedule/raw/refs/heads/main/CFB_Odds/Data/CFB%20Teams%20Full%20Crosswalk.csv", 
+  cfb_crosswalk <- read_csv("CFB_Odds/Data/CFB Teams Full Crosswalk.csv", 
                             show_col_types = FALSE)
   
   # Unnest the data, which has multiple nested list columns
@@ -105,12 +106,27 @@ get_odds_api <- function(sport = "americanfootball_ncaaf",
 
 api_data <- get_odds_api()
 
-cfb_crosswalk <- read_csv("https://github.com/trashduty/trash-schedule/raw/refs/heads/main/CFB_Odds/Data/CFB%20Teams%20Full%20Crosswalk.csv", 
+# cfb_crosswalk <- read_csv("https://github.com/trashduty/trash-schedule/raw/refs/heads/main/CFB_Odds/Data/CFB%20Teams%20Full%20Crosswalk.csv", 
+#                           show_col_types = FALSE)
+
+# lookup <- read_csv("https://github.com/trashduty/trash-schedule/raw/refs/heads/main/CFB_Odds/Data/Expanded_CFB_Spread_Pricing_Table_Binned.csv",
+#                    show_col_types = FALSE) |>
+#   janitor::clean_names()
+
+model_raw <- read_csv("https://github.com/trashduty/trash-schedule/raw/refs/heads/main/cfb%20model%20output_new.csv",
+                      show_col_types = FALSE) |>
+  janitor::clean_names() 
+
+cfb_crosswalk <- read_csv("CFB_Odds/Data/CFB Teams Full Crosswalk.csv", 
                           show_col_types = FALSE)
 
-lookup <- read_csv("https://github.com/trashduty/trash-schedule/raw/refs/heads/main/CFB_Odds/Data/Expanded_CFB_Spread_Pricing_Table_Binned.csv",
+lookup <- read_csv("CFB_Odds/Data/Expanded_CFB_Spread_Pricing_Table_Binned.csv",
                    show_col_types = FALSE) |>
   janitor::clean_names()
+
+model_raw <- read_csv("cfb model output_new.csv",
+                      show_col_types = FALSE) |>
+  janitor::clean_names() 
 
 clean_team_names <- function(names) {
   names %>%
@@ -124,9 +140,7 @@ clean_team_names <- function(names) {
     str_squish()
 }
 
-model_raw <- read_csv("https://github.com/trashduty/trash-schedule/raw/refs/heads/main/cfb%20model%20output_new.csv",
-                      show_col_types = FALSE) |>
-  janitor::clean_names() 
+
 
 WEEK <- max(model_raw$week)
 
