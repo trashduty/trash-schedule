@@ -8,6 +8,9 @@ library(jsonlite)
 library(glue)
 library(lubridate)
 library(stringr)
+library(cfbfastR)
+
+options(scipen=999)
 
 get_odds_api <- function(sport = "americanfootball_ncaaf", 
                          apiKey = Sys.getenv("ODDS_API_KEY"), 
@@ -66,7 +69,8 @@ get_odds_api <- function(sport = "americanfootball_ncaaf",
       str_squish()
   }
   
-  cfb_crosswalk <- read_csv("CFB Teams Full Crosswalk.csv")
+  cfb_crosswalk <- read_csv("https://github.com/trashduty/trash-schedule/raw/refs/heads/main/CFB_Odds/Data/CFB%20Teams%20Full%20Crosswalk.csv", 
+                            show_col_types = FALSE)
   
   # Unnest the data, which has multiple nested list columns
   api_unnested <- api_data |> 
@@ -88,7 +92,8 @@ get_odds_api <- function(sport = "americanfootball_ncaaf",
     rename(away_name = btb_team_short, away_logo = logo) |> 
     mutate(week = case_when(
       commence_ny < week_one_wednesday ~ 0,  # Pre-season or invalid
-      TRUE ~ as.numeric(floor((commence_ny - week_one_wednesday) / 7) + 1)
+      # TRUE ~ as.numeric(floor((commence_ny - week_one_wednesday) / 7) + 1)
+      TRUE ~ as.numeric(floor((commence_ny - week_one_wednesday) / 7)) # There is a week 0 in college football
     )) |> 
     mutate(week = if_else(week == 23, 22, week)) |> 
     select(week, commence_time, commence_ny, bookmaker_id, 
@@ -100,7 +105,10 @@ get_odds_api <- function(sport = "americanfootball_ncaaf",
 
 api_data <- get_odds_api()
 
-lookup <- read_csv("Expanded_CFB_Spread_Pricing_Table_Binned.csv",
+cfb_crosswalk <- read_csv("https://github.com/trashduty/trash-schedule/raw/refs/heads/main/CFB_Odds/Data/CFB%20Teams%20Full%20Crosswalk.csv", 
+                          show_col_types = FALSE)
+
+lookup <- read_csv("https://github.com/trashduty/trash-schedule/raw/refs/heads/main/CFB_Odds/Data/Expanded_CFB_Spread_Pricing_Table_Binned.csv",
                    show_col_types = FALSE) |>
   janitor::clean_names()
 
@@ -116,23 +124,11 @@ clean_team_names <- function(names) {
     str_squish()
 }
 
-model_raw <- read_csv("cfb model output_new.csv",
+model_raw <- read_csv("https://github.com/trashduty/trash-schedule/raw/refs/heads/main/cfb%20model%20output_new.csv",
                       show_col_types = FALSE) |>
   janitor::clean_names() 
 
 WEEK <- max(model_raw$week)
-
-# margin <- read_csv("https://github.com/trashduty/trash-schedule/raw/refs/heads/main/NFL_Odds/Data/interpolated_2d_margin_probs.csv",
-#                    show_col_types = FALSE) |>
-#   janitor::clean_names()
-# 
-# lookup <- read_csv("https://github.com/trashduty/trash-schedule/raw/refs/heads/main/NFL_Odds/Data/NFL_Totals_Lookup_Stratified_By_Spread.csv",
-#                    show_col_types = FALSE) |>
-#   janitor::clean_names()
-# 
-# model_raw <- read_csv("https://github.com/trashduty/trash-schedule/raw/refs/heads/main/Week%201%20model%20pred_updated.csv",
-#                       show_col_types = FALSE) |>
-#   janitor::clean_names()
 
 calc_implied_odds <- function(odds) {
   ifelse(odds < 0,
@@ -155,23 +151,27 @@ api_totals <- api_data |>
   mutate(game = paste0(away_name, "@", home_name)) |> 
   select(week, game, bookmaker, name, total_price = price, total = point)
 
+api_totals <- api_data |> 
+  filter(market == "totals", name == "Over", week == WEEK) |> 
+  mutate(game = paste0(away_name, "@", home_name)) |> 
+  summarize(median_total = median(point, na.rm = TRUE), 
+            .by = c(week, game))
+
 odds_calculated <- model_raw |> 
   select(-opening_spread) |> 
   left_join(select(api_spreads, week, team, game, spread, spread_price,
                    last_update_api, bookmaker, logo), 
             by = c("week", "team")) |> 
   filter(!is.na(game)) |> 
-  mutate(median_spread = median(spread, na.rm = TRUE), 
+  mutate(median_spread_raw = median(spread, na.rm = TRUE), 
          .by = c(game, team), .after = spread) |> 
+  mutate(median_spread = round(median_spread_raw * 2) / 2) |> 
   mutate(true_spread = ((model_prediction_raw * 0.3) + (median_spread * 0.7)),  
          .after = spread) |> 
   mutate(true_spread = round(true_spread * 2) / 2) |> 
   mutate(spread = round(spread * 2) / 2, .after = spread) |> 
   mutate(implied_odds_spread = calc_implied_odds(spread_price)) |> 
-  left_join(api_totals, by = c("week", "game", "bookmaker"), 
-            relationship = "many-to-many") |> 
-  mutate(median_total = median(total, na.rm = TRUE), 
-         .by = game) |> 
+  left_join(api_totals, by = c("week", "game")) |> 
   mutate(total_bin = case_when(
     abs(spread) <= 50 ~ 1, 
     abs(spread) <= 59.6 ~ 2, 
@@ -179,7 +179,7 @@ odds_calculated <- model_raw |>
   )) |> 
   left_join(lookup, 
             by = c("total_bin", 
-                   "median_spread" = "market_spread", 
+                   "spread" = "market_spread", 
                    "true_spread")) |> 
   mutate(implied_odds_spread = calc_implied_odds(spread_price)) |> 
   mutate(cover_edge = cover_probability - implied_odds_spread) |>
@@ -199,7 +199,7 @@ odds_calculated <- model_raw |>
       model_prediction = true_spread[median_cover_row],
       market_line = spread[median_cover_row],
       market_price = spread_price[median_cover_row], 
-      cover_probability = cover_probability[median_cover_row],
+      median_cover_probability = cover_probability[median_cover_row],
       edge = cover_edge[median_cover_row],
       best_book = bookmaker[highest_cover_row],
       best_line = spread[highest_cover_row],
@@ -207,8 +207,10 @@ odds_calculated <- model_raw |>
       best_cover_probability = cover_probability[highest_cover_row], 
       best_edge = cover_edge[highest_cover_row],
       .by = c(week, game, team, logo)
-    )
+    ) |> 
+    rename(cover_probability = median_cover_probability)
 
 
 write_csv(spread_summary, "CFB_Odds/Data/spreads_odds.csv")
+# write_csv(spread_summary, "spreads_odds.csv")
 
