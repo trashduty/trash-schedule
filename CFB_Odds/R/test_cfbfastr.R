@@ -1,3 +1,15 @@
+library(dplyr)
+library(tidyr)
+library(readr)
+library(janitor)
+library(nflreadr)
+library(httr)
+library(jsonlite)
+library(glue)
+library(lubridate)
+library(stringr)
+library(cfbfastR)
+
 cfb_fastR <- cfbfastR::espn_cfb_schedule(year = 2025) |> 
     filter(type == "regular") |> 
     mutate(game_date = as_date(with_tz(ymd_hm(game_date), "America/New_York")))
