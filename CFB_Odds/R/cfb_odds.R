@@ -180,7 +180,7 @@ odds_calculated <- model_raw |>
   mutate(median_spread_raw = median(spread, na.rm = TRUE), 
          .by = c(game, team), .after = spread) |> 
   mutate(median_spread = round(median_spread_raw * 2) / 2) |> 
-  mutate(true_spread = ((model_prediction_raw * 0.3) + (median_spread * 0.7)),  
+  mutate(true_spread = ((model_prediction_raw * 0.35) + (median_spread * 0.65)),  
          .after = spread) |> 
   mutate(true_spread = round(true_spread * 2) / 2) |> 
   mutate(spread = round(spread * 2) / 2, .after = spread) |> 
