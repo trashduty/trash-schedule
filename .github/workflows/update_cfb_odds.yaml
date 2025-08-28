@@ -1,9 +1,9 @@
 on:
   schedule:
-    # Every day at 10 AM UTC/6 AM ET (daylight savings time will change this)
-    - cron: '0 10 * * *'
-    # Every day at  8 PM UTC/4 PM ET (daylight savings time will change this)
-    - cron: '0 20 * * *'
+    # Every day at 10:30 AM UTC/6:30 AM ET (daylight savings time will change this)
+    - cron: '30 10 * * *'
+    # Every day at  8:30 PM UTC/4:30 PM ET (daylight savings time will change this)
+    - cron: '30 20 * * *'
   workflow_dispatch:
   push:
     paths:
@@ -50,5 +50,10 @@ jobs:
           git config --local user.email "actions@github.com"
           git config --local user.name "GitHub Actions"
           git add *
-          git commit -m 'Data updated' || echo "No changes to commit"
-          git push origin || echo "No changes to commit"
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m 'Data updated'
+            git pull --rebase origin main
+            git push origin main
+          fi
