@@ -1,5 +1,9 @@
 on:
   schedule:
+    # Every day at 10:30 AM UTC/6:30 AM ET (daylight savings time will change this)
+    - cron: '30 10 * * *'
+    # Every day at  8:30 PM UTC/4:30 PM ET (daylight savings time will change this)
+    - cron: '30 20 * * *'
     # Fridays: Every 10 minutes from 6:30 AM to 11:00 PM NY time (10:30-3:00 UTC)
     - cron: '30,40,50 10 * 1,8-12 5'    # 6:30-6:50 AM NY
     - cron: '0,10,20,30,40,50 11-14 * 1,8-12 5'  # 7:00 AM-10:50 AM NY  
