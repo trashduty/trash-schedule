@@ -1,9 +1,18 @@
 on:
   schedule:
-    # Every day at 10 AM UTC/6 AM ET (daylight savings time will change this)
-    - cron: '0 10 * * *'
-    # Every day at  8 PM UTC/4 PM ET (daylight savings time will change this)
-    - cron: '0 20 * * *'
+    # NFL: Every 10 minutes on Saturday and Sunday from 7:30 AM to 8:00 PM LA time (Sept-Feb)
+    - cron: '30,40,50 14 * 1-2,9-12 6'    # Saturday 7:30-7:50 AM LA
+    - cron: '0,10,20,30,40,50 15-23 * 1-2,9-12 6'  # Saturday 8:00 AM-3:50 PM LA
+    - cron: '0,10,20,30,40,50 0-3 * 1-2,9-12 6'    # Saturday 4:00-7:50 PM LA
+    - cron: '0 4 * 1-2,9-12 6'                     # Saturday 8:00 PM LA
+    
+    - cron: '30,40,50 14 * 1-2,9-12 0'    # Sunday 7:30-7:50 AM LA
+    - cron: '0,10,20,30,40,50 15-23 * 1-2,9-12 0'  # Sunday 8:00 AM-3:50 PM LA
+    - cron: '0,10,20,30,40,50 0-3 * 1-2,9-12 0'    # Sunday 4:00-7:50 PM LA
+    - cron: '0 4 * 1-2,9-12 0'                     # Sunday 8:00 PM LA
+    
+    # NFL: Hourly on all other days (Monday-Friday) during Sept-Feb
+    - cron: '0 * * 1-2,9-12 1,2,3,4,5'    # Monday-Friday hourly
   workflow_dispatch:
   push:
     paths:
