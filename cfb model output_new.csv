@@ -1,101 +1,101 @@
 ﻿week,Team,Opponent,Model Prediction Raw,Model Prediction,Opening Spread,Cover Probability (%),Edge (%),Market Total,bin_cat
-2,Louisville,James Madison,-13,,-13.5,,,58.5,2
-2,Pittsburgh,Central Michigan,-17,,-22,,,52.5,2
-2,Texas Tech,Kent State,-33,,-48,,,58,2
-2,SMU,Baylor,-6,,-2.5,,,65,3
-2,Duke,Illinois,4,,3,,,49,1
-2,Navy,UAB,-17,,-21,,,60.5,3
-2,Missouri,Kansas,-4,,-6.5,,,51,2
-2,Western Michigan,North Texas,-0.5,,10,,,60,3
-2,Oregon,Oklahoma State,-24.5,,-29,,,57.5,2
-2,Florida,South Florida,-16.5,,-18,,,56,2
-2,Arkansas,Arkansas State,-18.5,,-24,,,62.5,3
-2,Charlotte,North Carolina,12,,13.5,,,49.5,1
-2,South Alabama,Tulane,8.5,,10,,,51.5,2
-2,Rice,Houston,7,,14,,,39.5,1
-2,Michigan State,Boston College,-0.5,,-5,,,46.5,1
-2,Virginia Tech,Vanderbilt,-6.5,,-1,,,47.5,1
-2,Oklahoma,Michigan,-0.5,,-5,,,46,1
-2,UNLV,UCLA,-3.5,,-2.5,,,53,2
-2,New Mexico State,Tulsa,0.5,,3.5,,,52.5,2
-2,BYU,Stanford,-20.5,,-18.5,,,46,1
-2,Washington State,San Diego State,-15.5,,-1.5,,,45,1
-2,Hawai'i,Sam Houston State,-1.5,,-6.5,,,48,1
-2,USC,Georgia Southern,-27,,-29.5,,,62,3
-2,Marshall,Missouri State,-22.5,,-10,,,57,2
-2,Penn State,Florida International,-42.5,,-41.5,,,54.5,2
-2,Auburn,Ball State,-30,,-43,,,52,2
+2,Louisville,James Madison,-12.5,,-13.5,,,58.5,2
+2,Pittsburgh,Central Michigan,-21,,-22,,,52.5,2
+2,Texas Tech,Kent State,-44,,-48,,,58,2
+2,SMU,Baylor,-5,,-2.5,,,65,3
+2,Duke,Illinois,4.5,,3,,,49,1
+2,Navy,UAB,-19,,-21,,,60.5,3
+2,Missouri,Kansas,-5.5,,-6.5,,,51,2
+2,Western Michigan,North Texas,8,,10,,,60,3
+2,Oregon,Oklahoma State,-26.5,,-29,,,57.5,2
+2,Florida,South Florida,-17.5,,-18,,,56,2
+2,Arkansas,Arkansas State,-22,,-24,,,62.5,3
+2,Charlotte,North Carolina,13.5,,13.5,,,49.5,1
+2,South Alabama,Tulane,10.5,,10,,,51.5,2
+2,Rice,Houston,13.5,,14,,,39.5,1
+2,Michigan State,Boston College,-4,,-5,,,46.5,1
+2,Virginia Tech,Vanderbilt,-2.5,,-1,,,47.5,1
+2,Oklahoma,Michigan,-4.5,,-5,,,46,1
+2,UNLV,UCLA,-1.5,,-2.5,,,53,2
+2,New Mexico State,Tulsa,3,,3.5,,,52.5,2
+2,BYU,Stanford,-18,,-18.5,,,46,1
+2,Washington State,San Diego State,-4,,-1.5,,,45,1
+2,Hawai'i,Sam Houston State,-5.5,,-6.5,,,48,1
+2,USC,Georgia Southern,-28.5,,-29.5,,,62,3
+2,Marshall,Missouri State,-12,,-10,,,57,2
+2,Penn State,Florida International,-42,,-41.5,,,54.5,2
+2,Auburn,Ball State,-41,,-43,,,52,2
 2,Colorado,Delaware,-25,,-23.5,,,50.5,2
-2,Georgia State,Memphis,11,,13,,,56.5,2
-2,Rutgers,Miami (OH),-9,,-15,,,46,1
-2,Ohio,West Virginia,0.5,,3.5,,,60.5,3
-2,Syracuse,Connecticut,-15,,-6.5,,,58.5,2
-2,Texas A&M,Utah State,-27,,-31.5,,,54.5,2
-2,UT San Antonio,Texas State,-3.5,,-4,,,65.5,3
-2,Jacksonville State,Liberty,-4.5,,6.5,,,49.5,1
-2,Alabama,Louisiana Monroe,-33,,-37,,,50,1
-2,Cincinnati,Bowling Green,-16,,-21.5,,,46.5,1
-2,Nebraska,Akron,-27.5,,-34,,,47,1
-2,NC State,Virginia,-1,,-2.5,,,55,2
-2,Texas,San Jos√© State,-32,,-36.5,,,52,2
-2,Mississippi State,Arizona State,7,,6.5,,,59,2
-2,Oregon State,Fresno State,-1,,-3,,,47.5,1
-2,Wisconsin,Middle Tennessee,-33,,-28.5,,,45,1
-2,Indiana,Kennesaw State,-36.5,,-35,,,53,2
-2,Kentucky,Ole Miss,11.5,,10,,,50.5,2
-2,Toledo,Western Kentucky,-3,,-7,,,58.5,2
-2,Iowa State,Iowa,-2.5,,-3,,,41.5,1
-2,Kansas State,Army,-8,,-17,,,46.5,1
-2,Clemson,Troy,-25,,-33,,,51.5,2
-2,LSU,Louisiana Tech,-32,,-37.5,,,51.5,2
-2,Maryland,Northern Illinois,-12.5,,-17.5,,,47.5,1
-2,James Madison,Louisville,13,,13.5,,,58.5,2
-2,Central Michigan,Pittsburgh,17,,22,,,52.5,2
-2,Kent State,Texas Tech,33,,48,,,58,2
-2,Baylor,SMU,6,,2.5,,,65,3
-2,Illinois,Duke,-4,,-3,,,49,1
-2,UAB,Navy,17,,21,,,60.5,3
-2,Kansas,Missouri,4,,6.5,,,51,2
-2,North Texas,Western Michigan,0.5,,-10,,,60,3
-2,Oklahoma State,Oregon,24.5,,29,,,57.5,2
-2,South Florida,Florida,16.5,,18,,,56,2
-2,Arkansas State,Arkansas,18.5,,24,,,62.5,3
-2,North Carolina,Charlotte,-12,,-13.5,,,49.5,1
-2,Tulane,South Alabama,-8.5,,-10,,,51.5,2
-2,Houston,Rice,-7,,-14,,,39.5,1
-2,Boston College,Michigan State,0.5,,5,,,46.5,1
-2,Vanderbilt,Virginia Tech,6.5,,1,,,47.5,1
-2,Michigan,Oklahoma,0.5,,5,,,46,1
-2,UCLA,UNLV,3.5,,2.5,,,53,2
-2,Tulsa,New Mexico State,-0.5,,-3.5,,,52.5,2
-2,Stanford,BYU,20.5,,18.5,,,46,1
-2,San Diego State,Washington State,15.5,,1.5,,,45,1
-2,Sam Houston State,Hawai'i,1.5,,6.5,,,48,1
-2,Georgia Southern,USC,27,,29.5,,,62,3
-2,Missouri State,Marshall,22.5,,10,,,57,2
-2,Florida International,Penn State,42.5,,41.5,,,54.5,2
-2,Ball State,Auburn,30,,43,,,52,2
+2,Georgia State,Memphis,13.5,,13,,,56.5,2
+2,Rutgers,Miami (OH),-15,,-15,,,46,1
+2,Ohio,West Virginia,5,,3.5,,,60.5,3
+2,Syracuse,Connecticut,-7,,-6.5,,,58.5,2
+2,Texas A&M,Utah State,-31.5,,-31.5,,,54.5,2
+2,UT San Antonio,Texas State,-2.5,,-4,,,65.5,3
+2,Jacksonville State,Liberty,6,,6.5,,,49.5,1
+2,Alabama,Louisiana Monroe,-37,,-37,,,50,1
+2,Cincinnati,Bowling Green,-20.5,,-21.5,,,46.5,1
+2,Nebraska,Akron,-33,,-34,,,47,1
+2,NC State,Virginia,-2.5,,-2.5,,,55,2
+2,Texas,San Jos√© State,-36,,-36.5,,,52,2
+2,Mississippi State,Arizona State,6,,6.5,,,59,2
+2,Oregon State,Fresno State,-3,,-3,,,47.5,1
+2,Wisconsin,Middle Tennessee,-30.5,,-28.5,,,45,1
+2,Indiana,Kennesaw State,-35.5,,-35,,,53,2
+2,Kentucky,Ole Miss,10.5,,10,,,50.5,2
+2,Toledo,Western Kentucky,-5,,-7,,,58.5,2
+2,Iowa State,Iowa,-3.5,,-3,,,41.5,1
+2,Kansas State,Army,-16,,-17,,,46.5,1
+2,Clemson,Troy,-31,,-33,,,51.5,2
+2,LSU,Louisiana Tech,-36,,-37.5,,,51.5,2
+2,Maryland,Northern Illinois,-15,,-17.5,,,47.5,1
+2,James Madison,Louisville,12.5,,13.5,,,58.5,2
+2,Central Michigan,Pittsburgh,21,,22,,,52.5,2
+2,Kent State,Texas Tech,44,,48,,,58,2
+2,Baylor,SMU,5,,2.5,,,65,3
+2,Illinois,Duke,-4.5,,-3,,,49,1
+2,UAB,Navy,19,,21,,,60.5,3
+2,Kansas,Missouri,5.5,,6.5,,,51,2
+2,North Texas,Western Michigan,-8,,-10,,,60,3
+2,Oklahoma State,Oregon,26.5,,29,,,57.5,2
+2,South Florida,Florida,17.5,,18,,,56,2
+2,Arkansas State,Arkansas,22,,24,,,62.5,3
+2,North Carolina,Charlotte,-13.5,,-13.5,,,49.5,1
+2,Tulane,South Alabama,-10.5,,-10,,,51.5,2
+2,Houston,Rice,-13.5,,-14,,,39.5,1
+2,Boston College,Michigan State,4,,5,,,46.5,1
+2,Vanderbilt,Virginia Tech,2.5,,1,,,47.5,1
+2,Michigan,Oklahoma,4.5,,5,,,46,1
+2,UCLA,UNLV,1.5,,2.5,,,53,2
+2,Tulsa,New Mexico State,-3,,-3.5,,,52.5,2
+2,Stanford,BYU,18,,18.5,,,46,1
+2,San Diego State,Washington State,4,,1.5,,,45,1
+2,Sam Houston State,Hawai'i,5.5,,6.5,,,48,1
+2,Georgia Southern,USC,28.5,,29.5,,,62,3
+2,Missouri State,Marshall,12,,10,,,57,2
+2,Florida International,Penn State,42,,41.5,,,54.5,2
+2,Ball State,Auburn,41,,43,,,52,2
 2,Delaware,Colorado,25,,23.5,,,50.5,2
-2,Memphis,Georgia State,-11,,-13,,,56.5,2
-2,Miami (OH),Rutgers,9,,15,,,46,1
-2,West Virginia,Ohio,-0.5,,-3.5,,,60.5,3
-2,Connecticut,Syracuse,15,,6.5,,,58.5,2
-2,Utah State,Texas A&M,27,,31.5,,,54.5,2
-2,Texas State,UT San Antonio,3.5,,4,,,65.5,3
-2,Liberty,Jacksonville State,4.5,,-6.5,,,49.5,1
-2,Louisiana Monroe,Alabama,33,,37,,,50,1
-2,Bowling Green,Cincinnati,16,,21.5,,,46.5,1
-2,Akron,Nebraska,27.5,,34,,,47,1
-2,Virginia,NC State,1,,2.5,,,55,2
-2,San Jos√© State,Texas,32,,36.5,,,52,2
-2,Arizona State,Mississippi State,-7,,-6.5,,,59,2
-2,Fresno State,Oregon State,1,,3,,,47.5,1
-2,Middle Tennessee,Wisconsin,33,,28.5,,,45,1
-2,Kennesaw State,Indiana,36.5,,35,,,53,2
-2,Ole Miss,Kentucky,-11.5,,-10,,,50.5,2
-2,Western Kentucky,Toledo,3,,7,,,58.5,2
-2,Iowa,Iowa State,2.5,,3,,,41.5,1
-2,Army,Kansas State,8,,17,,,46.5,1
-2,Troy,Clemson,25,,33,,,51.5,2
-2,Louisiana Tech,LSU,32,,37.5,,,51.5,2
-2,Northern Illinois,Maryland,12.5,,17.5,,,47.5,1
+2,Memphis,Georgia State,-13.5,,-13,,,56.5,2
+2,Miami (OH),Rutgers,15,,15,,,46,1
+2,West Virginia,Ohio,-5,,-3.5,,,60.5,3
+2,Connecticut,Syracuse,7,,6.5,,,58.5,2
+2,Utah State,Texas A&M,31.5,,31.5,,,54.5,2
+2,Texas State,UT San Antonio,2.5,,4,,,65.5,3
+2,Liberty,Jacksonville State,-6,,-6.5,,,49.5,1
+2,Louisiana Monroe,Alabama,37,,37,,,50,1
+2,Bowling Green,Cincinnati,20.5,,21.5,,,46.5,1
+2,Akron,Nebraska,33,,34,,,47,1
+2,Virginia,NC State,2.5,,2.5,,,55,2
+2,San Jos√© State,Texas,36,,36.5,,,52,2
+2,Arizona State,Mississippi State,-6,,-6.5,,,59,2
+2,Fresno State,Oregon State,3,,3,,,47.5,1
+2,Middle Tennessee,Wisconsin,30.5,,28.5,,,45,1
+2,Kennesaw State,Indiana,35.5,,35,,,53,2
+2,Ole Miss,Kentucky,-10.5,,-10,,,50.5,2
+2,Western Kentucky,Toledo,5,,7,,,58.5,2
+2,Iowa,Iowa State,3.5,,3,,,41.5,1
+2,Army,Kansas State,16,,17,,,46.5,1
+2,Troy,Clemson,31,,33,,,51.5,2
+2,Louisiana Tech,LSU,36,,37.5,,,51.5,2
+2,Northern Illinois,Maryland,15,,17.5,,,47.5,1
