@@ -163,11 +163,6 @@ api_spreads <- api_data |>
 api_totals <- api_data |> 
   filter(market == "totals", name == "Over", week == WEEK) |> 
   mutate(game = paste0(away_name, "@", home_name)) |> 
-  select(week, game, bookmaker, name, total_price = price, total = point)
-
-api_totals <- api_data |> 
-  filter(market == "totals", name == "Over", week == WEEK) |> 
-  mutate(game = paste0(away_name, "@", home_name)) |> 
   summarize(median_total = median(point, na.rm = TRUE), 
             .by = c(week, game))
 
