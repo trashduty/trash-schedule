@@ -181,10 +181,10 @@ odds_calculated <- model_raw |>
   mutate(spread = round(spread * 2) / 2, .after = spread) |> 
   mutate(implied_odds_spread = calc_implied_odds(spread_price)) |> 
   left_join(api_totals, by = c("week", "game")) |> 
-  mutate(total_bin = case_when(
-    abs(spread) <= 50 ~ 1, 
-    abs(spread) <= 59.6 ~ 2, 
-    abs(spread) >= 60 ~ 3
+   mutate(total_bin = case_when(
+    abs(median_total) <= 50 ~ 1, 
+    abs(median_total) <= 59.6 ~ 2, 
+    abs(median_total) >= 60 ~ 3
   )) |> 
   left_join(lookup, 
             by = c("total_bin", 
