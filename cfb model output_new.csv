@@ -4,7 +4,7 @@
 3,Iowa,UMass,-39,-35.5,-33.5,0.53494217,0.011133,44.5,1
 3,Michigan,Central Michigan,-34,-30,-27.5,0.54228899,0.018479,42,1
 3,Missouri,Louisiana,-22.5,-23,-23.5,0.47990372,-0.04391,49.25,1
-3,Alabama,Wisconsin,-19,-20.5,-21.5,0.46703321,-0.05678,46.75,1
+3,Alabama,Wisconsin,-19,-20,-20.5,0.48011021,-0.0437,46.75,1
 3,Louisiana Tech,New Mexico State,-6.5,-9.5,-11.5,0.43845771,-0.08535,44.5,1
 3,Nevada,Middle Tennessee,-6,-8,-9,0.45027467,-0.07353,45.5,1
 3,Notre Dame,Texas A&M,-12,-8.5,-7,0.49475761,-0.02905,49.16666667,1
@@ -24,6 +24,7 @@
 3,Virginia Tech,Old Dominion,-11.5,-8.5,-7.5,0.49036489,-0.03344,51,2
 3,LSU,Florida,1,-4,-7,0.41307344,-0.11074,53.16666667,2
 3,North Texas,Washington State,-7,-6,-5.5,0.49244982,-0.03136,58.25,2
+3,Florida Internationa,Florida Atlantic,-2.5,-3,-3,0.47155707,-0.05225,55.75,2
 3,Georgia Southern,Jacksonville Stat,1,-1.5,-3,0.44594403,-0.07787,55.5,2
 3,Tulane,Duke,-3.5,-3,-2.5,0.51017946,-0.01363,52.5,2
 3,Southern Mississippi,App State,14,4.5,-1,0.39788102,-0.12593,52.5,2
@@ -39,6 +40,7 @@
 3,Arkansas State,Iowa State,24.5,22.5,21.5,0.49467987,-0.02913,55,2
 3,Purdue,USC,26,23,21.5,0.48569555,-0.03811,58.25,2
 3,Temple,Oklahoma,9,19.5,25,0.59839635,0.074587,51.5,2
+3,Northwestern,Oregon,21,25.5,28,0.53782652,0.014017,51.5,2
 3,Arkansas,Ole Miss,3.5,6.5,8.5,0.55957488,0.035765,62,3
 3,Oregon State,Texas Tech,23.5,24,24.5,0.52058121,-0.00323,60.5,3
 3,Buffalo,Kent State,-27.5,-24.5,-23,0.51074644,-0.01306,48.75,1
@@ -50,10 +52,11 @@
 3,Texas A&M,Notre Dame,12,8.5,7,0.47173475,-0.05207,49.16666667,1
 3,Middle Tennessee,Nevada,6,8,9,0.5320095,0.0082,45.5,1
 3,New Mexico State,Louisiana Tech,6.5,9.5,11.5,0.55769268,0.033883,44.5,1
-3,Wisconsin,Alabama,19,20.5,21.5,0.53283544,0.009026,46.75,1
+3,Wisconsin,Alabama,19,20,20.5,0.51871041,-0.0051,46.75,1
 3,Louisiana,Missouri,22.5,23,23.5,0.51835266,-0.00546,49.25,1
 3,Central Michigan,Michigan,34,30,27.5,0.45202117,-0.07179,42,1
 3,UMass,Iowa,39,35.5,33.5,0.46792293,-0.05589,44.5,1
+3,Oregon,Northwestern,-21,-25.5,-28,0.43563973,-0.08817,51.5,2
 3,Oklahoma,Temple,-9,-19.5,-25,0.38543454,-0.13837,51.5,2
 3,USC,Purdue,-26,-23,-21.5,0.51466093,-0.00915,58.25,2
 3,Iowa State,Arkansas State,-24.5,-22.5,-21.5,0.50574878,-0.01806,55,2
@@ -69,6 +72,7 @@
 3,App State,Southern Mississippi,-14,-4.5,1,0.58310658,0.059297,52.5,2
 3,Duke,Tulane,3.5,3,2.5,0.48669817,-0.03711,52.5,2
 3,Jacksonville Stat,Georgia Southern,-1,1.5,3,0.51239297,-0.01142,55.5,2
+3,Florida Atlantic,Florida Internationa,2.5,3,3,0.48669817,-0.03711,55.75,2
 3,Washington State,North Texas,7,6,5.5,0.50505162,-0.01876,58.25,2
 3,Florida,LSU,-1,4,7,0.55566239,0.031853,53.16666667,2
 3,Old Dominion,Virginia Tech,11.5,8.5,7.5,0.5156522,-0.00816,51,2
