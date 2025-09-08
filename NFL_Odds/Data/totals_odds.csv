@@ -1,4 +1,4 @@
 week,game,model_prediction,median_over_line,median_over_price,median_over_cover_probability,median_over_edge,median_under_line,median_under_price,median_under_cover_probability,median_under_edge,best_over_book,best_over_line,best_over_price,best_over_cover_probability,best_over_edge,best_under_book,best_under_line,best_under_price,best_under_cover_probability,best_under_edge
-1,BAL@BUF,51,50.5,-118,0.51380316,-0.02748124366972471,51,-110,0.48619684,-0.03761268380952382,BetRivers,50.5,-114,0.51380316,-0.018907120373831687,DraftKings,50.5,-102,0.48619684,-0.018753655049504936
+1,BAL@BUF,51.5,51.5,-120,0.4956664,-0.04978814545454541,51.5,-115,0.5043336,-0.03055012093023246,FanDuel,51.5,-105,0.4956664,-0.016528721951219516,DraftKings,53.5,-120,0.55746665,0.012012104545454538
 1,MIN@CHI,39.5,43.5,-115,0.38124165,-0.15364207093023252,44,-110,0.61875835,0.09494882619047618,FanDuel,43.5,-110,0.38124165,-0.14256787380952385,DraftKings,43.5,-105,0.61875835,0.10656322804878049
 1,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
