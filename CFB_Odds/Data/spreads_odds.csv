@@ -1,13 +1,11 @@
 week,game,team,logo,last_update_api,model_prediction,market_line,market_price,cover_probability,edge,best_book,best_line,best_price,best_cover_probability,best_edge
-4,Wyoming@Colorado,Colorado,http://a.espncdn.com/i/teamlogos/ncaa/500/38.png,2025-09-21T03:24:09Z,-16,-13.5,-115,0.53417875,-7.049709302324736e-4,BetMGM,-13.5,-110,0.53417875,0.0103692261904762
-4,NA@UTEP,UTEP,http://a.espncdn.com/i/teamlogos/ncaa/500/2638.png,2025-09-21T03:24:09Z,12,19.5,-110,0.64159004,0.11778051619047614,DraftKings,20.5,-115,0.65515221,0.1202684890697675
-4,Fresno State@Hawai'i,Hawai'i,http://a.espncdn.com/i/teamlogos/ncaa/500/62.png,2025-09-21T03:24:09Z,4,2.5,-108,0.46276187,-0.056468899230769254,DraftKings,2.5,-105,0.46276187,-0.0494332519512195
-4,California@San Diego State,San Diego State,http://a.espncdn.com/i/teamlogos/ncaa/500/21.png,2025-09-21T03:24:09Z,8.5,7.5,-118,0.50591429,-0.035370113669724756,DraftKings,7.5,-115,0.50591429,-0.02896943093023252
-4,Georgia State@Vanderbilt,Vanderbilt,http://a.espncdn.com/i/teamlogos/ncaa/500/238.png,2025-09-21T03:24:09Z,-48.5,-56.5,175,0.36251843,-0.0011179336363636438,FanDuel,-55.5,235,0.37852479,0.08001732731343286
-4,UT San Antonio@Colorado State,Colorado State,http://a.espncdn.com/i/teamlogos/ncaa/500/36.png,2025-09-21T03:24:09Z,6.5,9.5,-110,0.57755759,0.05374806619047612,FanDuel,9.5,100,0.57755759,0.07755758999999995
-4,California@San Diego State,California,http://a.espncdn.com/i/teamlogos/ncaa/500/25.png,2025-09-21T03:24:09Z,-8.5,-7.5,-110,0.49475761,-0.02905191380952382,Fanatics,-7.5,-105,0.49475761,-0.01743751195121951
-4,Fresno State@Hawai'i,Fresno State,http://a.espncdn.com/i/teamlogos/ncaa/500/278.png,2025-09-21T03:24:09Z,-4,-2.5,-115,0.53378365,-0.0011000709302324552,FanDuel,-2.5,-112,0.53378365,0.00548176320754723
-4,Marshall@NA,Marshall,http://a.espncdn.com/i/teamlogos/ncaa/500/276.png,2025-09-21T03:24:09Z,3.5,3.5,-105,0.52030068,0.008105558048780437,Fanatics,5.5,-115,0.55015685,0.015273129069767521
-4,Wyoming@Colorado,Wyoming,http://a.espncdn.com/i/teamlogos/ncaa/500/2751.png,2025-09-21T03:24:09Z,16,13.5,-110,0.45936257,-0.06444695380952381,FanDuel,13.5,-108,0.45936257,-0.05986819923076925
-4,UT San Antonio@Colorado State,UT San Antonio,http://a.espncdn.com/i/teamlogos/ncaa/500/2636.png,2025-09-21T03:24:09Z,-6.5,-9.5,-115,0.42056002,-0.11432370093023253,DraftKings,-8.5,-115,0.43754723,-0.0973364909302325
-4,Georgia State@Vanderbilt,Georgia State,http://a.espncdn.com/i/teamlogos/ncaa/500/2247.png,2025-09-21T03:24:09Z,48.5,55.5,-200,0.62043415,-0.04623251666666661,Fanatics,54.5,240,0.60454491,0.31042726294117645
+4,Wyoming@Colorado,Colorado,http://a.espncdn.com/i/teamlogos/ncaa/500/38.png,2025-09-21T04:07:28Z,-23,-24.5,-125,0.45712831,-0.0984272455555556,Fanatics,-24.5,-125,0.45712831,-0.0984272455555556
+4,NA@UTEP,UTEP,http://a.espncdn.com/i/teamlogos/ncaa/500/2638.png,2025-09-21T04:07:28Z,2.5,5.5,198,0.56501262,0.22944215020134223,BetMGM,5.5,200,0.56501262,0.23167928666666665
+4,Fresno State@Hawai'i,Hawai'i,http://a.espncdn.com/i/teamlogos/ncaa/500/62.png,2025-09-21T04:07:28Z,4,2.5,-110,0.46276187,-0.061047653809523816,BetMGM,2.5,-105,0.46276187,-0.0494332519512195
+4,California@San Diego State,San Diego State,http://a.espncdn.com/i/teamlogos/ncaa/500/21.png,2025-09-21T04:07:28Z,1,-4.5,-115,0.37931574,-0.1555679809302325,FanDuel,-4.5,-113,0.37931574,-0.1512006919248826
+4,UT San Antonio@Colorado State,Colorado State,http://a.espncdn.com/i/teamlogos/ncaa/500/36.png,2025-09-21T04:07:28Z,5.5,7.5,-112,0.5657232,0.03742131320754716,Fanatics,6.5,115,0.5316022,0.06648592093023259
+4,California@San Diego State,California,http://a.espncdn.com/i/teamlogos/ncaa/500/25.png,2025-09-21T04:07:28Z,-1,4.5,-110,0.62413291,0.1003233861904762,BetMGM,4.5,-110,0.62413291,0.1003233861904762
+4,Fresno State@Hawai'i,Fresno State,http://a.espncdn.com/i/teamlogos/ncaa/500/278.png,2025-09-21T04:07:28Z,-4,-2.5,-110,0.53378365,0.009974126190476218,DraftKings,-2.5,-110,0.53378365,0.009974126190476218
+4,Marshall@NA,Marshall,http://a.espncdn.com/i/teamlogos/ncaa/500/276.png,2025-09-21T04:07:28Z,-4,-7.5,185,0.41706168,0.06618448701754387,FanDuel,-7.5,205,0.41706168,0.08919282754098362
+4,Wyoming@Colorado,Wyoming,http://a.espncdn.com/i/teamlogos/ncaa/500/2751.png,2025-09-21T04:07:28Z,23,24.5,-105,0.53871387,0.026518748048780516,FanDuel,24.5,-102,0.53871387,0.033763374950495084
+4,UT San Antonio@Colorado State,UT San Antonio,http://a.espncdn.com/i/teamlogos/ncaa/500/2636.png,2025-09-21T04:07:28Z,-5.5,-7.5,-110,0.43502863,-0.08878089380952381,DraftKings,-7.5,100,0.43502863,-0.06497136999999997
