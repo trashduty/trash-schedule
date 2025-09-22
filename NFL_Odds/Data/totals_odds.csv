@@ -1,4 +1,4 @@
 week,game,model_prediction,median_over_line,median_over_price,median_over_cover_probability,median_over_edge,median_under_line,median_under_price,median_under_cover_probability,median_under_edge,best_over_book,best_over_line,best_over_price,best_over_cover_probability,best_over_edge,best_under_book,best_under_line,best_under_price,best_under_cover_probability,best_under_edge
 3,DET@BAL,55,53.5,-110,0.53775725,0.013947726190476128,53.5,-115,0.46224275,-0.07264097093023253,FanDuel,53.5,-105,0.53775725,0.02556212804878044,DraftKings,53.5,-110,0.46224275,-0.061566773809523856
-3,KC@NYG,39,32.5,-115,0.68067516,0.14579143906976744,31.5,-108,0.29583701,-0.22339375923076926,DraftKings,32.5,-105,0.68067516,0.16848003804878042,BetMGM,32.5,-110,0.31932484,-0.20448468380952384
+3,KC@NYG,39,32.5,110,0.68591122,0.20972074380952388,32.5,-145,0.31408878,-0.27774795469387753,FanDuel,32.5,114,0.68591122,0.21862150037383182,BetRivers,32,-106,0.2889987,-0.2255644067961165
 3,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
