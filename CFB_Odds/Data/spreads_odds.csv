@@ -1,8 +1,5 @@
 week,game,team,logo,last_update_api,model_prediction,market_line,market_price,cover_probability,edge,best_book,best_line,best_price,best_cover_probability,best_edge
-5,San JosÃ© State@Stanford,Stanford,http://a.espncdn.com/i/teamlogos/ncaa/500/24.png,2025-09-28T03:15:47Z,0,1.5,-500,0.52321624,-0.31011709333333337,BetMGM,1.5,-500,0.52321624,-0.31011709333333337
-5,BYU@Colorado,Colorado,http://a.espncdn.com/i/teamlogos/ncaa/500/38.png,2025-09-28T03:24:17Z,-3.5,-6.5,-115,0.43049383,-0.10438989093023249,FanDuel,-5.5,-102,0.4495559,-0.05539459504950495
-5,Alabama@Georgia,Georgia,http://a.espncdn.com/i/teamlogos/ncaa/500/61.png,2025-09-28T03:13:13Z,1,2.5,285,0.5221594,0.26241914025974034,DraftKings,2.5,325,0.5221594,0.28686528235294123
-5,Louisiana Tech@UTEP,UTEP,http://a.espncdn.com/i/teamlogos/ncaa/500/2638.png,2025-09-28T03:24:36Z,7.5,7.5,-170,0.52595124,-0.10367838962962961,DraftKings,7.5,-160,0.52595124,-0.08943337538461538
-5,BYU@Colorado,BYU,http://a.espncdn.com/i/teamlogos/ncaa/500/252.png,2025-09-28T03:24:17Z,3.5,6.5,-110,0.57112189,0.047312366190476185,BetMGM,6.5,-105,0.57112189,0.0589267680487805
-5,Louisiana Tech@UTEP,Louisiana Tech,http://a.espncdn.com/i/teamlogos/ncaa/500/2348.png,2025-09-28T03:24:36Z,-7.5,-7.5,130,0.47474928,0.039966671304347834,BetMGM,-7.5,140,0.47474928,0.05808261333333331
-5,Alabama@Georgia,Alabama,http://a.espncdn.com/i/teamlogos/ncaa/500/333.png,2025-09-28T03:13:13Z,-1,-2.5,-475,0.47434037,-0.3517465865217391,BetMGM,-3.5,200,0.43608382,0.1027504866666667
+5,BYU@Colorado,Colorado,http://a.espncdn.com/i/teamlogos/ncaa/500/38.png,2025-09-28T04:08:00Z,2,2.5,110,0.50235622,0.026165743809523856,DraftKings,2.5,114,0.50235622,0.0350665003738318
+5,Louisiana Tech@UTEP,UTEP,http://a.espncdn.com/i/teamlogos/ncaa/500/2638.png,2025-09-28T04:08:00Z,11,12.5,550,0.54418605,0.3903398961538461,DraftKings,12.5,700,0.54418605,0.41918605
+5,BYU@Colorado,BYU,http://a.espncdn.com/i/teamlogos/ncaa/500/252.png,2025-09-28T04:08:00Z,-2,-2.5,-145,0.49415058,-0.09768615469387754,FanDuel,-2.5,-130,0.49415058,-0.07106681130434778
+5,Louisiana Tech@UTEP,Louisiana Tech,http://a.espncdn.com/i/teamlogos/ncaa/500/2348.png,2025-09-28T04:08:00Z,-11,-12.5,-1100,0.45078709,-0.46587957666666663,BetMGM,-11.5,-750,0.46856822,-0.4137847211764706
