@@ -1,7 +1,5 @@
 week,game,model_prediction,median_over_line,median_over_price,median_over_cover_probability,median_over_edge,median_under_line,median_under_price,median_under_cover_probability,median_under_edge,best_over_book,best_over_line,best_over_price,best_over_cover_probability,best_over_edge,best_under_book,best_under_line,best_under_price,best_under_cover_probability,best_under_edge
 5,DET@CIN,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
 5,KC@JAX,48.5,45.5,-110,0.57354761,0.04973808619047615,45.5,-110,0.42645239,-0.09735713380952382,FanDuel,45.5,-105,0.57354761,0.06135248804878046,BetMGM,45.5,-110,0.42645239,-0.09735713380952382
-5,NE@BUF,53,49.5,-110,0.59810355,0.0742940261904762,49.5,-113,0.40189645,-0.1286199819248826,FanDuel,49.5,-104,0.59810355,0.08829962843137262,DraftKings,49.5,-108,0.40189645,-0.11733431923076926
-5,TEN@ARI,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
-5,WAS@LAC,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+5,NE@BUF,53,49.5,-110,0.59810355,0.0742940261904762,49.5,-113,0.40189645,-0.1286199819248826,Fanatics,48.5,-110,0.62642395,0.10261442619047612,DraftKings,49.5,-108,0.40189645,-0.11733431923076926
 5,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
