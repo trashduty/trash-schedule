@@ -1,5 +1,5 @@
 week,game,model_prediction,median_over_line,median_over_price,median_over_cover_probability,median_over_edge,median_under_line,median_under_price,median_under_cover_probability,median_under_edge,best_over_book,best_over_line,best_over_price,best_over_cover_probability,best_over_edge,best_under_book,best_under_line,best_under_price,best_under_cover_probability,best_under_edge
 5,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
 6,BUF@ATL,50,50,-110,0.4807898,-0.04301972380952385,50,-110,0.49133777,-0.03247175380952383,DraftKings,49.5,-118,0.50866223,-0.03262217366972475,DraftKings,49.5,-102,0.49133777,-0.013612725049504948
-6,CHI@WAS,43,49.5,-115,0.32081865,-0.21406507093023253,49.5,-110,0.67918135,0.15537182619047618,BetMGM,49.5,-110,0.32081865,-0.20299087380952385,DraftKings,49.5,-105,0.67918135,0.1669862280487805
+6,CHI@WAS,43,49.5,-112,0.32081865,-0.20748323679245284,49.5,-110,0.67918135,0.15537182619047618,BetMGM,49.5,-110,0.32081865,-0.20299087380952385,DraftKings,49.5,-105,0.67918135,0.1669862280487805
 6,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
