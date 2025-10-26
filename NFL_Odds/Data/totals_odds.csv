@@ -1,5 +1,4 @@
 week,game,model_prediction,median_over_line,median_over_price,median_over_cover_probability,median_over_edge,median_under_line,median_under_price,median_under_cover_probability,median_under_edge,best_over_book,best_over_line,best_over_price,best_over_cover_probability,best_over_edge,best_under_book,best_under_line,best_under_price,best_under_cover_probability,best_under_edge
-8,DAL@DEN,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
 8,GB@PIT,46.5,46.5,-105,0.49651283,-0.015682291951219507,46,-110,0.47736266,-0.04644686380952384,FanDuel,45.5,-112,0.52263734,-0.005664546792452874,DraftKings,46.5,-115,0.50348717,-0.031396550930232525
 8,WAS@KC,48,48,-110,0.48225825,-0.041551273809523837,48,-110,0.4848887,-0.03892082380952383,DraftKings,47.5,-112,0.5151113,-0.013190586792452774,FanDuel,47.5,-105,0.4848887,-0.027306421951219517
 8,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
