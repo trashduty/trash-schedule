@@ -1,8 +1,6 @@
 week,game,team,team_logo_espn,last_update_api,model_prediction,market_line,market_price,cover_probability,edge,best_book,best_line,best_price,best_cover_probability,best_edge
-8,GB@PIT,GB,https://a.espncdn.com/i/teamlogos/nfl/500/gb.png,2025-10-27T03:31:30Z,-6,-10.5,140,0.30479999999999996,-0.11186666666666673,DraftKings,-10.5,2200,0.30479999999999996,0.26132173913043477
-8,GB@PIT,PIT,https://a.espncdn.com/i/teamlogos/nfl/500/pit.png,2025-10-27T03:31:30Z,6,8.5,-132,0.6245999999999999,0.055634482758620596,FanDuel,9.5,920,0.6490000000000001,0.5509607843137256
-8,WAS@KC,KC,https://a.espncdn.com/i/teamlogos/nfl/500/kc.png,2025-10-27T03:31:53Z,-11,-11,-110,0.4821,-0.04170952380952386,DraftKings,-10.5,-115,0.5179000000000002,-0.01698372093023226
-8,WAS@KC,WAS,https://a.espncdn.com/i/teamlogos/nfl/500/wsh.png,2025-10-27T03:31:53Z,11,10.5,-105,0.482,-0.03019512195121954,FanDuel,11.5,-112,0.518,-0.010301886792452808
+8,WAS@KC,KC,https://a.espncdn.com/i/teamlogos/nfl/500/kc.png,2025-10-27T04:12:55Z,-11,-11,-110,0.4821,-0.04170952380952386,DraftKings,-10.5,-115,0.5179000000000002,-0.01698372093023226
+8,WAS@KC,WAS,https://a.espncdn.com/i/teamlogos/nfl/500/wsh.png,2025-10-27T04:12:55Z,11,10.5,-105,0.482,-0.03019512195121954,FanDuel,11.5,-112,0.518,-0.010301886792452808
 8,NA,ATL,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
 8,NA,BAL,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
 8,NA,BUF,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
@@ -12,6 +10,7 @@ week,game,team,team_logo_espn,last_update_api,model_prediction,market_line,marke
 8,NA,CLE,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
 8,NA,DAL,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
 8,NA,DEN,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+8,NA,GB,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
 8,NA,HOU,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
 8,NA,IND,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
 8,NA,LAC,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
@@ -22,6 +21,7 @@ week,game,team,team_logo_espn,last_update_api,model_prediction,market_line,marke
 8,NA,NYG,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
 8,NA,NYJ,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
 8,NA,PHI,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+8,NA,PIT,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
 8,NA,SF,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
 8,NA,TB,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
 8,NA,TEN,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
