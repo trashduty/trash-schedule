@@ -1,4 +1,4 @@
 week,game,model_prediction,median_over_line,median_over_price,median_over_cover_probability,median_over_edge,median_under_line,median_under_price,median_under_cover_probability,median_under_edge,best_over_book,best_over_line,best_over_price,best_over_cover_probability,best_over_edge,best_under_book,best_under_line,best_under_price,best_under_cover_probability,best_under_edge
 10,PHI@GB,44,45.5,-110,0.45186463,-0.07194489380952385,45.5,-110,0.54813537,0.024325846190476175,FanDuel,44.5,-120,0.47874112,-0.0667134254545454,DraftKings,45.5,-108,0.54813537,0.028904600769230737
-10,PIT@LAC,45,44.5,-110,0.5070523,-0.016757223809523825,44.5,-120,0.4929477,-0.052506845454545426,BetMGM,43.5,-118,0.53604078,-0.005243623669724751,FanDuel,44.5,-110,0.4929477,-0.030861823809523847
+10,PIT@LAC,39.5,35.5,-115,0.6114846,0.07660087906976754,35.5,-125,0.3885154,-0.16704015555555557,FanDuel,35.5,-102,0.6114846,0.10653410495049509,Fanatics,35.5,-110,0.38412753,-0.13968199380952384
 10,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
