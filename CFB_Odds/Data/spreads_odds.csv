@@ -1,64 +1,70 @@
 week,game,team,logo,last_update_api,model_prediction,market_line,market_price,cover_probability,edge,best_book,best_line,best_price,best_cover_probability,best_edge
-13,Pittsburgh@Georgia Tech,Georgia Tech,http://a.espncdn.com/i/teamlogos/ncaa/500/59.png,2025-11-22T22:47:30Z,-1.5,-2.5,-115,0.47832905,-0.05655467093023253,Fanatics,-2.5,-110,0.47832905,-0.04548047380952386
-13,East Carolina@UT San Antonio,UT San Antonio,http://a.espncdn.com/i/teamlogos/ncaa/500/2636.png,2025-11-22T22:46:50Z,-20,-27.5,110,0.36520186,-0.11098861619047617,BetMGM,-27.5,115,0.36520186,-0.09991441906976745
-13,Colorado State@Boise State,Boise State,http://a.espncdn.com/i/teamlogos/ncaa/500/68.png,2025-11-22T22:47:30Z,-18,-17.5,-105,0.49687527,-0.015319851951219543,FanDuel,-17.5,-102,0.49687527,-0.008075225049504975
-13,Oklahoma State@UCF,UCF,http://a.espncdn.com/i/teamlogos/ncaa/500/2116.png,2025-11-22T22:47:30Z,-3,2.5,-115,0.60032239,0.06543866906976747,Fanatics,2.5,-115,0.60032239,0.06543866906976747
-13,Nebraska@Penn State,Penn State,http://a.espncdn.com/i/teamlogos/ncaa/500/213.png,2025-11-22T22:47:30Z,-10.5,-7.5,-105,0.53482468,0.02262955804878053,Fanatics,-7.5,100,0.53482468,0.03482468000000005
-13,New Mexico State@UTEP,UTEP,http://a.espncdn.com/i/teamlogos/ncaa/500/2638.png,2025-11-22T22:47:30Z,0,2.5,145,0.53802255,0.12985928469387753,Fanatics,2.5,175,0.53802255,0.17438618636363634
-13,Liberty@Louisiana Tech,Louisiana Tech,http://a.espncdn.com/i/teamlogos/ncaa/500/2348.png,2025-11-22T22:46:50Z,2,2.5,-105,0.50174527,-0.010449851951219502,DraftKings,2.5,-105,0.50174527,-0.010449851951219502
-13,Arizona State@Colorado,Colorado,http://a.espncdn.com/i/teamlogos/ncaa/500/38.png,2025-11-22T22:47:30Z,6.5,7,-110,0.51167648,-0.012133043809523847,FanDuel,6.5,-104,0.51167648,0.001872558431372573
-13,Illinois@Wisconsin,Wisconsin,http://a.espncdn.com/i/teamlogos/ncaa/500/275.png,2025-11-22T22:47:30Z,9.5,8.5,-110,0.50188147,-0.021928053809523784,FanDuel,8.5,-105,0.50188147,-0.010313651951219471
-13,Michigan@Maryland,Maryland,http://a.espncdn.com/i/teamlogos/ncaa/500/120.png,2025-11-22T22:47:30Z,20,18.5,-125,0.48731699,-0.06823856555555557,DraftKings,18.5,-125,0.48731699,-0.06823856555555557
-13,Syracuse@Notre Dame,Notre Dame,http://a.espncdn.com/i/teamlogos/ncaa/500/87.png,2025-11-22T22:47:03Z,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
-13,Syracuse@Notre Dame,Notre Dame,http://a.espncdn.com/i/teamlogos/ncaa/500/87.png,2025-11-22T22:47:03Z,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
-13,Syracuse@Notre Dame,Notre Dame,http://a.espncdn.com/i/teamlogos/ncaa/500/87.png,2025-11-22T22:47:03Z,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
-13,Syracuse@Notre Dame,Notre Dame,http://a.espncdn.com/i/teamlogos/ncaa/500/87.png,2025-11-22T22:47:03Z,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
-13,Coastal Carolina@South Carolina,South Carolina,http://a.espncdn.com/i/teamlogos/ncaa/500/2579.png,2025-11-22T22:46:51Z,-36,-42.5,-110,0.37581712,-0.14799240380952383,Fanatics,-42.5,-110,0.37581712,-0.14799240380952383
-13,Western Kentucky@LSU,LSU,http://a.espncdn.com/i/teamlogos/ncaa/500/99.png,2025-11-22T22:47:30Z,-24.5,-23.5,-115,0.50929795,-0.02558577093023251,BetMGM,-23.5,-110,0.50929795,-0.014511573809523837
-13,NA@Texas State,Texas State,http://a.espncdn.com/i/teamlogos/ncaa/500/326.png,2025-11-22T22:47:30Z,-15.5,-17.5,-105,0.44591836,-0.06627676195121951,Fanatics,-15.5,-115,0.48575461,-0.049129110930232534
-13,USC@Oregon,Oregon,http://a.espncdn.com/i/teamlogos/ncaa/500/2483.png,2025-11-22T22:47:30Z,-17,-20.5,-115,0.42614646,-0.1087372609302325,DraftKings,-20.5,-110,0.42614646,-0.09766306380952383
-13,Georgia State@Troy,Troy,http://a.espncdn.com/i/teamlogos/ncaa/500/2653.png,2025-11-22T22:47:30Z,-9.5,-7.5,-110,0.51479931,-0.009010213809523826,DraftKings,-7.5,100,0.51479931,0.01479931000000001
-13,Arkansas@Texas,Texas,http://a.espncdn.com/i/teamlogos/ncaa/500/251.png,2025-11-22T22:47:30Z,-9,-8.5,-115,0.48297245,-0.05191127093023251,BetMGM,-8.5,-115,0.48297245,-0.05191127093023251
-13,Kansas State@Utah,Utah,http://a.espncdn.com/i/teamlogos/ncaa/500/254.png,2025-11-22T22:47:30Z,-10,-4.5,-110,0.5763629,0.052553376190476175,DraftKings,-4.5,-105,0.5763629,0.06416777804878049
-13,Kentucky@Vanderbilt,Vanderbilt,http://a.espncdn.com/i/teamlogos/ncaa/500/238.png,2025-11-22T22:47:30Z,-20.5,-27.5,-110,0.35051735,-0.17329217380952383,DraftKings,-27.5,-105,0.35051735,-0.16167777195121952
-13,Tennessee@Florida,Florida,http://a.espncdn.com/i/teamlogos/ncaa/500/57.png,2025-11-22T22:47:30Z,4.5,3.5,-118,0.50089302,-0.04039138366972472,BetMGM,3.5,-115,0.50089302,-0.03399070093023249
-13,BYU@Cincinnati,Cincinnati,http://a.espncdn.com/i/teamlogos/ncaa/500/2132.png,2025-11-22T22:47:30Z,1.5,2.5,-105,0.51239297,1.978480487804246e-4,DraftKings,2.5,-105,0.51239297,1.978480487804246e-4
-13,Utah State@Fresno State,Fresno State,http://a.espncdn.com/i/teamlogos/ncaa/500/278.png,2025-11-22T22:47:30Z,-5.5,-2.5,-117,0.55290578,0.01373527308755762,DraftKings,-2.5,-112,0.55290578,0.02460389320754719
-13,Duke@North Carolina,North Carolina,http://a.espncdn.com/i/teamlogos/ncaa/500/153.png,2025-11-22T22:46:51Z,9,8.5,-118,0.52252021,-0.018764193669724705,FanDuel,10.5,-102,0.55568837,0.05073787495049509
-13,Marshall@App State,App State,http://a.espncdn.com/i/teamlogos/ncaa/500/2026.png,2025-11-22T22:40:46Z,-0.5,-1.5,-375,0.48247401,-0.3069996742105263,DraftKings,-1.5,-375,0.48247401,-0.3069996742105263
-13,California@Stanford,Stanford,http://a.espncdn.com/i/teamlogos/ncaa/500/24.png,2025-11-22T22:47:30Z,3,4,-110,0.52592049,0.0021109661904761268,FanDuel,3.5,-104,0.52592049,0.016116568431372547
-13,Tulane@Temple,Temple,http://a.espncdn.com/i/teamlogos/ncaa/500/218.png,2025-11-22T22:47:30Z,12.5,16.5,-110,0.58694072,0.06313119619047614,FanDuel,16.5,110,0.58694072,0.11075024380952381
-13,Washington@UCLA,UCLA,http://a.espncdn.com/i/teamlogos/ncaa/500/26.png,2025-11-22T22:47:30Z,12,10.5,-105,0.50323165,-0.008963471951219493,FanDuel,10.5,-105,0.50323165,-0.008963471951219493
-13,South Florida@NA,South Florida,http://a.espncdn.com/i/teamlogos/ncaa/500/58.png,2025-11-22T22:47:30Z,-22.5,-24.5,-105,0.45432816,-0.05786696195121954,BetMGM,-24.5,110,0.45432816,-0.021862316190476183
-13,East Carolina@UT San Antonio,East Carolina,http://a.espncdn.com/i/teamlogos/ncaa/500/151.png,2025-11-22T22:46:50Z,20,29.5,-115,0.66503208,0.13014835906976752,FanDuel,29.5,-110,0.66503208,0.1412225561904762
-13,Pittsburgh@Georgia Tech,Pittsburgh,http://a.espncdn.com/i/teamlogos/ncaa/500/221.png,2025-11-22T22:47:30Z,1.5,2.5,-105,0.50992485,-0.002270271951219538,FanDuel,2.5,-105,0.50992485,-0.002270271951219538
-13,Michigan@Maryland,Michigan,http://a.espncdn.com/i/teamlogos/ncaa/500/130.png,2025-11-22T22:47:30Z,-20,-18.5,-102,0.51234228,0.007391784950495084,Fanatics,-18.5,100,0.51234228,0.012342280000000039
-13,Illinois@Wisconsin,Illinois,http://a.espncdn.com/i/teamlogos/ncaa/500/356.png,2025-11-22T22:47:30Z,-9.5,-8.5,-110,0.49748019,-0.026329333809523847,DraftKings,-8.5,-110,0.49748019,-0.026329333809523847
-13,Arizona State@Colorado,Arizona State,http://a.espncdn.com/i/teamlogos/ncaa/500/9.png,2025-11-22T22:47:30Z,-6.5,-7,-110,0.45482351,-0.06898601380952385,FanDuel,-6.5,-118,0.48990546,-0.05137894366972473
-13,Liberty@Louisiana Tech,Liberty,http://a.espncdn.com/i/teamlogos/ncaa/500/2335.png,2025-11-22T22:46:50Z,-2,-3.5,168,0.46037065,0.08723632164179101,FanDuel,-3.5,168,0.46037065,0.08723632164179101
-13,New Mexico State@UTEP,New Mexico State,http://a.espncdn.com/i/teamlogos/ncaa/500/166.png,2025-11-22T22:47:30Z,-0,-2.5,-188,0.45883524,-0.1939425377777778,BetMGM,-2.5,-165,0.45883524,-0.16380626943396226
-13,Nebraska@Penn State,Nebraska,http://a.espncdn.com/i/teamlogos/ncaa/500/158.png,2025-11-22T22:47:30Z,10.5,7.5,-115,0.46578567,-0.06909805093023252,BetRivers,7.5,-114,0.46578567,-0.06692461037383174
-13,Oklahoma State@UCF,Oklahoma State,http://a.espncdn.com/i/teamlogos/ncaa/500/197.png,2025-11-22T22:47:30Z,3,-2.5,-110,0.39623158000000003,-0.1275779438095238,DraftKings,-1.5,-115,0.41241778,-0.1224659409302325
-13,Colorado State@Boise State,Colorado State,http://a.espncdn.com/i/teamlogos/ncaa/500/36.png,2025-11-22T22:47:30Z,18,17.5,-115,0.50383186,-0.03105186093023249,BetRivers,17.5,-114,0.50383186,-0.028878420373831704
-13,Washington@UCLA,Washington,http://a.espncdn.com/i/teamlogos/ncaa/500/264.png,2025-11-22T22:47:30Z,-12,-10.5,-115,0.50282955,-0.03205417093023255,FanDuel,-10.5,-115,0.50282955,-0.03205417093023255
-13,Tulane@Temple,Tulane,http://a.espncdn.com/i/teamlogos/ncaa/500/2655.png,2025-11-22T22:47:30Z,-12.5,-16.5,-118,0.41547442,-0.12580998366972473,Fanatics,-16.5,-115,0.41547442,-0.1194093009302325
-13,California@Stanford,California,http://a.espncdn.com/i/teamlogos/ncaa/500/25.png,2025-11-22T22:47:30Z,-3,-3.5,-118,0.47550112,-0.06578328366972475,BetMGM,-3.5,-115,0.47550112,-0.05938260093023251
-13,Marshall@App State,Marshall,http://a.espncdn.com/i/teamlogos/ncaa/500/276.png,2025-11-22T22:40:46Z,0.5,1.5,270,0.51466042,0.24439014972972972,DraftKings,1.5,270,0.51466042,0.24439014972972972
-13,New Mexico@NA,New Mexico,http://a.espncdn.com/i/teamlogos/ncaa/500/167.png,2025-11-22T22:47:30Z,-0.5,-3.5,-108,0.42899302,-0.09023774923076927,BetMGM,-3.5,-105,0.42899302,-0.08320210195121952
-13,Duke@North Carolina,Duke,http://a.espncdn.com/i/teamlogos/ncaa/500/150.png,2025-11-22T22:46:51Z,-9,-8.5,-110,0.48362935,-0.04018017380952382,Fanatics,-7.5,-115,0.49904778,-0.03583594093023251
-13,Utah State@Fresno State,Utah State,http://a.espncdn.com/i/teamlogos/ncaa/500/328.png,2025-11-22T22:47:30Z,5.5,2.5,-105,0.44400493,-0.0681901919512195,Fanatics,2.5,100,0.44400493,-0.05599506999999998
-13,TCU@NA,TCU,http://a.espncdn.com/i/teamlogos/ncaa/500/2628.png,2025-11-22T22:47:30Z,-4.5,-4.5,-110,0.48664799,-0.03716153380952386,DraftKings,-4.5,-110,0.48664799,-0.03716153380952386
-13,BYU@Cincinnati,BYU,http://a.espncdn.com/i/teamlogos/ncaa/500/252.png,2025-11-22T22:47:30Z,-1.5,-2.5,-115,0.48447197,-0.050411750930232535,DraftKings,-2.5,-115,0.48447197,-0.050411750930232535
-13,Tennessee@Florida,Tennessee,http://a.espncdn.com/i/teamlogos/ncaa/500/2633.png,2025-11-22T22:47:30Z,-4.5,-3.5,-104,0.49730427,-0.012499651568627423,Fanatics,-3.5,100,0.49730427,-0.0026957300000000073
-13,Sam Houston State@NA,Sam Houston State,http://a.espncdn.com/i/teamlogos/ncaa/500/2534.png,2025-11-22T22:47:30Z,13,13.5,100,0.52033029,0.020330289999999973,FanDuel,13.5,104,0.52033029,0.030134211568627445
-13,Kentucky@Vanderbilt,Kentucky,http://a.espncdn.com/i/teamlogos/ncaa/500/96.png,2025-11-22T22:47:30Z,20.5,27.5,-114,0.64365631,0.11094602962616829,BetMGM,27.5,105,0.64365631,0.15585143195121953
-13,Kansas State@Utah,Kansas State,http://a.espncdn.com/i/teamlogos/ncaa/500/2306.png,2025-11-22T22:47:30Z,10,4.5,-118,0.42944238,-0.11184202366972473,Fanatics,4.5,-110,0.42944238,-0.09436714380952382
-13,Arkansas@Texas,Arkansas,http://a.espncdn.com/i/teamlogos/ncaa/500/8.png,2025-11-22T22:47:30Z,9,9.5,-115,0.53168857,-0.003195150930232482,FanDuel,7.5,100,0.50349487,0.0034948700000000388
-13,Georgia State@Troy,Georgia State,http://a.espncdn.com/i/teamlogos/ncaa/500/2247.png,2025-11-22T22:47:30Z,9.5,7.5,-115,0.48584241,-0.04904131093023251,FanDuel,7.5,-110,0.48584241,-0.037967113809523834
-13,USC@Oregon,USC,http://a.espncdn.com/i/teamlogos/ncaa/500/30.png,2025-11-22T22:47:30Z,17,20.5,-110,0.57144718,0.04763765619047622,Fanatics,20.5,-105,0.57144718,0.05925205804878053
-13,Western Kentucky@LSU,Western Kentucky,http://a.espncdn.com/i/teamlogos/ncaa/500/98.png,2025-11-22T22:47:30Z,24.5,24.5,-115,0.50954952,-0.02533420093023253,DraftKings,24.5,-112,0.50954952,-0.018752366792452846
-13,Coastal Carolina@South Carolina,Coastal Carolina,http://a.espncdn.com/i/teamlogos/ncaa/500/324.png,2025-11-22T22:46:51Z,36,43.5,-115,0.6337654,0.09888167906976753,FanDuel,43.5,-114,0.6337654,0.10105511962616831
-13,Syracuse@Notre Dame,Syracuse,http://a.espncdn.com/i/teamlogos/ncaa/500/183.png,2025-11-22T22:47:03Z,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
-13,Syracuse@Notre Dame,Syracuse,http://a.espncdn.com/i/teamlogos/ncaa/500/183.png,2025-11-22T22:47:03Z,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
-13,Syracuse@Notre Dame,Syracuse,http://a.espncdn.com/i/teamlogos/ncaa/500/183.png,2025-11-22T22:47:03Z,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
-13,Syracuse@Notre Dame,Syracuse,http://a.espncdn.com/i/teamlogos/ncaa/500/183.png,2025-11-22T22:47:03Z,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+13,Pittsburgh@Georgia Tech,Georgia Tech,http://a.espncdn.com/i/teamlogos/ncaa/500/59.png,2025-11-22T23:23:39Z,-1.5,-2.5,-115,0.47832905,-0.05655467093023253,Fanatics,-2.5,-110,0.47832905,-0.04548047380952386
+13,East Carolina@UT San Antonio,UT San Antonio,http://a.espncdn.com/i/teamlogos/ncaa/500/2636.png,2025-11-22T23:23:01Z,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+13,East Carolina@UT San Antonio,UT San Antonio,http://a.espncdn.com/i/teamlogos/ncaa/500/2636.png,2025-11-22T23:23:01Z,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+13,East Carolina@UT San Antonio,UT San Antonio,http://a.espncdn.com/i/teamlogos/ncaa/500/2636.png,2025-11-22T23:23:01Z,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+13,Colorado State@Boise State,Boise State,http://a.espncdn.com/i/teamlogos/ncaa/500/68.png,2025-11-22T23:23:39Z,-18,-17.5,-105,0.49687527,-0.015319851951219543,FanDuel,-17.5,-102,0.49687527,-0.008075225049504975
+13,Oklahoma State@UCF,UCF,http://a.espncdn.com/i/teamlogos/ncaa/500/2116.png,2025-11-22T23:23:13Z,-3,2.5,105,0.60032239,0.1125175119512195,DraftKings,2.5,114,0.60032239,0.13303267037383176
+13,Nebraska@Penn State,Penn State,http://a.espncdn.com/i/teamlogos/ncaa/500/213.png,2025-11-22T23:23:39Z,-10,-7,-115,0.52481715,-0.010066570930232555,FanDuel,-7.5,-102,0.52481715,0.019866654950495
+13,New Mexico State@UTEP,UTEP,http://a.espncdn.com/i/teamlogos/ncaa/500/2638.png,2025-11-22T23:23:01Z,-4,-3.5,-235,0.48871327,-0.21277926731343288,BetMGM,-3.5,-235,0.48871327,-0.21277926731343288
+13,Arizona State@Colorado,Colorado,http://a.espncdn.com/i/teamlogos/ncaa/500/38.png,2025-11-22T23:23:39Z,6.5,7,-110,0.51167648,-0.012133043809523847,FanDuel,6.5,-104,0.51167648,0.001872558431372573
+13,Illinois@Wisconsin,Wisconsin,http://a.espncdn.com/i/teamlogos/ncaa/500/275.png,2025-11-22T23:23:39Z,9.5,8.5,-110,0.50188147,-0.021928053809523784,FanDuel,8.5,-105,0.50188147,-0.010313651951219471
+13,Michigan@Maryland,Maryland,http://a.espncdn.com/i/teamlogos/ncaa/500/120.png,2025-11-22T23:23:28Z,24,23.5,-115,0.50333552,-0.03154820093023247,Fanatics,24.5,-110,0.52058121,-0.0032283138095238195
+13,Syracuse@Notre Dame,Notre Dame,http://a.espncdn.com/i/teamlogos/ncaa/500/87.png,2025-11-22T23:23:28Z,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+13,Syracuse@Notre Dame,Notre Dame,http://a.espncdn.com/i/teamlogos/ncaa/500/87.png,2025-11-22T23:23:28Z,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+13,Syracuse@Notre Dame,Notre Dame,http://a.espncdn.com/i/teamlogos/ncaa/500/87.png,2025-11-22T23:23:28Z,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+13,Syracuse@Notre Dame,Notre Dame,http://a.espncdn.com/i/teamlogos/ncaa/500/87.png,2025-11-22T23:23:28Z,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+13,Coastal Carolina@South Carolina,South Carolina,http://a.espncdn.com/i/teamlogos/ncaa/500/2579.png,2025-11-22T23:23:28Z,-36,-40.5,-125,0.41261762,-0.14293793555555556,Fanatics,-42.5,100,0.37581712,-0.12418288
+13,Western Kentucky@LSU,LSU,http://a.espncdn.com/i/teamlogos/ncaa/500/99.png,2025-11-22T23:23:39Z,-25,-24.5,-110,0.49913302,-0.024676503809523853,FanDuel,-24.5,-110,0.49913302,-0.024676503809523853
+13,NA@Texas State,Texas State,http://a.espncdn.com/i/teamlogos/ncaa/500/326.png,2025-11-22T23:23:28Z,-10,-8.5,-110,0.50752946,-0.016280063809523848,FanDuel,-7.5,-114,0.52481715,-0.00789313037383177
+13,USC@Oregon,Oregon,http://a.espncdn.com/i/teamlogos/ncaa/500/2483.png,2025-11-22T23:23:28Z,-10,-10.5,-110,0.46707637,-0.05673315380952382,DraftKings,-10.5,-105,0.46707637,-0.045118751951219505
+13,Georgia State@Troy,Troy,http://a.espncdn.com/i/teamlogos/ncaa/500/2653.png,2025-11-22T23:23:28Z,-10,-8.5,-110,0.50752946,-0.016280063809523848,FanDuel,-8.5,-108,0.50752946,-0.011701309230769286
+13,Arkansas@Texas,Texas,http://a.espncdn.com/i/teamlogos/ncaa/500/251.png,2025-11-22T23:23:13Z,-14,-16.5,-115,0.43998558,-0.09489814093023252,BetMGM,-16.5,-115,0.43998558,-0.09489814093023252
+13,Kansas State@Utah,Utah,http://a.espncdn.com/i/teamlogos/ncaa/500/254.png,2025-11-22T23:23:28Z,-9.5,-3.5,-125,0.58315397,0.02759841444444444,BetMGM,-3.5,-125,0.58315397,0.02759841444444444
+13,Kentucky@Vanderbilt,Vanderbilt,http://a.espncdn.com/i/teamlogos/ncaa/500/238.png,2025-11-22T23:23:28Z,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+13,Kentucky@Vanderbilt,Vanderbilt,http://a.espncdn.com/i/teamlogos/ncaa/500/238.png,2025-11-22T23:23:28Z,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+13,Kentucky@Vanderbilt,Vanderbilt,http://a.espncdn.com/i/teamlogos/ncaa/500/238.png,2025-11-22T23:23:28Z,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+13,Kentucky@Vanderbilt,Vanderbilt,http://a.espncdn.com/i/teamlogos/ncaa/500/238.png,2025-11-22T23:23:28Z,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+13,Tennessee@Florida,Florida,http://a.espncdn.com/i/teamlogos/ncaa/500/57.png,2025-11-22T23:23:39Z,4.5,3.5,-118,0.50089302,-0.04039138366972472,BetMGM,3.5,-115,0.50089302,-0.03399070093023249
+13,BYU@Cincinnati,Cincinnati,http://a.espncdn.com/i/teamlogos/ncaa/500/2132.png,2025-11-22T23:23:39Z,1.5,2.5,-105,0.51239297,1.978480487804246e-4,DraftKings,2.5,-105,0.51239297,1.978480487804246e-4
+13,Utah State@Fresno State,Fresno State,http://a.espncdn.com/i/teamlogos/ncaa/500/278.png,2025-11-22T23:23:39Z,-5.5,-2.5,-117,0.55290578,0.01373527308755762,DraftKings,-2.5,-112,0.55290578,0.02460389320754719
+13,Duke@North Carolina,North Carolina,http://a.espncdn.com/i/teamlogos/ncaa/500/153.png,2025-11-22T23:23:28Z,4.5,1.5,-118,0.44625265,-0.09503175366972477,FanDuel,1.5,-114,0.44625265,-0.08645763037383175
+13,California@Stanford,Stanford,http://a.espncdn.com/i/teamlogos/ncaa/500/24.png,2025-11-22T23:23:39Z,3,4,-110,0.52592049,0.0021109661904761268,FanDuel,3.5,-104,0.52592049,0.016116568431372547
+13,Tulane@Temple,Temple,http://a.espncdn.com/i/teamlogos/ncaa/500/218.png,2025-11-22T23:23:28Z,13.5,18.5,105,0.61382124,0.12601636195121957,FanDuel,18.5,142,0.61382124,0.20059809950413227
+13,Washington@UCLA,UCLA,http://a.espncdn.com/i/teamlogos/ncaa/500/26.png,2025-11-22T23:23:39Z,12,10.5,-105,0.50323165,-0.008963471951219493,FanDuel,10.5,-105,0.50323165,-0.008963471951219493
+13,South Florida@NA,South Florida,http://a.espncdn.com/i/teamlogos/ncaa/500/58.png,2025-11-22T23:23:13Z,-22,-23.5,380,0.46476083,0.25642749666666664,DraftKings,-23.5,380,0.46476083,0.25642749666666664
+13,East Carolina@UT San Antonio,East Carolina,http://a.espncdn.com/i/teamlogos/ncaa/500/151.png,2025-11-22T23:23:01Z,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+13,East Carolina@UT San Antonio,East Carolina,http://a.espncdn.com/i/teamlogos/ncaa/500/151.png,2025-11-22T23:23:01Z,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+13,East Carolina@UT San Antonio,East Carolina,http://a.espncdn.com/i/teamlogos/ncaa/500/151.png,2025-11-22T23:23:01Z,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+13,Pittsburgh@Georgia Tech,Pittsburgh,http://a.espncdn.com/i/teamlogos/ncaa/500/221.png,2025-11-22T23:23:39Z,1.5,2.5,-105,0.50992485,-0.002270271951219538,FanDuel,2.5,-105,0.50992485,-0.002270271951219538
+13,Michigan@Maryland,Michigan,http://a.espncdn.com/i/teamlogos/ncaa/500/130.png,2025-11-22T23:23:28Z,-24,-23.5,-110,0.4967319,-0.027077623809523832,FanDuel,-25.5,104,0.46365417,-0.026541908431372552
+13,Illinois@Wisconsin,Illinois,http://a.espncdn.com/i/teamlogos/ncaa/500/356.png,2025-11-22T23:23:39Z,-9.5,-8,-110,0.49748019,-0.026329333809523847,DraftKings,-8.5,-110,0.49748019,-0.026329333809523847
+13,Arizona State@Colorado,Arizona State,http://a.espncdn.com/i/teamlogos/ncaa/500/9.png,2025-11-22T23:23:39Z,-6.5,-7,-110,0.45482351,-0.06898601380952385,FanDuel,-6.5,-118,0.48990546,-0.05137894366972473
+13,New Mexico State@UTEP,New Mexico State,http://a.espncdn.com/i/teamlogos/ncaa/500/166.png,2025-11-22T23:23:01Z,4,3.5,325,0.50947769,0.27418357235294116,DraftKings,3.5,325,0.50947769,0.27418357235294116
+13,Nebraska@Penn State,Nebraska,http://a.espncdn.com/i/teamlogos/ncaa/500/158.png,2025-11-22T23:23:39Z,10,7,-105,0.44189258,-0.07030254195121954,FanDuel,7.5,-120,0.47580901,-0.06964553545454544
+13,Oklahoma State@UCF,Oklahoma State,http://a.espncdn.com/i/teamlogos/ncaa/500/197.png,2025-11-22T23:23:13Z,3,-2.5,-140,0.39623158000000003,-0.18710175333333334,FanDuel,-2.5,-125,0.39623158000000003,-0.15932397555555555
+13,Colorado State@Boise State,Colorado State,http://a.espncdn.com/i/teamlogos/ncaa/500/36.png,2025-11-22T23:23:39Z,18,17.5,-115,0.50383186,-0.03105186093023249,BetRivers,17.5,-114,0.50383186,-0.028878420373831704
+13,Washington@UCLA,Washington,http://a.espncdn.com/i/teamlogos/ncaa/500/264.png,2025-11-22T23:23:39Z,-12,-10.5,-115,0.50282955,-0.03205417093023255,FanDuel,-10.5,-115,0.50282955,-0.03205417093023255
+13,Tulane@Temple,Tulane,http://a.espncdn.com/i/teamlogos/ncaa/500/2655.png,2025-11-22T23:23:28Z,-13.5,-18.5,-120,0.38702968,-0.15842486545454543,DraftKings,-18.5,-120,0.38702968,-0.15842486545454543
+13,California@Stanford,California,http://a.espncdn.com/i/teamlogos/ncaa/500/25.png,2025-11-22T23:23:39Z,-3,-3.5,-118,0.47550112,-0.06578328366972475,BetMGM,-3.5,-115,0.47550112,-0.05938260093023251
+13,New Mexico@NA,New Mexico,http://a.espncdn.com/i/teamlogos/ncaa/500/167.png,2025-11-22T23:23:39Z,-0.5,-3.5,-105,0.42899302,-0.08320210195121952,FanDuel,-3.5,-105,0.42899302,-0.08320210195121952
+13,Duke@North Carolina,Duke,http://a.espncdn.com/i/teamlogos/ncaa/500/150.png,2025-11-22T23:23:28Z,-4.5,-1.5,-105,0.55091322,0.03871809804878046,Fanatics,-1.5,100,0.55091322,0.05091321999999998
+13,Utah State@Fresno State,Utah State,http://a.espncdn.com/i/teamlogos/ncaa/500/328.png,2025-11-22T23:23:39Z,5.5,2.5,-105,0.44400493,-0.0681901919512195,Fanatics,2.5,100,0.44400493,-0.05599506999999998
+13,TCU@NA,TCU,http://a.espncdn.com/i/teamlogos/ncaa/500/2628.png,2025-11-22T23:23:28Z,-3,-2.5,-115,0.51398078,-0.020902940930232483,BetMGM,-1.5,-118,0.53069328,-0.0105911236697247
+13,BYU@Cincinnati,BYU,http://a.espncdn.com/i/teamlogos/ncaa/500/252.png,2025-11-22T23:23:39Z,-1.5,-2.5,-115,0.48447197,-0.050411750930232535,DraftKings,-2.5,-115,0.48447197,-0.050411750930232535
+13,Tennessee@Florida,Tennessee,http://a.espncdn.com/i/teamlogos/ncaa/500/2633.png,2025-11-22T23:23:39Z,-4.5,-3.5,-107,0.49730427,-0.019603942560386445,FanDuel,-3.5,-104,0.49730427,-0.012499651568627423
+13,Sam Houston State@NA,Sam Houston State,http://a.espncdn.com/i/teamlogos/ncaa/500/2534.png,2025-11-22T23:18:45Z,13,13.5,550,0.52033029,0.3664841361538461,BetMGM,13.5,550,0.52033029,0.3664841361538461
+13,Kentucky@Vanderbilt,Kentucky,http://a.espncdn.com/i/teamlogos/ncaa/500/96.png,2025-11-22T23:23:28Z,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+13,Kentucky@Vanderbilt,Kentucky,http://a.espncdn.com/i/teamlogos/ncaa/500/96.png,2025-11-22T23:23:28Z,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+13,Kentucky@Vanderbilt,Kentucky,http://a.espncdn.com/i/teamlogos/ncaa/500/96.png,2025-11-22T23:23:28Z,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+13,Kentucky@Vanderbilt,Kentucky,http://a.espncdn.com/i/teamlogos/ncaa/500/96.png,2025-11-22T23:23:28Z,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+13,Kansas State@Utah,Kansas State,http://a.espncdn.com/i/teamlogos/ncaa/500/2306.png,2025-11-22T23:23:28Z,9.5,3.5,-102,0.42222688,-0.08272361504950493,DraftKings,3.5,105,0.42222688,-0.06557799804878045
+13,Arkansas@Texas,Arkansas,http://a.espncdn.com/i/teamlogos/ncaa/500/8.png,2025-11-22T23:23:13Z,14,16.5,-110,0.55812411,0.034314586190476115,DraftKings,16.5,-110,0.55812411,0.034314586190476115
+13,Georgia State@Troy,Georgia State,http://a.espncdn.com/i/teamlogos/ncaa/500/2247.png,2025-11-22T23:23:28Z,10,8.5,-115,0.49181759,-0.04306613093023248,BetMGM,9.5,-118,0.507609,-0.03367540366972477
+13,USC@Oregon,USC,http://a.espncdn.com/i/teamlogos/ncaa/500/30.png,2025-11-22T23:23:28Z,10,9.5,-105,0.51504762,0.0028524980487805163,FanDuel,9.5,-104,0.51504762,0.005243698431372623
+13,Western Kentucky@LSU,Western Kentucky,http://a.espncdn.com/i/teamlogos/ncaa/500/98.png,2025-11-22T23:23:39Z,25,24.5,-110,0.50055027,-0.023259253809523872,DraftKings,24.5,-108,0.50055027,-0.01868049923076931
+13,Coastal Carolina@South Carolina,Coastal Carolina,http://a.espncdn.com/i/teamlogos/ncaa/500/324.png,2025-11-22T23:23:28Z,36,42.5,-114,0.61791839,0.08520810962616832,DraftKings,43.5,-120,0.6337654,0.08831085454545462
+13,Syracuse@Notre Dame,Syracuse,http://a.espncdn.com/i/teamlogos/ncaa/500/183.png,2025-11-22T23:23:28Z,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+13,Syracuse@Notre Dame,Syracuse,http://a.espncdn.com/i/teamlogos/ncaa/500/183.png,2025-11-22T23:23:28Z,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+13,Syracuse@Notre Dame,Syracuse,http://a.espncdn.com/i/teamlogos/ncaa/500/183.png,2025-11-22T23:23:28Z,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+13,Syracuse@Notre Dame,Syracuse,http://a.espncdn.com/i/teamlogos/ncaa/500/183.png,2025-11-22T23:23:28Z,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
