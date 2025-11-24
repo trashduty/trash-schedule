@@ -1,8 +1,4 @@
 week,game,model_prediction,median_over_line,median_over_price,median_over_cover_probability,median_over_edge,median_under_line,median_under_price,median_under_cover_probability,median_under_edge,best_over_book,best_over_line,best_over_price,best_over_cover_probability,best_over_edge,best_under_book,best_under_line,best_under_price,best_under_cover_probability,best_under_edge
-12,ATL@NO,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
 12,CAR@SF,51,49.5,-110,0.54045394,0.016644416190476186,49.5,-110,0.45954606,-0.06426346380952386,DraftKings,49.5,-110,0.54045394,0.016644416190476186,DraftKings,49.5,-110,0.45954606,-0.06426346380952386
-12,CLE@LV,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
-12,JAX@ARI,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
-12,PHI@DAL,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
-12,TB@LA,49.5,49.5,-110,0.49473575,-0.029073773809523862,49.5,-110,0.50526425,-0.018545273809523866,Fanatics,49.5,-110,0.49473575,-0.029073773809523862,DraftKings,49.5,-105,0.50526425,-0.006930871951219553
+12,TB@LA,47.5,46.5,-110,0.53022758,0.006418056190476196,46.5,-120,0.46977242,-0.07568212545454539,BetMGM,44.5,-118,0.58727946,0.04599505633027523,BetRivers,48.5,-122,0.53233975,-0.017209799549549598
 12,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
