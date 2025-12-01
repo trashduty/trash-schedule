@@ -1,4 +1,4 @@
 week,game,model_prediction,median_over_line,median_over_price,median_over_cover_probability,median_over_edge,median_under_line,median_under_price,median_under_cover_probability,median_under_edge,best_over_book,best_over_line,best_over_price,best_over_cover_probability,best_over_edge,best_under_book,best_under_line,best_under_price,best_under_cover_probability,best_under_edge
-13,DEN@WAS,43.5,43.5,-110,0.49481872,-0.028990803809523846,43.5,-120,0.50518128,-0.04027326545454546,DraftKings,43.5,-110,0.5006478,-0.02316172380952386,FanDuel,43.5,-114,0.50518128,-0.02752900037383177
+13,DEN@WAS,41.5,40.5,-110,0.52859375,0.004784226190476137,40.5,-124,0.47424001,-0.07933141857142861,DraftKings,40.5,-105,0.52859375,0.01639862804878045,FanDuel,40.5,-120,0.47424001,-0.07121453545454542
 13,NYG@NE,48.5,46.5,-112,0.55930034,0.030998453207547128,46.5,-108,0.44069966,-0.07853110923076928,FanDuel,46.5,-110,0.55930034,0.035490816190476115,Fanatics,46.5,-110,0.45258868,-0.071220843809523815
 13,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
