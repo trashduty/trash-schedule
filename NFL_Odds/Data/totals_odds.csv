@@ -1,4 +1,4 @@
 week,game,model_prediction,median_over_line,median_over_price,median_over_cover_probability,median_over_edge,median_under_line,median_under_price,median_under_cover_probability,median_under_edge,best_over_book,best_over_line,best_over_price,best_over_cover_probability,best_over_edge,best_under_book,best_under_line,best_under_price,best_under_cover_probability,best_under_edge
-14,HOU@KC,40,37.5,-110,0.5673023,0.0434927761904762,37.5,-120,0.4326977,-0.1127568454545454,FanDuel,37.5,102,0.5673023,0.07225279504950499,BetMGM,36.5,-105,0.40116116,-0.1110339619512195
+14,HOU@KC,37,33.5,-120,0.60004271,0.054588164545454565,34.5,-128,0.42827765,-0.13312585877192978,Fanatics,33.5,-110,0.60004271,0.07623318619047614,BetMGM,34.5,-110,0.42827765,-0.09553187380952383
 14,PHI@LAC,42,41.5,-114,0.50734939,-0.025360890373831713,42,-110,0.49265061,-0.031158913809523847,Fanatics,41.5,-110,0.50734939,-0.016460133809523825,FanDuel,41.5,-105,0.49265061,-0.019544511951219534
 14,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
