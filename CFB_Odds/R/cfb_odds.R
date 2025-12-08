@@ -151,7 +151,10 @@ calc_implied_odds <- function(odds) {
 }
 
 api_spreads <- api_data |> 
-  filter(market == "spreads", week == WEEK) |>
+  filter(
+    market == "spreads",
+    if (WEEK >= 16) week >= 16 else week == WEEK
+  ) |>
   mutate(game = paste0(away_name, "@", home_name)) |> 
   filter(game != "NA@UNLV") |> 
   left_join(select(cfb_crosswalk, btb_team_short, api_team, logo), 
@@ -161,7 +164,12 @@ api_spreads <- api_data |>
          spread = point, spread_price = price, logo)
 
 api_totals <- api_data |> 
-  filter(market == "totals", name == "Over", week == WEEK) |> 
+  # filter(market == "totals", name == "Over", week >= WEEK) |> 
+  filter(
+    market == "totals",
+    name == "Over", 
+    if (WEEK >= 16) week >= 16 else week == WEEK
+  ) |> 
   mutate(game = paste0(away_name, "@", home_name)) |> 
   summarize(median_total = median(point, na.rm = TRUE), 
             .by = c(week, game))
@@ -181,7 +189,7 @@ odds_calculated <- model_raw |>
   mutate(spread = round(spread * 2) / 2, .after = spread) |> 
   mutate(implied_odds_spread = calc_implied_odds(spread_price)) |> 
   left_join(api_totals, by = c("week", "game")) |> 
-   mutate(total_bin = case_when(
+  mutate(total_bin = case_when(
     abs(median_total) <= 50 ~ 1, 
     abs(median_total) <= 59.6 ~ 2, 
     abs(median_total) >= 60 ~ 3
@@ -202,24 +210,23 @@ odds_calculated <- model_raw |>
   ) |> 
   ungroup()
 
-  spread_summary <- odds_calculated |> 
-    summarise(
-      last_update_api = max(last_update_api, na.rm = TRUE), 
-      model_prediction = true_spread[median_cover_row],
-      market_line = spread[median_cover_row],
-      market_price = spread_price[median_cover_row], 
-      median_cover_probability = cover_probability[median_cover_row],
-      edge = cover_edge[median_cover_row],
-      best_book = bookmaker[highest_cover_row],
-      best_line = spread[highest_cover_row],
-      best_price = spread_price[highest_cover_row], 
-      best_cover_probability = cover_probability[highest_cover_row], 
-      best_edge = cover_edge[highest_cover_row],
-      .by = c(week, game, team, logo)
-    ) |> 
-    rename(cover_probability = median_cover_probability)
+spread_summary <- odds_calculated |> 
+  summarise(
+    last_update_api = max(last_update_api, na.rm = TRUE), 
+    model_prediction = true_spread[median_cover_row],
+    market_line = spread[median_cover_row],
+    market_price = spread_price[median_cover_row], 
+    median_cover_probability = cover_probability[median_cover_row],
+    edge = cover_edge[median_cover_row],
+    best_book = bookmaker[highest_cover_row],
+    best_line = spread[highest_cover_row],
+    best_price = spread_price[highest_cover_row], 
+    best_cover_probability = cover_probability[highest_cover_row], 
+    best_edge = cover_edge[highest_cover_row],
+    .by = c(week, game, team, logo)
+  ) |> 
+  rename(cover_probability = median_cover_probability)
 
 
 write_csv(spread_summary, "CFB_Odds/Data/spreads_odds.csv")
 # write_csv(spread_summary, "spreads_odds.csv")
-
