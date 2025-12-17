@@ -152,81 +152,138 @@ calc_implied_odds <- function(odds) {
          100 / (odds + 100))             # Positive odds (underdogs)
 }
 
-api_spreads <- api_data |> 
-  filter(
-    market == "spreads",
-    if (WEEK >= 16) week >= 16 else week == WEEK
+api_spreads <- api_data |>
+  # filter(market == "spreads", week == WEEK) |>
+  filter(market == "spreads") |>
+  mutate(game = paste0(away_name, "@", home_name)) |>
+  filter(game != "NA@UNLV") |>
+  left_join(
+    select(cfb_crosswalk, btb_team_short, api_team, logo),
+    by = c("name" = "api_team")
   ) |>
-  mutate(game = paste0(away_name, "@", home_name)) |> 
-  filter(game != "NA@UNLV") |> 
-  left_join(select(cfb_crosswalk, btb_team_short, api_team, logo), 
-            by = c("name" = "api_team")) |> 
-  rename(team = btb_team_short) |> 
-  select(week, game, last_update_api, bookmaker, team, game,
-         spread = point, spread_price = price, logo)
+  rename(team = btb_team_short) |>
+  select(
+    week,
+    game,
+    last_update_api,
+    bookmaker,
+    team,
+    game,
+    spread = point,
+    spread_price = price,
+    logo
+  )
 
-api_totals <- api_data |> 
-  # filter(market == "totals", name == "Over", week >= WEEK) |> 
-  filter(
-    market == "totals",
-    name == "Over", 
-    if (WEEK >= 16) week >= 16 else week == WEEK
-  ) |> 
-  mutate(game = paste0(away_name, "@", home_name)) |> 
-  summarize(median_total = median(point, na.rm = TRUE), 
-            .by = c(week, game))
+api_totals <- api_data |>
+  # filter(market == "totals", name == "Over", week == WEEK) |>
+  filter(market == "totals", name == "Over") |>
+  mutate(game = paste0(away_name, "@", home_name)) |>
+  summarize(median_total = median(point, na.rm = TRUE), .by = c(week, game))
 
-odds_calculated <- model_raw |> 
-  select(-opening_spread) |> 
-  left_join(select(api_spreads, week, team, game, spread, spread_price,
-                   last_update_api, bookmaker, logo), 
-            by = c("week", "team")) |> 
-  filter(!is.na(game)) |> 
-  mutate(median_spread_raw = median(spread, na.rm = TRUE), 
-         .by = c(game, team), .after = spread) |> 
-  mutate(median_spread = round(median_spread_raw * 2) / 2) |> 
-  mutate(true_spread = ((model_prediction_raw * 0.35) + (median_spread * 0.65)),  
-         .after = spread) |> 
-  mutate(true_spread = round(true_spread * 2) / 2) |> 
-  mutate(spread = round(spread * 2) / 2, .after = spread) |> 
-  mutate(implied_odds_spread = calc_implied_odds(spread_price)) |> 
-  left_join(api_totals, by = c("week", "game")) |> 
-  mutate(total_bin = case_when(
-    abs(median_total) <= 50 ~ 1, 
-    abs(median_total) <= 59.6 ~ 2, 
-    abs(median_total) >= 60 ~ 3
-  )) |> 
-  left_join(lookup, 
-            by = c("total_bin", 
-                   "spread" = "market_spread", 
-                   "true_spread")) |> 
-  mutate(implied_odds_spread = calc_implied_odds(spread_price)) |> 
+odds_calculated <- model_raw |>
+  select(-opening_spread) |>
+  left_join(
+    select(
+      api_spreads,
+      # week,
+      team,
+      game,
+      spread,
+      spread_price,
+      last_update_api,
+      bookmaker,
+      logo
+    ),
+    # by = c("week", "team")
+    by = c("team")
+  ) |>
+  filter(!is.na(game)) |>
+  mutate(
+    median_spread_raw = median(spread, na.rm = TRUE),
+    .by = c(game, team),
+    .after = spread
+  ) |>
+  mutate(median_spread = round(median_spread_raw * 2) / 2) |>
+  mutate(
+    true_spread = ((model_prediction_raw * 0.35) + (median_spread * 0.65)),
+    .after = spread
+  ) |>
+  mutate(true_spread = round(true_spread * 2) / 2) |>
+  mutate(spread = round(spread * 2) / 2, .after = spread) |>
+  mutate(implied_odds_spread = calc_implied_odds(spread_price)) |>
+  left_join(select(api_totals, -week), by = c("game")) |>
+  mutate(
+    total_bin = case_when(
+      abs(median_total) <= 50 ~ 1,
+      abs(median_total) <= 59.6 ~ 2,
+      abs(median_total) >= 60 ~ 3
+    )
+  ) |>
+  left_join(
+    lookup,
+    by = c("total_bin", "spread" = "market_spread", "true_spread")
+  ) |>
+  mutate(implied_odds_spread = calc_implied_odds(spread_price)) |>
   mutate(cover_edge = cover_probability - implied_odds_spread) |>
   mutate(no_cover_edge = no_cover_probability - implied_odds_spread) |>
-  group_by(week, game, team) |> 
+  # group_by(week, game, team) |>
+  group_by(game, team) |>
   mutate(
-    median_cover_row = row_number(-cover_edge) == ceiling(n()/2),
-    highest_cover_row = row_number(-cover_edge) == 1, 
-    median_no_cover_row = row_number(-no_cover_edge) == ceiling(n()/2),
+    median_cover_row = row_number(-cover_edge) == ceiling(n() / 2),
+    highest_cover_row = row_number(-cover_edge) == 1,
+    median_no_cover_row = row_number(-no_cover_edge) == ceiling(n() / 2),
     highest_no_cover_row = row_number(-no_cover_edge) == 1
-  ) |> 
-  ungroup()
+  ) |>
+  ungroup() |> 
+  # Extract home and away teams
+  mutate(
+    away_temp = sub("@.*", "", game),
+    home_temp = sub(".*@", "", game)
+  ) %>%
+  # Identify which team name is valid (not "NA")
+  mutate(
+    valid_team = case_when(
+      away_temp == "NA" & home_temp != "NA" ~ home_temp,
+      home_temp == "NA" & away_temp != "NA" ~ away_temp,
+      TRUE ~ NA_character_  # both valid or both NA
+    )
+  ) %>%
+  # Determine home and away from team/opponent columns
+  mutate(
+    home_team = case_when(
+      !is.na(valid_team) & team == valid_team ~ opponent,
+      !is.na(valid_team) & opponent == valid_team ~ team,
+      TRUE ~ home_temp  # no fix needed
+    ),
+    away_team = case_when(
+      !is.na(valid_team) & team == valid_team ~ team,
+      !is.na(valid_team) & opponent == valid_team ~ opponent,
+      TRUE ~ away_temp  # no fix needed
+    )
+  ) %>%
+  # Rebuild the game column
+  mutate(
+    game = paste0(away_team, "@", home_team)
+  ) %>%
+  # Clean up temporary columns
+  select(-away_temp, -home_temp, -valid_team) 
+  
 
-spread_summary <- odds_calculated |> 
+spread_summary <- odds_calculated |>
   summarise(
-    last_update_api = max(last_update_api, na.rm = TRUE), 
+    last_update_api = max(last_update_api, na.rm = TRUE),
     model_prediction = true_spread[median_cover_row],
     market_line = spread[median_cover_row],
-    market_price = spread_price[median_cover_row], 
+    market_price = spread_price[median_cover_row],
     median_cover_probability = cover_probability[median_cover_row],
     edge = cover_edge[median_cover_row],
     best_book = bookmaker[highest_cover_row],
     best_line = spread[highest_cover_row],
-    best_price = spread_price[highest_cover_row], 
-    best_cover_probability = cover_probability[highest_cover_row], 
+    best_price = spread_price[highest_cover_row],
+    best_cover_probability = cover_probability[highest_cover_row],
     best_edge = cover_edge[highest_cover_row],
     .by = c(week, game, team, logo)
-  ) |> 
+  ) |>
   rename(cover_probability = median_cover_probability)
 
 
