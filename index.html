@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CFB Spreads - Interactive Table</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow:  0 2px 8px rgba(0,0,0,0.1);
+            padding: 20px;
+        }
+
+        h1 {
+            color: #112446;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+
+        .controls {
+            margin-bottom: 20px;
+            display: flex;
+            gap:  10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            flex: 1;
+            max-width: 400px;
+            min-width: 200px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #112446;
+        }
+
+        .refresh-btn {
+            padding: 10px 20px;
+            background-color: #112446;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .refresh-btn:hover {
+            background-color: #1a3a6b;
+        }
+
+        .refresh-btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .status-message {
+            padding: 10px 15px;
+            border-radius: 4px;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .status-success {
+            background-color: #d4edda;
+            color:  #155724;
+            border:  1px solid #c3e6cb;
+        }
+
+        .status-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status-loading {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        thead {
+            background-color: #112446;
+            color: white;
+            position: sticky;
+            top: 0;
+            z-index:  10;
+        }
+
+        th {
+            padding: 12px 8px;
+            text-align:  left;
+            font-weight: 600;
+            cursor: pointer;
+            user-select: none;
+            white-space: nowrap;
+        }
+
+        th:hover {
+            background-color: #1a3a6b;
+        }
+
+        th.sortable::after {
+            content: ' ↕';
+            opacity: 0.5;
+            font-size: 12px;
+        }
+
+        th.sorted-asc::after {
+            content: ' ↑';
+            opacity: 1;
+        }
+
+        th.sorted-desc::after {
+            content: ' ↓';
+            opacity:  1;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid #eee;
+        }
+
+        tbody tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        td {
+            padding: 10px 8px;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            font-size: 16px;
+        }
+
+        .color-cell {
+            font-weight: 600;
+            text-align: center;
+            padding: 10px 8px;
+        }
+
+        .last-updated {
+            font-size: 12px;
+            color: #666;
+            margin-top: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            table {
+                font-size: 12px;
+            }
+
+            th, td {
+                padding:  8px 4px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>CFB Spreads</h1>
+        
+        <div id="statusMessage" style="display: none;"></div>
+
+        <div class="controls">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Search teams, opponents, or any column...">
+            </div>
+            <button class="refresh-btn" id="refreshBtn">Refresh Data</button>
+        </div>
+
+        <div class="table-wrapper">
+            <table id="dataTable">
+                <thead>
+                    <tr>
+                        <th class="sortable" data-column="week">week</th>
+                        <th class="sortable" data-column="Team">Team</th>
+                        <th class="sortable" data-column="Opponent">Opponent</th>
+                        <th class="sortable" data-column="Model Prediction Raw">Model Prediction Raw</th>
+                        <th class="sortable" data-column="Model Prediction">Model Prediction</th>
+                        <th class="sortable" data-column="Opening Spread">Opening Spread</th>
+                        <th class="sortable" data-column="Cover Probability (%)">Cover Probability (%)</th>
+                        <th class="sortable" data-column="Edge (%)">Edge (%)</th>
+                        <th class="sortable" data-column="Market Total">Market Total</th>
+                        <th class="sortable" data-column="bin_cat">bin_cat</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                </tbody>
+            </table>
+            <div id="noResults" class="no-results" style="display: none;">
+                No results found
+            </div>
+        </div>
+
+        <div class="last-updated" id="lastUpdated"></div>
+    </div>
+
+    <script>
+        const GITHUB_CSV_URL = 'https://raw.githubusercontent.com/trashduty/trash-schedule/main/cfb%20model%20output_new.csv';
+        
+        let tableData = [];
+        let filteredData = [];
+        let sortColumn = null;
+        let sortDirection = 'asc';
+
+        // Show status message
+        function showStatus(message, type) {
+            const statusEl = document.getElementById('statusMessage');
+            statusEl.textContent = message;
+            statusEl.className = `status-message status-${type}`;
+            statusEl.style.display = 'block';
+            
+            if (type === 'success') {
+                setTimeout(() => {
+                    statusEl.style.display = 'none';
+                }, 3000);
+            }
+        }
+
+        // Parse CSV
+        function parseCSV(csv) {
+            const lines = csv.trim().split('\n');
+            const headers = lines[0].split(',').map(h => h.trim().replace(/^\uFEFF/, '')); // Remove BOM
+            const data = [];
+
+            for (let i = 1; i < lines.length; i++) {
+                if (!lines[i].trim()) continue;
+                const values = lines[i].split(',');
+                const row = {};
+                headers.forEach((header, index) => {
+                    row[header] = values[index] ?  values[index].trim() : '';
+                });
+                data.push(row);
+            }
+
+            return data;
+        }
+
+        // Color function for positive/negative values (red to green)
+        function getColorForValue(value) {
+            const numValue = parseFloat(value);
+            if (isNaN(numValue)) return { backgroundColor: 'transparent', color: 'inherit' };
+            
+            let r, g, b;
+            
+            if (numValue < 0) {
+                // Negative values:  Red (intensity based on magnitude)
+                // Darker red for more negative values
+                const intensity = Math.min(Math.abs(numValue) * 10, 1); // Scale factor
+                r = Math.round(255 * Math.min(intensity * 2, 1));
+                g = Math.round(50 * (1 - Math.min(intensity, 1)));
+                b = Math.round(50 * (1 - Math.min(intensity, 1)));
+            } else {
+                // Positive values: Green (intensity based on magnitude)
+                // Darker green for more positive values
+                const intensity = Math.min(numValue * 10, 1); // Scale factor
+                r = Math.round(50 * (1 - Math.min(intensity, 1)));
+                g = Math.round(255 * Math.min(intensity * 2, 1));
+                b = Math.round(50 * (1 - Math.min(intensity, 1)));
+            }
+            
+            const backgroundColor = `rgb(${r}, ${g}, ${b})`;
+            const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+            const color = brightness > 155 ? '#000000' : '#ffffff';
+            
+            return { backgroundColor, color };
+        }
+
+        // Fetch data from GitHub
+        async function fetchData() {
+            const refreshBtn = document.getElementById('refreshBtn');
+            refreshBtn.disabled = true;
+            showStatus('Loading data from GitHub...', 'loading');
+
+            try {
+                const response = await fetch(GITHUB_CSV_URL + '?t=' + Date.now()); // Cache buster
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const csvText = await response.text();
+                tableData = parseCSV(csvText);
+                filteredData = [...tableData];
+                
+                renderTable(filteredData);
+                showStatus(`Successfully loaded ${tableData.length} rows`, 'success');
+                
+                const now = new Date();
+                document.getElementById('lastUpdated').textContent = 
+                    `Last updated: ${now.toLocaleString()}`;
+                
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                showStatus(`Error loading data: ${error.message}`, 'error');
+            } finally {
+                refreshBtn.disabled = false;
+            }
+        }
+
+        // Render table
+        function renderTable(data) {
+            const tbody = document.getElementById('tableBody');
+            const noResults = document.getElementById('noResults');
+            
+            if (data.length === 0) {
+                tbody.innerHTML = '';
+                noResults.style.display = 'block';
+                return;
+            }
+            
+            noResults.style.display = 'none';
+            
+            tbody.innerHTML = data.map(row => {
+                const coverProbStyle = getColorForValue(row['Cover Probability (%)']);
+                const edgeStyle = getColorForValue(row['Edge (%)']);
+                
+                return `
+                    <tr>
+                        <td>${row.week || ''}</td>
+                        <td>${row.Team || ''}</td>
+                        <td>${row.Opponent || ''}</td>
+                        <td>${row['Model Prediction Raw'] || ''}</td>
+                        <td>${row['Model Prediction'] || ''}</td>
+                        <td>${row['Opening Spread'] || ''}</td>
+                        <td class="color-cell" style="background-color: ${coverProbStyle.backgroundColor}; color: ${coverProbStyle.color}">${row['Cover Probability (%)'] ?  parseFloat(row['Cover Probability (%)']).toFixed(8) : ''}</td>
+                        <td class="color-cell" style="background-color: ${edgeStyle.backgroundColor}; color: ${edgeStyle.color}">${row['Edge (%)'] ? parseFloat(row['Edge (%)']).toFixed(6) : ''}</td>
+                        <td>${row['Market Total'] || ''}</td>
+                        <td>${row.bin_cat || ''}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Sort table
+        function sortTable(column) {
+            if (sortColumn === column) {
+                sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                sortColumn = column;
+                sortDirection = 'asc';
+            }
+
+            filteredData.sort((a, b) => {
+                let aVal = a[column] || '';
+                let bVal = b[column] || '';
+
+                // Try to parse as numbers
+                const aNum = parseFloat(aVal);
+                const bNum = parseFloat(bVal);
+
+                if (!isNaN(aNum) && !isNaN(bNum)) {
+                    return sortDirection === 'asc' ? aNum - bNum : bNum - aNum;
+                }
+
+                // String comparison
+                return sortDirection === 'asc' 
+                    ? aVal.localeCompare(bVal)
+                    : bVal.localeCompare(aVal);
+            });
+
+            // Update header classes
+            document.querySelectorAll('th').forEach(th => {
+                th.classList.remove('sorted-asc', 'sorted-desc');
+                if (th.dataset.column === column) {
+                    th.classList.add(sortDirection === 'asc' ? 'sorted-asc' : 'sorted-desc');
+                }
+            });
+
+            renderTable(filteredData);
+        }
+
+        // Search functionality
+        function searchTable(query) {
+            const lowerQuery = query.toLowerCase();
+            
+            filteredData = tableData.filter(row => {
+                return Object.values(row).some(value => 
+                    value.toString().toLowerCase().includes(lowerQuery)
+                );
+            });
+
+            renderTable(filteredData);
+        }
+
+        // Event listeners
+        document.querySelectorAll('th.sortable').forEach(th => {
+            th.addEventListener('click', () => {
+                sortTable(th.dataset.column);
+            });
+        });
+
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            searchTable(e.target.value);
+        });
+
+        document.getElementById('refreshBtn').addEventListener('click', fetchData);
+
+        // Initial load
+        fetchData();
+
+        // Auto-refresh every 5 minutes
+        setInterval(fetchData, 5 * 60 * 1000);
+    </script>
+</body>
+</html>
