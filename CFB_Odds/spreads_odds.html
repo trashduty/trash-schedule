@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CFB Spreads & Odds</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        
+        h1 {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            text-align: center;
+            font-size: 28px;
+            font-weight: 600;
+        }
+        
+        .table-wrapper {
+            overflow-x: auto;
+            padding: 20px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        
+        thead {
+            background: #f8f9fa;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        th {
+            padding: 12px 8px;
+            text-align: left;
+            font-weight: 600;
+            color: #333;
+            border-bottom: 2px solid #dee2e6;
+            white-space: nowrap;
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        th:hover {
+            background: #e9ecef;
+        }
+        
+        th::after {
+            content: ' ⇅';
+            opacity: 0.3;
+            font-size: 12px;
+        }
+        
+        th.sort-asc::after {
+            content: ' ↑';
+            opacity: 1;
+        }
+        
+        th.sort-desc::after {
+            content: ' ↓';
+            opacity: 1;
+        }
+        
+        td {
+            padding: 10px 8px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        tbody tr {
+            transition: background-color 0.2s;
+        }
+        
+        tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .logo {
+            width: 30px;
+            height: 30px;
+            object-fit: contain;
+        }
+        
+        .edge-cell {
+            font-weight: 600;
+            padding: 6px 8px;
+            border-radius: 4px;
+            text-align: center;
+        }
+        
+        .filter-container {
+            padding: 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .filter-group label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #666;
+            text-transform: uppercase;
+        }
+        
+        .filter-group input,
+        .filter-group select {
+            padding: 8px 12px;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        .stats {
+            padding: 15px 20px;
+            background: #e7f3ff;
+            border-top: 1px solid #dee2e6;
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+        
+        .stat-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #333;
+            margin-top: 5px;
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 20px;
+                padding: 15px;
+            }
+            
+            table {
+                font-size: 12px;
+            }
+            
+            th, td {
+                padding: 8px 4px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏈 College Football Spreads & Odds</h1>
+        
+        <div class="filter-container">
+            <div class="filter-group">
+                <label>Search Team</label>
+                <input type="text" id="searchInput" placeholder="Search teams...">
+            </div>
+            <div class="filter-group">
+                <label>Week</label>
+                <select id="weekFilter">
+                    <option value="">All Weeks</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Min Edge %</label>
+                <input type="number" id="minEdge" placeholder="0" step="0.01" style="width: 100px;">
+            </div>
+        </div>
+        
+        <div class="table-wrapper">
+            <table id="oddsTable">
+                <thead>
+                    <tr>
+                        <th data-column="week">Week</th>
+                        <th data-column="game">Game</th>
+                        <th data-column="team">Team</th>
+                        <th data-column="logo">Logo</th>
+                        <th data-column="model_prediction">Model</th>
+                        <th data-column="market_line">Market Line</th>
+                        <th data-column="market_price">Market Price</th>
+                        <th data-column="cover_probability">Cover %</th>
+                        <th data-column="edge">Edge %</th>
+                        <th data-column="best_book">Best Book</th>
+                        <th data-column="best_line">Best Line</th>
+                        <th data-column="best_price">Best Price</th>
+                        <th data-column="best_cover_probability">Best Cover %</th>
+                        <th data-column="best_edge">Best Edge %</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-label">Total Games</div>
+                <div class="stat-value" id="totalGames">0</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Avg Edge</div>
+                <div class="stat-value" id="avgEdge">0%</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Positive Edges</div>
+                <div class="stat-value" id="positiveEdges">0</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const csvData = `week,game,team,logo,last_update_api,model_prediction,market_line,market_price,cover_probability,edge,best_book,best_line,best_price,best_cover_probability,best_edge
+17,Washington State@Utah State,Washington State,http://a.espncdn.com/i/teamlogos/ncaa/500/265.png,2025-12-17T00:25:30Z,-0,2.5,-112,0.53802255,0.009720663207547164,BetMGM,2.5,-105,0.53802255,0.025827421951219522
+17,Kennesaw State@Western Michigan,Kennesaw State,http://a.espncdn.com/i/teamlogos/ncaa/500/338.png,2025-12-17T00:25:30Z,1,3.5,-115,0.565302,0.030418279069767462,DraftKings,3.5,-115,0.565302,0.030418279069767462
+18,USC@TCU,TCU,http://a.espncdn.com/i/teamlogos/ncaa/500/2628.png,2025-12-17T00:25:30Z,4,4.5,-110,0.52605397,0.002244446190476146,DraftKings,4.5,-108,0.52605397,0.006823200769230708
+17,Old Dominion@South Florida,South Florida,http://a.espncdn.com/i/teamlogos/ncaa/500/58.png,2025-12-17T00:25:30Z,-6.5,-2.5,-117,0.5698667,0.030696193087557555,DraftKings,-2.5,-115,0.5698667,0.034982933023255805
+17,Alabama@Oklahoma,Oklahoma,http://a.espncdn.com/i/teamlogos/ncaa/500/201.png,2025-12-17T00:25:30Z,-0.5,1,-110,0.51810758,-0.005701943809523824,FanDuel,1.5,-115,0.53372612,-0.0011576009302325385
+17,Miami@Texas A&M,Miami,http://a.espncdn.com/i/teamlogos/ncaa/500/2390.png,2025-12-17T00:25:30Z,4,3.5,-115,0.50947769,-0.025406030930232526,BetMGM,3.5,-110,0.50947769,-0.014331833809523853
+17,Toledo@Louisville,Toledo,http://a.espncdn.com/i/teamlogos/ncaa/500/2649.png,2025-12-17T00:25:30Z,7.5,6.5,-105,0.49170436,-0.020490761951219516,FanDuel,6.5,100,0.49170436,-0.008295639999999993
+17,James Madison@Oregon,James Madison,http://a.espncdn.com/i/teamlogos/ncaa/500/256.png,2025-12-17T00:25:30Z,21,21,-107,0.49820576,-0.01870245256038644,DraftKings,21,-105,0.49820576,-0.013989361951219512
+17,Tulane@Ole Miss,Tulane,http://a.espncdn.com/i/teamlogos/ncaa/500/2655.png,2025-12-17T00:25:30Z,18,17.5,-115,0.50825608,-0.02662764093023251,BetMGM,17.5,-110,0.50825608,-0.015553443809523837
+17,UNLV@Ohio,Ohio,http://a.espncdn.com/i/teamlogos/ncaa/500/195.png,2025-12-17T00:25:30Z,6,5.5,-115,0.50913824,-0.025745480930232545,FanDuel,5.5,-105,0.50913824,-0.003056881951219559
+17,UNLV@Ohio,UNLV,http://a.espncdn.com/i/teamlogos/ncaa/500/2439.png,2025-12-17T00:25:30Z,-6,-5.5,-110,0.49568701,-0.028122513809523852,Fanatics,-5.5,-105,0.49568701,-0.01650811195121954
+17,Tulane@Ole Miss,Ole Miss,http://a.espncdn.com/i/teamlogos/ncaa/500/145.png,2025-12-17T00:25:30Z,-18,-17.5,-108,0.49301191,-0.026218859230769276,FanDuel,-17.5,-104,0.49301191,-0.01679201156862742
+17,Miami@Texas A&M,Texas A&M,http://a.espncdn.com/i/teamlogos/ncaa/500/245.png,2025-12-17T00:25:30Z,-4,-3.5,-105,0.48871327,-0.023481851951219546,FanDuel,-3.5,100,0.48871327,-0.011286730000000023
+17,Toledo@Louisville,Louisville,http://a.espncdn.com/i/teamlogos/ncaa/500/97.png,2025-12-17T00:25:30Z,-7.5,-6.5,-115,0.50985739,-0.025026330930232543,Fanatics,-6.5,-115,0.50985739,-0.025026330930232543
+17,James Madison@Oregon,Oregon,http://a.espncdn.com/i/teamlogos/ncaa/500/2483.png,2025-12-17T00:25:30Z,-21,-21,-110,0.47727176,-0.04653776380952385,FanDuel,-21.5,-102,0.47727176,-0.027678735049504966
+17,NA@NC State,NC State,http://a.espncdn.com/i/teamlogos/ncaa/500/152.png,2025-12-17T00:25:30Z,-4,-4.5,-110,0.47283048,-0.05097904380952384,FanDuel,-4.5,-110,0.47283048,-0.05097904380952384
+17,Old Dominion@South Florida,Old Dominion,http://a.espncdn.com/i/teamlogos/ncaa/500/295.png,2025-12-17T00:25:30Z,6.5,2.5,-105,0.42706139,-0.08513373195121954,FanDuel,2.5,100,0.42706139,-0.07293861
+17,Alabama@Oklahoma,Alabama,http://a.espncdn.com/i/teamlogos/ncaa/500/333.png,2025-12-17T00:25:30Z,0.5,-1,-110,0.46135101,-0.06245851380952383,FanDuel,-1.5,-105,0.46135101,-0.05084411195121952
+17,Kennesaw State@Western Michigan,Western Michigan,http://a.espncdn.com/i/teamlogos/ncaa/500/2711.png,2025-12-17T00:25:30Z,-1,-3.5,-105,0.43608382,-0.07611130195121951,FanDuel,-3.5,-102,0.43608382,-0.06497280156862743
+17,Washington State@Utah State,Utah State,http://a.espncdn.com/i/teamlogos/ncaa/500/328.png,2025-12-17T00:25:30Z,0,-2,-110,0.45883524,-0.06497428380952386,FanDuel,-2.5,-105,0.45883524,-0.053359881951219545`;
+
+        let data = [];
+        let filteredData = [];
+        let sortColumn = null;
+        let sortDirection = 'asc';
+
+        function parseCSV(csv) {
+            const lines = csv.trim().split('\n');
+            const headers = lines[0].split(',');
+            const result = [];
+            
+            for (let i = 1; i < lines.length; i++) {
+                const obj = {};
+                const currentLine = lines[i].split(',');
+                
+                for (let j = 0; j < headers.length; j++) {
+                    obj[headers[j]] = currentLine[j];
+                }
+                result.push(obj);
+            }
+            return result;
+        }
+
+        function getEdgeColor(edge) {
+            const value = parseFloat(edge);
+            if (isNaN(value)) return '';
+            
+            if (value > 0) {
+                const intensity = Math.min(value * 1000, 100);
+                const greenValue = Math.floor(155 + intensity);
+                return `rgb(${255 - intensity}, ${greenValue}, ${255 - intensity})`;
+            } else {
+                const intensity = Math.min(Math.abs(value) * 1000, 100);
+                const redValue = Math.floor(155 + intensity);
+                return `rgb(${redValue}, ${255 - intensity}, ${255 - intensity})`;
+            }
+        }
+
+        function formatPercentage(value) {
+            const num = parseFloat(value);
+            return isNaN(num) ? value : (num * 100).toFixed(2) + '%';
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+            
+            filteredData.forEach(row => {
+                const tr = document.createElement('tr');
+                
+                const edgeColor = getEdgeColor(row.edge);
+                const bestEdgeColor = getEdgeColor(row.best_edge);
+                
+                tr.innerHTML = `
+                    <td>${row.week}</td>
+                    <td>${row.game}</td>
+                    <td><strong>${row.team}</strong></td>
+                    <td><img src="${row.logo}" alt="${row.team}" class="logo" onerror="this.style.display='none'"></td>
+                    <td>${row.model_prediction}</td>
+                    <td>${row.market_line}</td>
+                    <td>${row.market_price}</td>
+                    <td>${formatPercentage(row.cover_probability)}</td>
+                    <td class="edge-cell" style="background-color: ${edgeColor}">${formatPercentage(row.edge)}</td>
+                    <td>${row.best_book}</td>
+                    <td>${row.best_line}</td>
+                    <td>${row.best_price}</td>
+                    <td>${formatPercentage(row.best_cover_probability)}</td>
+                    <td class="edge-cell" style="background-color: ${bestEdgeColor}">${formatPercentage(row.best_edge)}</td>
+                `;
+                
+                tbody.appendChild(tr);
+            });
+            
+            updateStats();
+        }
+
+        function sortTable(column) {
+            if (sortColumn === column) {
+                sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                sortColumn = column;
+                sortDirection = 'asc';
+            }
+            
+            filteredData.sort((a, b) => {
+                let aVal = a[column];
+                let bVal = b[column];
+                
+                const aNum = parseFloat(aVal);
+                const bNum = parseFloat(bVal);
+                
+                if (!isNaN(aNum) && !isNaN(bNum)) {
+                    aVal = aNum;
+                    bVal = bNum;
+                }
+                
+                if (aVal < bVal) return sortDirection === 'asc' ? -1 : 1;
+                if (aVal > bVal) return sortDirection === 'asc' ? 1 : -1;
+                return 0;
+            });
+            
+            document.querySelectorAll('th').forEach(th => {
+                th.classList.remove('sort-asc', 'sort-desc');
+            });
+            
+            const th = document.querySelector(`th[data-column="${column}"]`);
+            th.classList.add(`sort-${sortDirection}`);
+            
+            renderTable();
+        }
+
+        function filterData() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const weekFilter = document.getElementById('weekFilter').value;
+            const minEdge = parseFloat(document.getElementById('minEdge').value) || -Infinity;
+            
+            filteredData = data.filter(row => {
+                const matchesSearch = row.team.toLowerCase().includes(searchTerm) || 
+                                    row.game.toLowerCase().includes(searchTerm);
+                const matchesWeek = !weekFilter || row.week === weekFilter;
+                const matchesEdge = parseFloat(row.best_edge) >= (minEdge / 100);
+                
+                return matchesSearch && matchesWeek && matchesEdge;
+            });
+            
+            renderTable();
+        }
+
+        function updateStats() {
+            document.getElementById('totalGames').textContent = filteredData.length;
+            
+            const edges = filteredData.map(row => parseFloat(row.edge)).filter(e => !isNaN(e));
+            const avgEdge = edges.length > 0 ? edges.reduce((a, b) => a + b, 0) / edges.length : 0;
+            document.getElementById('avgEdge').textContent = (avgEdge * 100).toFixed(2) + '%';
+            
+            const positiveCount = edges.filter(e => e > 0).length;
+            document.getElementById('positiveEdges').textContent = positiveCount;
+        }
+
+        function populateWeekFilter() {
+            const weeks = [...new Set(data.map(row => row.week))].sort((a, b) => parseInt(a) - parseInt(b));
+            const select = document.getElementById('weekFilter');
+            
+            weeks.forEach(week => {
+                const option = document.createElement('option');
+                option.value = week;
+                option.textContent = `Week ${week}`;
+                select.appendChild(option);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            data = parseCSV(csvData);
+            filteredData = [...data];
+            
+            populateWeekFilter();
+            renderTable();
+            
+            document.querySelectorAll('th').forEach(th => {
+                th.addEventListener('click', () => {
+                    const column = th.getAttribute('data-column');
+                    if (column) sortTable(column);
+                });
+            });
+            
+            document.getElementById('searchInput').addEventListener('input', filterData);
+            document.getElementById('weekFilter').addEventListener('change', filterData);
+            document.getElementById('minEdge').addEventListener('input', filterData);
+        });
+    </script>
+</body>
+</html>
