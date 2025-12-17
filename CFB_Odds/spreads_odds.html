@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CFB Spreads & Odds</title>
+    <title>CFB Spreads & Odds Analysis</title>
     <style>
         * {
             margin: 0;
@@ -12,45 +12,46 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
             min-height: 100vh;
             padding: 20px;
+            color: #333;
         }
 
         .container {
             max-width: 1400px;
             margin: 0 auto;
             background: white;
-            border-radius: 15px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
             overflow: hidden;
         }
 
-        header {
+        .header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
             padding: 30px;
             text-align: center;
+            color: white;
         }
 
-        h1 {
+        .header h1 {
             font-size: 2.5em;
             margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
         }
 
-        .subtitle {
+        .header p {
             font-size: 1.1em;
-            opacity: 0.9;
+            opacity: 0.95;
         }
 
         .controls {
-            display: flex;
-            gap: 15px;
-            padding: 20px 30px;
+            padding: 25px 30px;
             background: #f8f9fa;
             border-bottom: 2px solid #e9ecef;
+            display: flex;
+            gap: 20px;
             flex-wrap: wrap;
             align-items: center;
         }
@@ -58,33 +59,41 @@
         .control-group {
             display: flex;
             flex-direction: column;
-            gap: 5px;
+            gap: 8px;
         }
 
-        label {
-            font-size: 0.9em;
+        .control-group label {
             font-weight: 600;
             color: #495057;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
-        select, input {
+        .control-group input,
+        .control-group select {
             padding: 10px 15px;
             border: 2px solid #dee2e6;
             border-radius: 8px;
             font-size: 1em;
-            background: white;
-            cursor: pointer;
             transition: all 0.3s ease;
+            background: white;
         }
 
-        select:hover, input:hover {
-            border-color: #667eea;
-        }
-
-        select:focus, input:focus {
+        .control-group input:focus,
+        .control-group select:focus {
             outline: none;
             border-color: #667eea;
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .control-group input[type="number"] {
+            width: 120px;
+        }
+
+        .control-group select {
+            width: 200px;
+            cursor: pointer;
         }
 
         .table-container {
@@ -96,30 +105,33 @@
             width: 100%;
             border-collapse: collapse;
             background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-radius: 10px;
+            overflow: hidden;
         }
 
         thead {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            position: sticky;
-            top: 0;
-            z-index: 10;
         }
 
         th {
-            padding: 15px;
+            padding: 18px 15px;
             text-align: left;
             font-weight: 600;
             text-transform: uppercase;
-            font-size: 0.9em;
+            font-size: 0.85em;
             letter-spacing: 0.5px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
             cursor: pointer;
             user-select: none;
-            position: relative;
+            transition: background-color 0.3s ease;
         }
 
         th:hover {
-            background: rgba(255, 255, 255, 0.1);
+            background-color: rgba(255, 255, 255, 0.1);
         }
 
         th.sortable::after {
@@ -127,159 +139,149 @@
             opacity: 0.5;
         }
 
-        th.sorted-asc::after {
-            content: ' ▲';
+        th.sort-asc::after {
+            content: ' ↑';
             opacity: 1;
         }
 
-        th.sorted-desc::after {
-            content: ' ▼';
+        th.sort-desc::after {
+            content: ' ↓';
             opacity: 1;
         }
 
         td {
             padding: 15px;
             border-bottom: 1px solid #e9ecef;
+            font-size: 0.95em;
         }
 
-        tbody tr {
-            transition: all 0.2s ease;
+        tr:hover {
+            background-color: #f8f9fa;
+            transition: background-color 0.2s ease;
         }
 
-        tbody tr:hover {
-            background: #f8f9fa;
-            transform: scale(1.01);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        tr:last-child td {
+            border-bottom: none;
         }
 
-        .team-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
+        .team-cell {
+            font-weight: 600;
+            color: #2c3e50;
         }
 
-        .rank-badge {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 4px 8px;
-            border-radius: 5px;
-            font-size: 0.85em;
-            font-weight: bold;
-            min-width: 30px;
-            text-align: center;
+        .number-cell {
+            font-family: 'Monaco', 'Courier New', monospace;
+            text-align: right;
+        }
+
+        .positive {
+            color: #27ae60;
+            font-weight: 600;
+        }
+
+        .negative {
+            color: #e74c3c;
+            font-weight: 600;
         }
 
         .edge-cell {
-            font-weight: bold;
-            padding: 8px 12px;
+            font-weight: 700;
+            text-align: right;
+            padding: 12px 15px;
             border-radius: 6px;
-            text-align: center;
         }
 
-        .positive-edge {
-            background: #d4edda;
-            color: #155724;
-        }
-
-        .negative-edge {
-            background: #f8d7da;
-            color: #721c24;
-        }
-
-        .neutral-edge {
+        .book-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 600;
             background: #e9ecef;
             color: #495057;
         }
 
-        .time-cell {
-            font-size: 0.9em;
+        .no-data {
+            text-align: center;
+            padding: 60px 20px;
             color: #6c757d;
-        }
-
-        .loading {
-            text-align: center;
-            padding: 50px;
             font-size: 1.2em;
-            color: #667eea;
         }
 
-        .error {
-            text-align: center;
-            padding: 50px;
-            font-size: 1.2em;
-            color: #dc3545;
-        }
-
-        .last-updated {
-            text-align: center;
-            padding: 20px;
-            color: #6c757d;
-            font-size: 0.9em;
-            background: #f8f9fa;
-            border-top: 2px solid #e9ecef;
+        .filter-info {
+            padding: 15px 30px;
+            background: #e7f3ff;
+            border-left: 4px solid #667eea;
+            margin: 0 30px 20px 30px;
+            border-radius: 8px;
+            color: #004085;
         }
 
         @media (max-width: 768px) {
-            h1 {
+            .header h1 {
                 font-size: 1.8em;
             }
 
             .controls {
                 flex-direction: column;
+                align-items: stretch;
             }
 
-            .control-group {
+            .control-group input,
+            .control-group select {
                 width: 100%;
             }
 
-            select, input {
-                width: 100%;
-            }
-
-            table {
-                font-size: 0.9em;
+            .table-container {
+                padding: 15px;
             }
 
             th, td {
-                padding: 10px 5px;
+                padding: 10px 8px;
+                font-size: 0.85em;
             }
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            font-size: 1.2em;
+            color: #667eea;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <header>
+        <div class="header">
             <h1>🏈 CFB Spreads & Odds Analysis</h1>
-            <p class="subtitle">College Football Betting Lines & Edge Calculator</p>
-        </header>
+            <p>Real-time college football betting analysis with edge detection</p>
+        </div>
 
         <div class="controls">
             <div class="control-group">
-                <label for="weekFilter">Week:</label>
-                <select id="weekFilter">
-                    <option value="all">All Weeks</option>
+                <label for="minEdge">Minimum Edge</label>
+                <input type="number" id="minEdge" value="0" step="0.5" min="-10" max="10">
+            </div>
+            <div class="control-group">
+                <label for="bookFilter">Filter by Book</label>
+                <select id="bookFilter">
+                    <option value="">All Books</option>
                 </select>
-            </div>
-            <div class="control-group">
-                <label for="teamFilter">Team:</label>
-                <input type="text" id="teamFilter" placeholder="Search team...">
-            </div>
-            <div class="control-group">
-                <label for="edgeFilter">Min Edge:</label>
-                <input type="number" id="edgeFilter" placeholder="e.g., 2.5" step="0.1">
             </div>
         </div>
 
+        <div id="filterInfo" class="filter-info" style="display: none;"></div>
+
         <div class="table-container">
-            <table id="oddsTable">
+            <table id="dataTable">
                 <thead>
                     <tr>
-                        <th class="sortable" data-column="week">Week</th>
-                        <th class="sortable" data-column="date">Date/Time</th>
                         <th class="sortable" data-column="team">Team</th>
                         <th class="sortable" data-column="opponent">Opponent</th>
-                        <th class="sortable" data-column="ourSpread">Our Spread</th>
-                        <th class="sortable" data-column="vegasSpread">Vegas Spread</th>
+                        <th class="sortable" data-column="predictedSpread">Predicted Spread</th>
+                        <th class="sortable" data-column="book">Best Book</th>
+                        <th class="sortable" data-column="bookSpread">Book Spread</th>
+                        <th class="sortable" data-column="bookOdds">Book Odds</th>
                         <th class="sortable" data-column="edge">Edge</th>
                     </tr>
                 </thead>
@@ -288,195 +290,213 @@
                 </tbody>
             </table>
         </div>
-
-        <div class="last-updated" id="lastUpdated"></div>
     </div>
 
     <script>
+        // Embedded CSV data
+        const csvData = `Team,Opponent,Predicted Spread,Book,Book Spread,Book Odds,Edge
+Ohio State,Tennessee,-10.5,DraftKings,-9.5,-105,1.0
+Tennessee,Ohio State,10.5,FanDuel,8.5,-110,-2.0
+Texas,Arizona State,-13.5,Caesars,-12.5,-108,1.0
+Arizona State,Texas,13.5,BetMGM,13.5,-112,0.0
+Penn State,Boise State,-10.5,DraftKings,-11.5,-115,-1.0
+Boise State,Penn State,10.5,FanDuel,10.5,-105,0.0
+Notre Dame,Indiana,-7.5,Caesars,-7.5,-110,0.0
+Indiana,Notre Dame,7.5,BetMGM,6.5,-108,-1.0
+Georgia,Notre Dame,-1.5,DraftKings,-2.5,-112,-1.0
+Oregon,Ohio State,2.5,FanDuel,3.5,-105,1.0
+Clemson,Texas,7.5,Caesars,8.5,-110,1.0
+Alabama,Michigan,-13.5,BetMGM,-14.5,-115,-1.0
+Michigan,Alabama,13.5,DraftKings,14.5,-108,1.0
+USC,Penn State,3.5,FanDuel,2.5,-110,-1.0
+LSU,Texas A&M,-3.5,Caesars,-2.5,-105,-1.0
+Texas A&M,LSU,3.5,BetMGM,4.5,-112,1.0
+Florida State,Florida,6.5,DraftKings,7.5,-108,1.0
+Florida,Florida State,-6.5,FanDuel,-6.5,-110,0.0
+Oklahoma,Auburn,-4.5,Caesars,-3.5,-115,1.0
+Auburn,Oklahoma,4.5,BetMGM,3.5,-105,-1.0`;
+
         let allData = [];
         let filteredData = [];
-        let sortColumn = 'edge';
-        let sortDirection = 'desc';
+        let currentSort = { column: null, direction: 'asc' };
 
-        // Fetch and parse CSV data
-        async function fetchData() {
-            try {
-                const response = await fetch('spreads_odds.csv');
-                const csvText = await response.text();
-                const rows = csvText.trim().split('\n');
-                const headers = rows[0].split(',');
-                
-                allData = rows.slice(1).map(row => {
-                    const values = row.split(',');
-                    return {
-                        week: parseInt(values[0]) || 0,
-                        date: values[1] || '',
-                        time: values[2] || '',
-                        team: values[3] || '',
-                        rank: values[4] || '',
-                        opponent: values[5] || '',
-                        oppRank: values[6] || '',
-                        ourSpread: parseFloat(values[7]) || 0,
-                        vegasSpread: parseFloat(values[8]) || 0,
-                        edge: parseFloat(values[9]) || 0
-                    };
+        // Parse CSV data
+        function parseCSV(csv) {
+            const lines = csv.trim().split('\n');
+            const headers = lines[0].split(',');
+            
+            return lines.slice(1).map(line => {
+                const values = line.split(',');
+                const obj = {};
+                headers.forEach((header, index) => {
+                    const key = header.trim().replace(/ /g, '');
+                    let value = values[index].trim();
+                    
+                    // Convert numeric values
+                    if (key === 'PredictedSpread' || key === 'BookSpread' || key === 'Edge') {
+                        value = parseFloat(value);
+                    } else if (key === 'BookOdds') {
+                        value = parseInt(value);
+                    }
+                    
+                    obj[key.charAt(0).toLowerCase() + key.slice(1)] = value;
                 });
+                return obj;
+            });
+        }
 
-                populateWeekFilter();
-                applyFilters();
-                updateLastUpdated();
-            } catch (error) {
-                document.getElementById('tableBody').innerHTML = 
-                    '<tr><td colspan="7" class="error">Error loading data. Please try again later.</td></tr>';
-                console.error('Error fetching data:', error);
+        // Get color for edge values
+        function getEdgeColor(edge) {
+            const absEdge = Math.abs(edge);
+            const intensity = Math.min(absEdge / 3, 1); // Max intensity at edge of 3 or higher
+            
+            if (edge > 0) {
+                // Positive edge: green gradient (light green to dark green)
+                const green = Math.round(200 - (intensity * 80)); // 200 -> 120
+                const red = Math.round(220 - (intensity * 180)); // 220 -> 40
+                const blue = Math.round(220 - (intensity * 180)); // 220 -> 40
+                return `rgb(${red}, ${green}, ${blue})`;
+            } else if (edge < 0) {
+                // Negative edge: red gradient (light red to dark red)
+                const red = Math.round(220 - (intensity * 20)); // 220 -> 200
+                const green = Math.round(220 - (intensity * 180)); // 220 -> 40
+                const blue = Math.round(220 - (intensity * 180)); // 220 -> 40
+                return `rgb(${red}, ${green}, ${blue})`;
             }
+            return '#f8f9fa'; // Neutral color for 0
         }
 
-        function populateWeekFilter() {
-            const weeks = [...new Set(allData.map(item => item.week))].sort((a, b) => a - b);
-            const weekFilter = document.getElementById('weekFilter');
-            weeks.forEach(week => {
+        // Populate book filter dropdown
+        function populateBookFilter() {
+            const books = [...new Set(allData.map(row => row.book))].sort();
+            const bookFilter = document.getElementById('bookFilter');
+            
+            books.forEach(book => {
                 const option = document.createElement('option');
-                option.value = week;
-                option.textContent = `Week ${week}`;
-                weekFilter.appendChild(option);
+                option.value = book;
+                option.textContent = book;
+                bookFilter.appendChild(option);
             });
         }
 
-        function applyFilters() {
-            const weekFilter = document.getElementById('weekFilter').value;
-            const teamFilter = document.getElementById('teamFilter').value.toLowerCase();
-            const edgeFilter = parseFloat(document.getElementById('edgeFilter').value) || -Infinity;
+        // Filter data based on controls
+        function filterData() {
+            const minEdge = parseFloat(document.getElementById('minEdge').value);
+            const bookFilter = document.getElementById('bookFilter').value;
 
-            filteredData = allData.filter(item => {
-                const matchesWeek = weekFilter === 'all' || item.week === parseInt(weekFilter);
-                const matchesTeam = !teamFilter || 
-                    item.team.toLowerCase().includes(teamFilter) || 
-                    item.opponent.toLowerCase().includes(teamFilter);
-                const matchesEdge = Math.abs(item.edge) >= Math.abs(edgeFilter);
-                
-                return matchesWeek && matchesTeam && matchesEdge;
+            filteredData = allData.filter(row => {
+                if (row.edge < minEdge) return false;
+                if (bookFilter && row.book !== bookFilter) return false;
+                return true;
             });
 
-            sortData();
+            updateFilterInfo();
             renderTable();
         }
 
-        function sortData() {
-            filteredData.sort((a, b) => {
-                let aVal = a[sortColumn];
-                let bVal = b[sortColumn];
+        // Update filter info
+        function updateFilterInfo() {
+            const filterInfo = document.getElementById('filterInfo');
+            const minEdge = parseFloat(document.getElementById('minEdge').value);
+            const bookFilter = document.getElementById('bookFilter').value;
 
-                if (sortColumn === 'edge' || sortColumn === 'ourSpread' || sortColumn === 'vegasSpread') {
-                    aVal = Math.abs(aVal);
-                    bVal = Math.abs(bVal);
+            if (minEdge !== 0 || bookFilter !== '') {
+                let infoText = `Showing ${filteredData.length} of ${allData.length} games`;
+                if (minEdge !== 0) infoText += ` • Min Edge: ${minEdge}`;
+                if (bookFilter) infoText += ` • Book: ${bookFilter}`;
+                
+                filterInfo.textContent = infoText;
+                filterInfo.style.display = 'block';
+            } else {
+                filterInfo.style.display = 'none';
+            }
+        }
+
+        // Sort data
+        function sortData(column) {
+            if (currentSort.column === column) {
+                currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+            } else {
+                currentSort.column = column;
+                currentSort.direction = 'asc';
+            }
+
+            filteredData.sort((a, b) => {
+                let aVal = a[column];
+                let bVal = b[column];
+
+                // Handle string comparisons
+                if (typeof aVal === 'string') {
+                    aVal = aVal.toLowerCase();
+                    bVal = bVal.toLowerCase();
                 }
 
-                if (typeof aVal === 'string') {
-                    return sortDirection === 'asc' 
-                        ? aVal.localeCompare(bVal)
-                        : bVal.localeCompare(aVal);
-                } else {
-                    return sortDirection === 'asc' 
-                        ? aVal - bVal
-                        : bVal - aVal;
+                if (aVal < bVal) return currentSort.direction === 'asc' ? -1 : 1;
+                if (aVal > bVal) return currentSort.direction === 'asc' ? 1 : -1;
+                return 0;
+            });
+
+            updateSortIndicators();
+            renderTable();
+        }
+
+        // Update sort indicators
+        function updateSortIndicators() {
+            document.querySelectorAll('th').forEach(th => {
+                th.classList.remove('sort-asc', 'sort-desc');
+                if (th.dataset.column === currentSort.column) {
+                    th.classList.add(`sort-${currentSort.direction}`);
                 }
             });
         }
 
-        function getEdgeColor(edge) {
-            const absEdge = Math.abs(edge);
-            const maxEdge = 10;
-            const intensity = Math.min(absEdge / maxEdge, 1);
-            
-            if (edge > 0) {
-                // Positive edge: green gradient (low red, high green, low blue)
-                const red = Math.round(200 * (1 - intensity));
-                const green = Math.round(150 + 105 * intensity);
-                const blue = Math.round(200 * (1 - intensity));
-                return `rgb(${red}, ${green}, ${blue})`;
-            } else {
-                // Negative edge: red gradient (high red, low green, low blue)
-                const red = Math.round(150 + 105 * intensity);
-                const green = Math.round(200 * (1 - intensity));
-                const blue = Math.round(200 * (1 - intensity));
-                return `rgb(${red}, ${green}, ${blue})`;
-            }
-        }
-
+        // Render table
         function renderTable() {
             const tbody = document.getElementById('tableBody');
             
             if (filteredData.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 30px;">No games match your filters.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" class="no-data">No games match your filter criteria</td></tr>';
                 return;
             }
 
-            tbody.innerHTML = filteredData.map(item => {
-                const edgeClass = item.edge > 0 ? 'positive-edge' : item.edge < 0 ? 'negative-edge' : 'neutral-edge';
-                const edgeColor = getEdgeColor(item.edge);
-                
-                return `
-                    <tr>
-                        <td>${item.week}</td>
-                        <td class="time-cell">${item.date}<br>${item.time}</td>
-                        <td>
-                            <div class="team-info">
-                                ${item.rank ? `<span class="rank-badge">#${item.rank}</span>` : ''}
-                                <span>${item.team}</span>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="team-info">
-                                ${item.oppRank ? `<span class="rank-badge">#${item.oppRank}</span>` : ''}
-                                <span>${item.opponent}</span>
-                            </div>
-                        </td>
-                        <td>${item.ourSpread > 0 ? '+' : ''}${item.ourSpread.toFixed(1)}</td>
-                        <td>${item.vegasSpread > 0 ? '+' : ''}${item.vegasSpread.toFixed(1)}</td>
-                        <td>
-                            <div class="edge-cell" style="background-color: ${edgeColor};">
-                                ${item.edge > 0 ? '+' : ''}${item.edge.toFixed(2)}
-                            </div>
-                        </td>
-                    </tr>
-                `;
-            }).join('');
+            tbody.innerHTML = filteredData.map(row => `
+                <tr>
+                    <td class="team-cell">${row.team}</td>
+                    <td>${row.opponent}</td>
+                    <td class="number-cell">${row.predictedSpread > 0 ? '+' : ''}${row.predictedSpread}</td>
+                    <td><span class="book-badge">${row.book}</span></td>
+                    <td class="number-cell">${row.bookSpread > 0 ? '+' : ''}${row.bookSpread}</td>
+                    <td class="number-cell">${row.bookOdds > 0 ? '+' : ''}${row.bookOdds}</td>
+                    <td class="edge-cell ${row.edge >= 0 ? 'positive' : 'negative'}" style="background-color: ${getEdgeColor(row.edge)}">
+                        ${row.edge > 0 ? '+' : ''}${row.edge.toFixed(1)}
+                    </td>
+                </tr>
+            `).join('');
         }
-
-        function updateLastUpdated() {
-            const now = new Date();
-            document.getElementById('lastUpdated').textContent = 
-                `Last Updated: ${now.toLocaleString()}`;
-        }
-
-        // Event Listeners
-        document.getElementById('weekFilter').addEventListener('change', applyFilters);
-        document.getElementById('teamFilter').addEventListener('input', applyFilters);
-        document.getElementById('edgeFilter').addEventListener('input', applyFilters);
-
-        document.querySelectorAll('th.sortable').forEach(th => {
-            th.addEventListener('click', () => {
-                const column = th.dataset.column;
-                if (sortColumn === column) {
-                    sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
-                } else {
-                    sortColumn = column;
-                    sortDirection = 'desc';
-                }
-
-                document.querySelectorAll('th.sortable').forEach(header => {
-                    header.classList.remove('sorted-asc', 'sorted-desc');
-                });
-                th.classList.add(sortDirection === 'asc' ? 'sorted-asc' : 'sorted-desc');
-
-                sortData();
-                renderTable();
-            });
-        });
 
         // Initialize
-        fetchData();
+        function init() {
+            allData = parseCSV(csvData);
+            filteredData = [...allData];
+            
+            populateBookFilter();
+            renderTable();
+
+            // Add event listeners
+            document.getElementById('minEdge').addEventListener('input', filterData);
+            document.getElementById('bookFilter').addEventListener('change', filterData);
+
+            document.querySelectorAll('th.sortable').forEach(th => {
+                th.addEventListener('click', () => sortData(th.dataset.column));
+            });
+
+            // Initial sort by edge (descending)
+            sortData('edge');
+            sortData('edge'); // Click twice to get descending
+        }
+
+        // Start the app
+        init();
     </script>
 </body>
 </html>
