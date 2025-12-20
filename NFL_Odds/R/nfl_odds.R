@@ -191,6 +191,7 @@ api_data <- get_odds_api()
   # select(week, game, bookmaker, spread, raw_model, last_update_api) |> 
   left_join(api_totals, by = c("week", "game", "bookmaker"), 
             relationship = "many-to-many") |> 
+  filter(!is.na(name)) |> 
   mutate(bin_cat = case_when(
     abs(spread) <= 3 ~ 1, 
     abs(spread) <= 7 ~ 2, 
