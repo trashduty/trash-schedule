@@ -1,8 +1,8 @@
 week,game,team,team_logo_espn,last_update_api,model_prediction,market_line,market_price,cover_probability,edge,best_book,best_line,best_price,best_cover_probability,best_edge
-17,CHI@SF,CHI,https://a.espncdn.com/i/teamlogos/nfl/500/chi.png,2025-12-29T01:36:08Z,3,2.5,100,0.4461,-0.053900000000000003,FanDuel,3.5,-136,0.5539000000000001,-0.022371186440677926
-17,CHI@SF,SF,https://a.espncdn.com/i/teamlogos/nfl/500/sf.png,2025-12-29T01:36:08Z,-3,-2.5,-135,0.5539,-0.020568085106383083,DraftKings,-2.5,-130,0.5539,-0.011317391304347835
-17,LA@ATL,ATL,https://a.espncdn.com/i/teamlogos/nfl/500/atl.png,2025-12-29T01:36:08Z,10,7.5,-115,0.3712,-0.16368372093023253,FanDuel,7.5,-115,0.3712,-0.16368372093023253
-17,LA@ATL,LA,https://a.espncdn.com/i/teamlogos/nfl/500/lar.png,2025-12-29T01:36:08Z,-10,-7.5,-105,0.6286,0.11640487804878052,FanDuel,-7.5,-105,0.6286,0.11640487804878052
+17,CHI@SF,CHI,https://a.espncdn.com/i/teamlogos/nfl/500/chi.png,2025-12-29T03:37:36Z,5.5,6.5,-110,0.5322047325419584,0.0083952087324346,DraftKings,6.5,-105,0.5322047325419584,0.020009610590738913
+17,CHI@SF,SF,https://a.espncdn.com/i/teamlogos/nfl/500/sf.png,2025-12-29T03:37:36Z,-5.5,-6.5,-125,0.4680914246355949,-0.08746413091996069,BetMGM,-6.5,-118,0.4680914246355949,-0.07319297903412986
+17,LA@ATL,ATL,https://a.espncdn.com/i/teamlogos/nfl/500/atl.png,2025-12-29T03:37:36Z,10,7.5,-115,0.3712,-0.16368372093023253,FanDuel,7.5,-115,0.3712,-0.16368372093023253
+17,LA@ATL,LA,https://a.espncdn.com/i/teamlogos/nfl/500/lar.png,2025-12-29T03:37:36Z,-10,-7.5,-105,0.6286,0.11640487804878052,FanDuel,-7.5,-105,0.6286,0.11640487804878052
 17,NA,ARI,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
 17,NA,BAL,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
 17,NA,BUF,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
