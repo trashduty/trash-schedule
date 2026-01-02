@@ -1,23 +1,17 @@
 week,game,team,logo,last_update_api,model_prediction,market_line,market_price,cover_probability,edge,best_book,best_line,best_price,best_cover_probability,best_edge
-18,Oregon@Indiana,Indiana,http://a.espncdn.com/i/teamlogos/ncaa/500/84.png,2026-01-02T21:43:18Z,-4,-4.5,-110,0.47671674000000003,-0.04709278380952381,FanDuel,-4.5,-105,0.47671674000000003,-0.035478381951219495
-18,Miami@Indiana,Indiana,http://a.espncdn.com/i/teamlogos/ncaa/500/84.png,2026-01-02T21:43:18Z,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
-18,Ole Miss@Indiana,Indiana,http://a.espncdn.com/i/teamlogos/ncaa/500/84.png,2026-01-02T21:43:18Z,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
-18,Rice@Texas State,Texas State,http://a.espncdn.com/i/teamlogos/ncaa/500/326.png,2026-01-02T21:42:51Z,-23,-31.5,135,0.3414869,-0.08404501489361704,DraftKings,-31.5,200,0.3414869,0.008153566666666667
-18,Rice@Texas State,Texas State,http://a.espncdn.com/i/teamlogos/ncaa/500/326.png,2026-01-02T21:42:51Z,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
-18,Wake Forest@Mississippi State,Mississippi State,http://a.espncdn.com/i/teamlogos/ncaa/500/344.png,2026-01-02T21:43:18Z,-3,-2.5,-118,0.51017946,-0.031104943669724716,FanDuel,-2.5,-114,0.51017946,-0.022530820373831695
-18,Navy@Cincinnati,Cincinnati,http://a.espncdn.com/i/teamlogos/ncaa/500/2132.png,2026-01-02T21:43:18Z,6.5,10.5,-120,0.59856326,0.05310871454545463,BetMGM,10.5,-110,0.59856326,0.0747537361904762
-18,Miami@Ole Miss,Ole Miss,http://a.espncdn.com/i/teamlogos/ncaa/500/145.png,2026-01-02T21:43:18Z,1.5,3.5,-122,0.55221421,0.00266466045045044,DraftKings,3.5,-115,0.55221421,0.01733048906976753
-18,Ole Miss@Indiana,Ole Miss,http://a.espncdn.com/i/teamlogos/ncaa/500/145.png,2026-01-02T21:43:18Z,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
-18,Ole Miss@Oregon,Ole Miss,http://a.espncdn.com/i/teamlogos/ncaa/500/145.png,2026-01-02T21:43:18Z,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
-18,Arizona@SMU,SMU,http://a.espncdn.com/i/teamlogos/ncaa/500/2567.png,2026-01-02T21:43:18Z,4,-1.5,-109,0.40619834,-0.11533276047846885,DraftKings,-1.5,-105,0.40619834,-0.10599678195121953
-18,Oregon@Indiana,Oregon,http://a.espncdn.com/i/teamlogos/ncaa/500/2483.png,2026-01-02T21:43:18Z,4,4,-105,0.50609532,-0.006099801951219508,BetRivers,4.5,-113,0.5268861,-0.0036303319248826016
-18,Miami@Oregon,Oregon,http://a.espncdn.com/i/teamlogos/ncaa/500/2483.png,2026-01-02T21:43:18Z,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
-18,Ole Miss@Oregon,Oregon,http://a.espncdn.com/i/teamlogos/ncaa/500/2483.png,2026-01-02T21:43:18Z,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
-18,Arizona@SMU,Arizona,http://a.espncdn.com/i/teamlogos/ncaa/500/12.png,2026-01-02T21:43:18Z,-4,1.5,-114,0.59093965,0.058229369626168315,BetMGM,1.5,-110,0.59093965,0.0671301261904762
-18,Miami@Ole Miss,Miami,http://a.espncdn.com/i/teamlogos/ncaa/500/2390.png,2026-01-02T21:43:18Z,-1.5,-3.5,-105,0.44594403,-0.06625109195121953,FanDuel,-3.5,100,0.44594403,-0.05405597000000001
-18,Miami@Indiana,Miami,http://a.espncdn.com/i/teamlogos/ncaa/500/2390.png,2026-01-02T21:43:18Z,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
-18,Miami@Oregon,Miami,http://a.espncdn.com/i/teamlogos/ncaa/500/2390.png,2026-01-02T21:43:18Z,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
-18,Navy@Cincinnati,Navy,http://a.espncdn.com/i/teamlogos/ncaa/500/2426.png,2026-01-02T21:43:18Z,-6.5,-10.5,-110,0.40756617,-0.11624335380952383,FanDuel,-10.5,-106,0.40756617,-0.10699693679611649
-18,Wake Forest@Mississippi State,Wake Forest,http://a.espncdn.com/i/teamlogos/ncaa/500/154.png,2026-01-02T21:43:18Z,3,2.5,-105,0.48669817,-0.025496951951219538,Fanatics,2.5,100,0.48669817,-0.013301830000000014
-18,Rice@Texas State,Rice,http://a.espncdn.com/i/teamlogos/ncaa/500/242.png,2026-01-02T21:42:51Z,23,31.5,-180,0.65172657,0.0088694271428571,FanDuel,31.5,-174,0.65172657,0.01669007364963504
-18,Rice@Texas State,Rice,http://a.espncdn.com/i/teamlogos/ncaa/500/242.png,2026-01-02T21:42:51Z,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+18,Oregon@Indiana,Indiana,http://a.espncdn.com/i/teamlogos/ncaa/500/84.png,2026-01-02T21:49:20Z,-4,-4.5,-110,0.47671674000000003,-0.04709278380952381,FanDuel,-4.5,-105,0.47671674000000003,-0.035478381951219495
+18,Miami@Indiana,Indiana,http://a.espncdn.com/i/teamlogos/ncaa/500/84.png,2026-01-02T21:49:20Z,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+18,Ole Miss@Indiana,Indiana,http://a.espncdn.com/i/teamlogos/ncaa/500/84.png,2026-01-02T21:49:20Z,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+18,Oregon@Indiana,Oregon,http://a.espncdn.com/i/teamlogos/ncaa/500/2483.png,2026-01-02T21:49:20Z,4,4,-105,0.50609532,-0.006099801951219508,BetRivers,4.5,-113,0.5268861,-0.0036303319248826016
+18,Miami@Oregon,Oregon,http://a.espncdn.com/i/teamlogos/ncaa/500/2483.png,2026-01-02T21:49:20Z,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+18,Ole Miss@Oregon,Oregon,http://a.espncdn.com/i/teamlogos/ncaa/500/2483.png,2026-01-02T21:49:20Z,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+18,Miami@Ole Miss,Ole Miss,http://a.espncdn.com/i/teamlogos/ncaa/500/145.png,2026-01-02T21:49:20Z,1.5,3.5,-122,0.55221421,0.00266466045045044,DraftKings,3.5,-115,0.55221421,0.01733048906976753
+18,Ole Miss@Indiana,Ole Miss,http://a.espncdn.com/i/teamlogos/ncaa/500/145.png,2026-01-02T21:49:20Z,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+18,Ole Miss@Oregon,Ole Miss,http://a.espncdn.com/i/teamlogos/ncaa/500/145.png,2026-01-02T21:49:20Z,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+18,Miami@Ole Miss,Miami,http://a.espncdn.com/i/teamlogos/ncaa/500/2390.png,2026-01-02T21:49:20Z,-1.5,-3.5,-105,0.44594403,-0.06625109195121953,FanDuel,-3.5,100,0.44594403,-0.05405597000000001
+18,Miami@Indiana,Miami,http://a.espncdn.com/i/teamlogos/ncaa/500/2390.png,2026-01-02T21:49:20Z,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+18,Miami@Oregon,Miami,http://a.espncdn.com/i/teamlogos/ncaa/500/2390.png,2026-01-02T21:49:20Z,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+18,Navy@Cincinnati,Navy,http://a.espncdn.com/i/teamlogos/ncaa/500/2426.png,2026-01-02T21:49:20Z,-4.5,-8.5,-110,0.40632555,-0.11748397380952386,DraftKings,-7.5,-115,0.42153915,-0.11334457093023254
+18,Navy@Cincinnati,Cincinnati,http://a.espncdn.com/i/teamlogos/ncaa/500/2132.png,2026-01-02T21:49:20Z,4.5,7.5,-110,0.58436729,0.06055776619047615,FanDuel,7.5,-110,0.58436729,0.06055776619047615
+18,Arizona@SMU,Arizona,http://a.espncdn.com/i/teamlogos/ncaa/500/12.png,2026-01-02T21:49:20Z,-4,1.5,-114,0.59093965,0.058229369626168315,BetMGM,1.5,-110,0.59093965,0.0671301261904762
+18,Arizona@SMU,SMU,http://a.espncdn.com/i/teamlogos/ncaa/500/2567.png,2026-01-02T21:49:20Z,4,-1.5,-109,0.40619834,-0.11533276047846885,DraftKings,-1.5,-105,0.40619834,-0.10599678195121953
