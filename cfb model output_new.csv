@@ -1,13 +1,9 @@
 ﻿week,Team,Opponent,Model Prediction Raw,Model Prediction,Opening Spread,Cover Probability (%),Edge (%),Market Total,bin_cat
 18,Indiana,Oregon,-4.5,-4,-4,0.47671674,-0.04709,47,1
-18,Texas State,Rice,-7,-10,-10.5,0.46785756,-0.05595,59.5,2
-18,Mississippi State,Wake Forest,-4.5,-3,-3,0.47155707,-0.05225,56.5,2
-18,Cincinnati,Navy,-1,-1,-1.5,0.49103976,-0.03277,55.5,2
-18,Ole Miss,Miami,-2,2,3,0.50383027,-0.01998,52,2
-18,SMU,Arizona,14,6,3,0.43551988,-0.08829,52.5,2
 18,Oregon,Indiana,4.5,4,4,0.50609532,-0.01771,47,1
-18,Arizona,SMU,-14,-6,-3,0.52308302,-0.00073,52.5,2
+18,Ole Miss,Miami,-2,2,3,0.50383027,-0.01998,52,2
 18,Miami,Ole Miss,2,-2,-3,0.45446054,-0.06935,52,2
 18,Navy,Cincinnati,1,1,1.5,0.50609688,-0.01771,55.5,2
-18,Wake Forest,Mississippi State,4.5,3,3,0.48669817,-0.03711,56.5,2
-18,Rice,Texas State,7,10,10.5,0.53828742,0.014478,59.5,2
+18,Cincinnati,Navy,-1,-1,-1.5,0.49103976,-0.03277,55.5,2
+18,Arizona,SMU,-14,-6,-3,0.52308302,-0.00073,52.5,2
+18,SMU,Arizona,14,6,3,0.43551988,-0.08829,52.5,2
