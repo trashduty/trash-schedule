@@ -1,13 +1,13 @@
 week,game,team,logo,last_update_api,model_prediction,market_line,market_price,cover_probability,edge,best_book,best_line,best_price,best_cover_probability,best_edge
-17,Oregon@Indiana,Indiana,http://a.espncdn.com/i/teamlogos/ncaa/500/84.png,2026-01-02T01:48:29Z,-3.5,-4,-112,0.46680289,-0.0614989967924528,FanDuel,-3.5,-115,0.48541374,-0.04946998093023253
-17,Ole Miss@Georgia,Georgia,http://a.espncdn.com/i/teamlogos/ncaa/500/61.png,2026-01-02T01:48:29Z,-4,-2.5,-125,0.53378365,-0.021771905555555526,Fanatics,-2.5,-120,0.53378365,-0.01167089545454536
-17,Oregon@Indiana,Oregon,http://a.espncdn.com/i/teamlogos/ncaa/500/2483.png,2026-01-02T01:48:29Z,3,4,-108,0.52592049,0.006689720769230689,FanDuel,3.5,-105,0.52592049,0.01372536804878044
-17,Ole Miss@Georgia,Ole Miss,http://a.espncdn.com/i/teamlogos/ncaa/500/145.png,2026-01-02T01:48:29Z,4,3.5,-120,0.50609532,-0.0393592254545454,BetMGM,4.5,-125,0.5268861,-0.028669455555555556
-17,Navy@Cincinnati,Cincinnati,http://a.espncdn.com/i/teamlogos/ncaa/500/2132.png,2026-01-02T01:48:29Z,-0.5,7,-105,0.63079015,0.11859502804878053,BetRivers,7.5,-113,0.66620174,0.13568530807511736
-17,Rice@Texas State,Texas State,http://a.espncdn.com/i/teamlogos/ncaa/500/326.png,2026-01-02T01:48:29Z,-17,-16.5,-105,0.49438256,-0.017812561951219497,DraftKings,-16.5,-105,0.49438256,-0.017812561951219497
-17,Wake Forest@Mississippi State,Mississippi State,http://a.espncdn.com/i/teamlogos/ncaa/500/344.png,2026-01-02T01:48:29Z,-5,-3,-112,0.50589878,-0.02240310679245283,FanDuel,-3.5,-102,0.50589878,9.482849504950375e-4
-17,Rice@Texas State,Rice,http://a.espncdn.com/i/teamlogos/ncaa/500/242.png,2026-01-02T01:48:29Z,17,15.5,-105,0.49361812,-0.01857700195121953,BetRivers,16.5,-110,0.50754874,-0.016260783809523782
-17,Wake Forest@Mississippi State,Wake Forest,http://a.espncdn.com/i/teamlogos/ncaa/500/154.png,2026-01-02T01:48:29Z,5,3,-105,0.45251285,-0.0596822719512195,FanDuel,3.5,-120,0.49230474,-0.053149805454545396
-17,Arizona@SMU,Arizona,http://a.espncdn.com/i/teamlogos/ncaa/500/12.png,2026-01-02T01:48:29Z,1.5,1.5,-120,0.49752939,-0.0479251554545454,BetMGM,1.5,-110,0.49752939,-0.02628013380952382
-17,Navy@Cincinnati,Navy,http://a.espncdn.com/i/teamlogos/ncaa/500/2426.png,2026-01-02T01:48:29Z,0.5,-7.5,-110,0.33922909,-0.18458043380952383,FanDuel,-7.5,100,0.33922909,-0.16077091
-18,Arizona@SMU,SMU,http://a.espncdn.com/i/teamlogos/ncaa/500/2567.png,2026-01-02T01:48:29Z,-1.5,1,-113,0.53226747,0.0017510380751173393,FanDuel,1.5,-115,0.54880002,0.013916299069767546
+17,Oregon@Indiana,Indiana,http://a.espncdn.com/i/teamlogos/ncaa/500/84.png,2026-01-02T02:34:57Z,-3.5,-4,-112,0.46680289,-0.0614989967924528,FanDuel,-3.5,-115,0.48541374,-0.04946998093023253
+17,Ole Miss@Georgia,Georgia,http://a.espncdn.com/i/teamlogos/ncaa/500/61.png,2026-01-02T02:34:57Z,-10.5,-12.5,-120,0.44478875,-0.1006657954545454,BetMGM,-13.5,-110,0.42939914,-0.09441038380952382
+17,Oregon@Indiana,Oregon,http://a.espncdn.com/i/teamlogos/ncaa/500/2483.png,2026-01-02T02:34:57Z,3,4,-108,0.52592049,0.006689720769230689,FanDuel,3.5,-105,0.52592049,0.01372536804878044
+17,Ole Miss@Georgia,Ole Miss,http://a.espncdn.com/i/teamlogos/ncaa/500/145.png,2026-01-02T02:34:57Z,10.5,12.5,-110,0.55406401,0.030254486190476215,FanDuel,13.5,-108,0.56800178,0.04877101076923074
+17,Navy@Cincinnati,Cincinnati,http://a.espncdn.com/i/teamlogos/ncaa/500/2132.png,2026-01-02T02:34:57Z,-0.5,7,-105,0.63079015,0.11859502804878053,BetRivers,7.5,-113,0.66620174,0.13568530807511736
+17,Rice@Texas State,Texas State,http://a.espncdn.com/i/teamlogos/ncaa/500/326.png,2026-01-02T02:34:57Z,-17,-16.5,-105,0.49438256,-0.017812561951219497,DraftKings,-16.5,-105,0.49438256,-0.017812561951219497
+17,Wake Forest@Mississippi State,Mississippi State,http://a.espncdn.com/i/teamlogos/ncaa/500/344.png,2026-01-02T02:34:57Z,-5,-3,-112,0.50589878,-0.02240310679245283,FanDuel,-3.5,-102,0.50589878,9.482849504950375e-4
+17,Rice@Texas State,Rice,http://a.espncdn.com/i/teamlogos/ncaa/500/242.png,2026-01-02T02:34:57Z,17,16.5,-110,0.50754874,-0.016260783809523782,FanDuel,16.5,-108,0.50754874,-0.01168202923076922
+17,Wake Forest@Mississippi State,Wake Forest,http://a.espncdn.com/i/teamlogos/ncaa/500/154.png,2026-01-02T02:34:57Z,5,3,-105,0.45251285,-0.0596822719512195,FanDuel,3.5,-120,0.49230474,-0.053149805454545396
+17,Arizona@SMU,Arizona,http://a.espncdn.com/i/teamlogos/ncaa/500/12.png,2026-01-02T02:34:57Z,1.5,1.5,-120,0.49752939,-0.0479251554545454,BetMGM,1.5,-110,0.49752939,-0.02628013380952382
+17,Navy@Cincinnati,Navy,http://a.espncdn.com/i/teamlogos/ncaa/500/2426.png,2026-01-02T02:34:57Z,0.5,-7.5,-110,0.33922909,-0.18458043380952383,FanDuel,-7.5,100,0.33922909,-0.16077091
+18,Arizona@SMU,SMU,http://a.espncdn.com/i/teamlogos/ncaa/500/2567.png,2026-01-02T02:34:57Z,-1.5,1,-113,0.53226747,0.0017510380751173393,FanDuel,1.5,-115,0.54880002,0.013916299069767546
