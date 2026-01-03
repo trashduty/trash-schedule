@@ -1,13 +1,13 @@
 week,game,team,logo,last_update_api,model_prediction,market_line,market_price,cover_probability,edge,best_book,best_line,best_price,best_cover_probability,best_edge
-18,Oregon@Indiana,Indiana,http://a.espncdn.com/i/teamlogos/ncaa/500/84.png,2026-01-03T21:59:11Z,-2.5,-4,-112,0.44705096,-0.08125092679245283,FanDuel,-4.5,-105,0.44705096,-0.06514416195121953
-18,Miami@Indiana,Indiana,http://a.espncdn.com/i/teamlogos/ncaa/500/84.png,2026-01-03T21:58:45Z,-3.5,-5.5,-115,0.4495559,-0.0853278209302325,FanDuel,-5.5,-115,0.4495559,-0.0853278209302325
-18,Ole Miss@Indiana,Indiana,http://a.espncdn.com/i/teamlogos/ncaa/500/84.png,2026-01-03T21:58:45Z,-4.5,-7.5,-110,0.41541178,-0.10839774380952383,FanDuel,-7.5,-110,0.41541178,-0.10839774380952383
-18,Oregon@Indiana,Oregon,http://a.espncdn.com/i/teamlogos/ncaa/500/2483.png,2026-01-03T21:59:11Z,2.5,4,-106,0.53580824,0.02124513320388355,BetMGM,4,-105,0.53580824,0.023613118048780524
-18,Miami@Oregon,Oregon,http://a.espncdn.com/i/teamlogos/ncaa/500/2483.png,2026-01-03T21:58:45Z,-2,-2.5,-106,0.49415058,-0.020412526796116492,FanDuel,-2.5,-106,0.49415058,-0.020412526796116492
-18,Ole Miss@Oregon,Oregon,http://a.espncdn.com/i/teamlogos/ncaa/500/2483.png,2026-01-03T21:58:45Z,-2.5,-3.5,-115,0.46299946,-0.07188426093023254,FanDuel,-3.5,-115,0.46299946,-0.07188426093023254
-18,Miami@Ole Miss,Ole Miss,http://a.espncdn.com/i/teamlogos/ncaa/500/145.png,2026-01-03T21:59:11Z,1.5,3.5,-112,0.55221421,0.023912323207547215,BetMGM,3.5,-110,0.55221421,0.028404686190476203
-18,Ole Miss@Indiana,Ole Miss,http://a.espncdn.com/i/teamlogos/ncaa/500/145.png,2026-01-03T21:58:45Z,4,7.5,-110,0.59509951,0.07128998619047622,FanDuel,7.5,-110,0.59509951,0.07128998619047622
-18,Ole Miss@Oregon,Ole Miss,http://a.espncdn.com/i/teamlogos/ncaa/500/145.png,2026-01-03T21:58:45Z,1.5,3.5,-105,0.55221421,0.040019088048780516,FanDuel,3.5,-105,0.55221421,0.040019088048780516
-18,Miami@Ole Miss,Miami,http://a.espncdn.com/i/teamlogos/ncaa/500/2390.png,2026-01-03T21:59:11Z,-1.5,-3.5,-110,0.44594403,-0.07786549380952384,FanDuel,-3.5,-105,0.44594403,-0.06625109195121953
-18,Miami@Indiana,Miami,http://a.espncdn.com/i/teamlogos/ncaa/500/2390.png,2026-01-03T21:58:45Z,4.5,5.5,-105,0.53281386,0.02061873804878045,FanDuel,5.5,-105,0.53281386,0.02061873804878045
-18,Miami@Oregon,Miami,http://a.espncdn.com/i/teamlogos/ncaa/500/2390.png,2026-01-03T21:58:45Z,2.5,2.5,-114,0.49244727,-0.04026301037383173,FanDuel,2.5,-114,0.49244727,-0.04026301037383173
+18,Oregon@Indiana,Indiana,http://a.espncdn.com/i/teamlogos/ncaa/500/84.png,2026-01-03T22:11:04Z,-2.5,-4,-112,0.44705096,-0.08125092679245283,FanDuel,-4.5,-105,0.44705096,-0.06514416195121953
+18,Miami@Indiana,Indiana,http://a.espncdn.com/i/teamlogos/ncaa/500/84.png,2026-01-03T22:11:04Z,-3.5,-5.5,-115,0.4495559,-0.0853278209302325,FanDuel,-5.5,-115,0.4495559,-0.0853278209302325
+18,Ole Miss@Indiana,Indiana,http://a.espncdn.com/i/teamlogos/ncaa/500/84.png,2026-01-03T22:11:04Z,-4.5,-7.5,-110,0.41541178,-0.10839774380952383,FanDuel,-7.5,-110,0.41541178,-0.10839774380952383
+18,Oregon@Indiana,Oregon,http://a.espncdn.com/i/teamlogos/ncaa/500/2483.png,2026-01-03T22:11:04Z,2.5,4,-106,0.53580824,0.02124513320388355,BetMGM,4,-105,0.53580824,0.023613118048780524
+18,Miami@Oregon,Oregon,http://a.espncdn.com/i/teamlogos/ncaa/500/2483.png,2026-01-03T22:11:04Z,-2,-2.5,-106,0.49415058,-0.020412526796116492,FanDuel,-2.5,-106,0.49415058,-0.020412526796116492
+18,Ole Miss@Oregon,Oregon,http://a.espncdn.com/i/teamlogos/ncaa/500/2483.png,2026-01-03T22:11:04Z,-2.5,-3.5,-115,0.46299946,-0.07188426093023254,FanDuel,-3.5,-115,0.46299946,-0.07188426093023254
+18,Miami@Ole Miss,Ole Miss,http://a.espncdn.com/i/teamlogos/ncaa/500/145.png,2026-01-03T22:11:04Z,1.5,3.5,-112,0.55221421,0.023912323207547215,BetMGM,3.5,-110,0.55221421,0.028404686190476203
+18,Ole Miss@Indiana,Ole Miss,http://a.espncdn.com/i/teamlogos/ncaa/500/145.png,2026-01-03T22:11:04Z,4,7.5,-110,0.59509951,0.07128998619047622,FanDuel,7.5,-110,0.59509951,0.07128998619047622
+18,Ole Miss@Oregon,Ole Miss,http://a.espncdn.com/i/teamlogos/ncaa/500/145.png,2026-01-03T22:11:04Z,1.5,3.5,-105,0.55221421,0.040019088048780516,FanDuel,3.5,-105,0.55221421,0.040019088048780516
+18,Miami@Ole Miss,Miami,http://a.espncdn.com/i/teamlogos/ncaa/500/2390.png,2026-01-03T22:11:04Z,-1.5,-3.5,-110,0.44594403,-0.07786549380952384,FanDuel,-3.5,-105,0.44594403,-0.06625109195121953
+18,Miami@Indiana,Miami,http://a.espncdn.com/i/teamlogos/ncaa/500/2390.png,2026-01-03T22:11:04Z,4.5,5.5,-105,0.53281386,0.02061873804878045,FanDuel,5.5,-105,0.53281386,0.02061873804878045
+18,Miami@Oregon,Miami,http://a.espncdn.com/i/teamlogos/ncaa/500/2390.png,2026-01-03T22:11:04Z,2.5,2.5,-114,0.49244727,-0.04026301037383173,FanDuel,2.5,-114,0.49244727,-0.04026301037383173
