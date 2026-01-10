@@ -1,7 +1,3 @@
 ﻿week,Team,Opponent,Model Prediction Raw,Model Prediction,Opening Spread,Cover Probability (%),Edge (%),Market Total,bin_cat
-18,Indiana,Oregon,0.5,-2.5,-4,0.44705096,-0.07676,47,1
-18,Oregon,Indiana,-0.5,2.5,4,0.53580824,0.011999,47,1
-18,Ole Miss,Miami,-2.5,1,3,0.52094842,-0.00286,52,2
-18,Miami,Ole Miss,2.5,-1,-3,0.43745364,-0.08636,52,2
-18,Arizona,SMU,4.5,-0.5,-3,0.42899302,-0.09482,52.5,2
-18,SMU,Arizona,-4.5,0.5,3,0.52949285,0.005683,52.5,2
+19,Indiana,Miami,-10,-8.5,-8,0.47740869,-0.0464,48,1
+19,Miami,Indiana,10,8.5,8,0.50591429,-0.0179,48,1
