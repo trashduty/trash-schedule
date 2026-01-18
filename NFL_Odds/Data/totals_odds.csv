@@ -1,3 +1,3 @@
 week,game,model_prediction,median_over_line,median_over_price,median_over_cover_probability,median_over_edge,median_under_line,median_under_price,median_under_cover_probability,median_under_edge,best_over_book,best_over_line,best_over_price,best_over_cover_probability,best_over_edge,best_under_book,best_under_line,best_under_price,best_under_cover_probability,best_under_edge
-20,HOU@NE,48,50.5,-118,0.4245839,-0.11670050366972473,50.5,-108,0.5754161,0.05618533076923071,DraftKings,51.5,-105,0.39641534,-0.11577978195121952,Fanatics,50.5,-105,0.5754161,0.06322097804878046
+20,HOU@NE,48,50.5,-125,0.4245839,-0.13097165555555557,50.5,-104,0.5754161,0.06561217843137257,BetMGM,50.5,-118,0.4245839,-0.11670050366972473,DraftKings,50.5,100,0.5754161,0.07541609999999999
 20,LA@CHI,46.5,49,-110,0.41203761,-0.11177191380952384,48.5,-102,0.56246599,0.057515494950495016,FanDuel,48.5,-120,0.43753401,-0.10792053545454544,DraftKings,49.5,-110,0.58796239,0.06415286619047611
