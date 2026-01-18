@@ -1,2 +1,2 @@
 week,game,model_prediction,median_over_line,median_over_price,median_over_cover_probability,median_over_edge,median_under_line,median_under_price,median_under_cover_probability,median_under_edge,best_over_book,best_over_line,best_over_price,best_over_cover_probability,best_over_edge,best_under_book,best_under_line,best_under_price,best_under_cover_probability,best_under_edge
-20,LA@CHI,47,49.5,-110,0.42563464,-0.09817488380952383,49.5,-110,0.57436536,0.05055583619047621,FanDuel,49.5,-108,0.42563464,-0.09359612923076926,DraftKings,49.5,-110,0.57436536,0.05055583619047621
+20,LA@CHI,46,47.5,-110,0.44981179,-0.07399773380952385,47.5,-118,0.55018821,0.00890380633027521,Fanatics,46.5,-120,0.47825116,-0.0672033854545454,BetMGM,47.5,-110,0.55018821,0.02637868619047612
