@@ -1,3 +1,3 @@
 week,game,model_prediction,median_over_line,median_over_price,median_over_cover_probability,median_over_edge,median_under_line,median_under_price,median_under_cover_probability,median_under_edge,best_over_book,best_over_line,best_over_price,best_over_cover_probability,best_over_edge,best_under_book,best_under_line,best_under_price,best_under_cover_probability,best_under_edge
 21,LA@SEA,47.5,47.5,-105,0.49512076,-0.01707436195121953,47.5,-115,0.50487924,-0.030004480930232558,DraftKings,47.5,-105,0.49512076,-0.01707436195121953,BetMGM,47.5,-110,0.50487924,-0.018930283809523885
-21,NE@DEN,43,41.5,-110,0.53729095,0.013481426190476209,42,-110,0.46270905,-0.061100473809523825,DraftKings,41.5,-108,0.53729095,0.01806018076923077,FanDuel,41.5,-105,0.46270905,-0.04948607195121951
+21,NE@DEN,43,41.5,-110,0.53729095,0.013481426190476209,41.5,-110,0.46270905,-0.061100473809523825,DraftKings,41.5,-108,0.53729095,0.01806018076923077,FanDuel,41.5,-105,0.46270905,-0.04948607195121951
