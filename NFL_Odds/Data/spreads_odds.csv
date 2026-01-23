@@ -1,5 +1,5 @@
 week,game,team,team_logo_espn,last_update_api,model_prediction,market_line,market_price,cover_probability,edge,best_book,best_line,best_price,best_cover_probability,best_edge
-21,LA@SEA,LA,https://a.espncdn.com/i/teamlogos/nfl/500/lar.png,2026-01-23T20:07:49Z,4,2.5,-112,0.4007,-0.12760188679245282,DraftKings,2.5,-110,0.4007,-0.12310952380952384
-21,LA@SEA,SEA,https://a.espncdn.com/i/teamlogos/nfl/500/sea.png,2026-01-23T20:07:49Z,-4,-2.5,-110,0.5992000000000002,0.07539047619047634,FanDuel,-2.5,-104,0.5992000000000002,0.08939607843137276
-21,NE@DEN,DEN,https://a.espncdn.com/i/teamlogos/nfl/500/den.png,2026-01-23T20:07:49Z,8,4.5,-115,0.356,-0.17888372093023253,BetRivers,4.5,-113,0.356,-0.17451643192488264
-21,NE@DEN,NE,https://a.espncdn.com/i/teamlogos/nfl/500/ne.png,2026-01-23T20:07:49Z,-8,-4.5,-105,0.64380000000000015,0.13160487804878063,FanDuel,-4.5,-102,0.64380000000000015,0.1388495049504952
+21,LA@SEA,LA,https://a.espncdn.com/i/teamlogos/nfl/500/lar.png,2026-01-23T21:07:04Z,4,2.5,-110,0.4007,-0.12310952380952384,DraftKings,2.5,-110,0.4007,-0.12310952380952384
+21,LA@SEA,SEA,https://a.espncdn.com/i/teamlogos/nfl/500/sea.png,2026-01-23T21:07:04Z,-4,-2.5,-110,0.5992000000000002,0.07539047619047634,FanDuel,-2.5,-104,0.5992000000000002,0.08939607843137276
+21,NE@DEN,DEN,https://a.espncdn.com/i/teamlogos/nfl/500/den.png,2026-01-23T21:07:04Z,8,4.5,-115,0.356,-0.17888372093023253,DraftKings,3.5,-102,0.33339999999999986,-0.1715504950495051
+21,NE@DEN,NE,https://a.espncdn.com/i/teamlogos/nfl/500/ne.png,2026-01-23T21:07:04Z,-8,-4.5,-105,0.64380000000000015,0.13160487804878063,FanDuel,-4.5,-102,0.64380000000000015,0.1388495049504952
