@@ -530,16 +530,11 @@
               td.textContent = formatted;
             }
           } else if (col.csv === 'game') {
-            const gameVal = (val || '').toString().trim();
-            const parts = gameVal.split('@');
-            if (parts.length === 2) {
-              const homeTeam = parts[1].trim().toUpperCase();
-              const pfrAbbr = PFR_TEAM_ABBR[homeTeam];
-              const pfrUrl = pfrAbbr
-                ? `https://www.pro-football-reference.com/teams/${pfrAbbr}/${NFL_SEASON_YEAR}.htm`
-                : `https://www.pro-football-reference.com/`;
+            const teamKey = (row['team'] || '').toString().trim().toUpperCase();
+            const pfrAbbr = PFR_TEAM_ABBR[teamKey];
+            if (pfrAbbr) {
               const a = document.createElement('a');
-              a.href = pfrUrl;
+              a.href = `https://www.pro-football-reference.com/teams/${pfrAbbr}/${NFL_SEASON_YEAR}.htm`;
               a.target = '_blank';
               a.rel = 'noopener noreferrer';
               a.textContent = formatted;
