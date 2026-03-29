@@ -117,7 +117,7 @@
 
     table {
       border-collapse: collapse;
-      width: 100%;
+      width: auto;
       font-size: 0.85rem;
     }
 
@@ -126,6 +126,19 @@
       text-align: left;
       border-bottom: 1px solid #ddd;
       white-space: nowrap;
+    }
+
+    td.numeric {
+      text-align: right;
+    }
+
+    table a {
+      color: inherit;
+      text-decoration: underline;
+    }
+
+    table a:hover {
+      opacity: 0.75;
     }
 
     th {
@@ -187,6 +200,41 @@
 
   <script>
     const CSV_URL = 'https://raw.githubusercontent.com/trashduty/trash-schedule/main/NFL_Odds/Data/spreads_odds.csv';
+
+    const TEAM_INJURY_URLS = {
+      ARI: 'https://www.espn.com/nfl/team/injuries/_/name/ari/arizona-cardinals',
+      ATL: 'https://www.espn.com/nfl/team/injuries/_/name/atl/atlanta-falcons',
+      BAL: 'https://www.espn.com/nfl/team/injuries/_/name/bal/baltimore-ravens',
+      BUF: 'https://www.espn.com/nfl/team/injuries/_/name/buf/buffalo-bills',
+      CAR: 'https://www.espn.com/nfl/team/injuries/_/name/car/carolina-panthers',
+      CHI: 'https://www.espn.com/nfl/team/injuries/_/name/chi/chicago-bears',
+      CIN: 'https://www.espn.com/nfl/team/injuries/_/name/cin/cincinnati-bengals',
+      CLE: 'https://www.espn.com/nfl/team/injuries/_/name/cle/cleveland-browns',
+      DAL: 'https://www.espn.com/nfl/team/injuries/_/name/dal/dallas-cowboys',
+      DEN: 'https://www.espn.com/nfl/team/injuries/_/name/den/denver-broncos',
+      DET: 'https://www.espn.com/nfl/team/injuries/_/name/det/detroit-lions',
+      GB:  'https://www.espn.com/nfl/team/injuries/_/name/gb/green-bay-packers',
+      HOU: 'https://www.espn.com/nfl/team/injuries/_/name/hou/houston-texans',
+      IND: 'https://www.espn.com/nfl/team/injuries/_/name/ind/indianapolis-colts',
+      JAX: 'https://www.espn.com/nfl/team/injuries/_/name/jax/jacksonville-jaguars',
+      KC:  'https://www.espn.com/nfl/team/injuries/_/name/kc/kansas-city-chiefs',
+      LAC: 'https://www.espn.com/nfl/team/injuries/_/name/lac/los-angeles-chargers',
+      LAR: 'https://www.espn.com/nfl/team/injuries/_/name/lar/los-angeles-rams',
+      LV:  'https://www.espn.com/nfl/team/injuries/_/name/lv/las-vegas-raiders',
+      MIA: 'https://www.espn.com/nfl/team/injuries/_/name/mia/miami-dolphins',
+      MIN: 'https://www.espn.com/nfl/team/injuries/_/name/min/minnesota-vikings',
+      NE:  'https://www.espn.com/nfl/team/injuries/_/name/ne/new-england-patriots',
+      NO:  'https://www.espn.com/nfl/team/injuries/_/name/no/new-orleans-saints',
+      NYG: 'https://www.espn.com/nfl/team/injuries/_/name/nyg/new-york-giants',
+      NYJ: 'https://www.espn.com/nfl/team/injuries/_/name/nyj/new-york-jets',
+      PHI: 'https://www.espn.com/nfl/team/injuries/_/name/phi/philadelphia-eagles',
+      PIT: 'https://www.espn.com/nfl/team/injuries/_/name/pit/pittsburgh-steelers',
+      SEA: 'https://www.espn.com/nfl/team/injuries/_/name/sea/seattle-seahawks',
+      SF:  'https://www.espn.com/nfl/team/injuries/_/name/sf/san-francisco-49ers',
+      TB:  'https://www.espn.com/nfl/team/injuries/_/name/tb/tampa-bay-buccaneers',
+      TEN: 'https://www.espn.com/nfl/team/injuries/_/name/ten/tennessee-titans',
+      WAS: 'https://www.espn.com/nfl/team/injuries/_/name/wsh/washington-commanders',
+    };
     const REFRESH_INTERVAL = 60000;
     const EXCLUDED_COLUMNS = new Set(['team_logo_espn', 'last_update_api']);
     const EDGE_THRESHOLD_PERCENT = 3; // minimum edge % considered favorable (green gradient)
@@ -440,8 +488,28 @@
         activeCols.forEach(col => {
           const td = document.createElement('td');
           const val = row[col.csv];
+          const formatted = formatValue(val, col.type);
 
-          td.textContent = formatValue(val, col.type);
+          if (col.csv === 'team') {
+            const teamKey = (val || '').toString().trim().toUpperCase();
+            const url = TEAM_INJURY_URLS[teamKey];
+            if (url) {
+              const a = document.createElement('a');
+              a.href = url;
+              a.target = '_blank';
+              a.rel = 'noopener noreferrer';
+              a.textContent = formatted;
+              td.appendChild(a);
+            } else {
+              td.textContent = formatted;
+            }
+          } else {
+            td.textContent = formatted;
+          }
+
+          if (col.type !== 'text') {
+            td.classList.add('numeric');
+          }
 
           if (typeof val === 'number') {
             if (col.type === 'spread_edge') {
