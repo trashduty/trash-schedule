@@ -201,6 +201,17 @@
   <script>
     const CSV_URL = 'https://raw.githubusercontent.com/trashduty/trash-schedule/main/NFL_Odds/Data/spreads_odds.csv';
 
+    // Pro-Football-Reference uses different team abbreviations than the standard NFL ones.
+    const PFR_TEAM_ABBR = {
+      ARI: 'crd', ATL: 'atl', BAL: 'rav', BUF: 'buf', CAR: 'car',
+      CHI: 'chi', CIN: 'cin', CLE: 'cle', DAL: 'dal', DEN: 'den',
+      DET: 'det', GB:  'gnb', HOU: 'htx', IND: 'clt', JAX: 'jax',
+      KC:  'kan', LAC: 'sdg', LAR: 'ram', LV:  'rai', MIA: 'mia',
+      MIN: 'min', NE:  'nwe', NO:  'nor', NYG: 'nyg', NYJ: 'nyj',
+      PHI: 'phi', PIT: 'pit', SEA: 'sea', SF:  'sfo', TB:  'tam',
+      TEN: 'oti', WAS: 'was',
+    };
+
     const TEAM_INJURY_URLS = {
       ARI: 'https://www.espn.com/nfl/team/injuries/_/name/ari/arizona-cardinals',
       ATL: 'https://www.espn.com/nfl/team/injuries/_/name/atl/atlanta-falcons',
@@ -238,7 +249,7 @@
     const REFRESH_INTERVAL = 60000;
     const EXCLUDED_COLUMNS = new Set(['team_logo_espn', 'last_update_api']);
     const EDGE_THRESHOLD_PERCENT = 3; // minimum edge % considered favorable (green gradient)
-    const NFL_SEASON_YEAR = 2026;
+    const NFL_SEASON_YEAR = 2025;
 
     let rawData = [];
     let allTeams = [];
@@ -520,14 +531,15 @@
             }
           } else if (col.csv === 'game') {
             const gameVal = (val || '').toString().trim();
-            const week = row['week'];
             const parts = gameVal.split('@');
-            if (parts.length === 2 && week) {
-              const team1 = parts[0].toLowerCase();
-              const team2 = parts[1].toLowerCase();
-              const weatherUrl = `http://www.nflweather.com/en/game/${NFL_SEASON_YEAR}/week-${week}/${team1}-at-${team2}`;
+            if (parts.length === 2) {
+              const homeTeam = parts[1].trim().toUpperCase();
+              const pfrAbbr = PFR_TEAM_ABBR[homeTeam];
+              const pfrUrl = pfrAbbr
+                ? `https://www.pro-football-reference.com/teams/${pfrAbbr}/${NFL_SEASON_YEAR}.htm`
+                : `https://www.pro-football-reference.com/`;
               const a = document.createElement('a');
-              a.href = weatherUrl;
+              a.href = pfrUrl;
               a.target = '_blank';
               a.rel = 'noopener noreferrer';
               a.textContent = formatted;
