@@ -238,6 +238,7 @@
     const REFRESH_INTERVAL = 60000;
     const EXCLUDED_COLUMNS = new Set(['team_logo_espn', 'last_update_api']);
     const EDGE_THRESHOLD_PERCENT = 3; // minimum edge % considered favorable (green gradient)
+    const NFL_SEASON_YEAR = 2026;
 
     let rawData = [];
     let allTeams = [];
@@ -261,13 +262,27 @@
     }
 
     function buildColumnMapping(headers) {
-      columnMapping = headers
+      const mapped = headers
         .filter(h => !EXCLUDED_COLUMNS.has(h))
         .map(h => ({
           csv: h,
           display: formatHeader(h),
           type: inferType(h)
         }));
+
+      // Insert lookahead_line after market_line if not already present in headers
+      if (!headers.includes('lookahead_line')) {
+        const mlIdx = mapped.findIndex(c => c.csv === 'market_line');
+        if (mlIdx !== -1) {
+          mapped.splice(mlIdx + 1, 0, {
+            csv: 'lookahead_line',
+            display: 'Lookahead Line',
+            type: 'decimal'
+          });
+        }
+      }
+
+      columnMapping = mapped;
     }
 
     function toggleTeamPicker(forceOpen) {
@@ -496,6 +511,23 @@
             if (url) {
               const a = document.createElement('a');
               a.href = url;
+              a.target = '_blank';
+              a.rel = 'noopener noreferrer';
+              a.textContent = formatted;
+              td.appendChild(a);
+            } else {
+              td.textContent = formatted;
+            }
+          } else if (col.csv === 'game') {
+            const gameVal = (val || '').toString().trim();
+            const week = row['week'];
+            const parts = gameVal.split('@');
+            if (parts.length === 2 && week) {
+              const team1 = parts[0].toLowerCase();
+              const team2 = parts[1].toLowerCase();
+              const weatherUrl = `http://www.nflweather.com/en/game/${NFL_SEASON_YEAR}/week-${week}/${team1}-at-${team2}`;
+              const a = document.createElement('a');
+              a.href = weatherUrl;
               a.target = '_blank';
               a.rel = 'noopener noreferrer';
               a.textContent = formatted;
