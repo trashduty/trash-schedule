@@ -220,7 +220,23 @@ monday_odds_raw <- map_dfr(unique_mondays, function(mon) {
 #   query_date, bookmaker, fav_spread, dog_spread, fav_team, dog_team.
 # Add an ET game date (corrects for UTC↔ET shift on late Monday night games).
 process_raw_odds <- function(raw_df) {
-  if (nrow(raw_df) == 0 || !"home_team" %in% names(raw_df)) return(tibble())
+  # Return a typed empty tibble so downstream add_team_pair / rename calls work
+  # even when no data is available for a given date range.
+  empty_result <- tibble(
+    api_game_id   = character(),
+    commence_time = character(),
+    game_date_et  = as_date(character()),
+    home_team     = character(),
+    away_team     = character(),
+    query_date    = as_date(character()),
+    bookmaker     = character(),
+    fav_spread    = numeric(),
+    dog_spread    = numeric(),
+    fav_team      = character(),
+    dog_team      = character()
+  )
+
+  if (nrow(raw_df) == 0 || !"home_team" %in% names(raw_df)) return(empty_result)
 
   processed <- raw_df |>
     mutate(
@@ -230,7 +246,7 @@ process_raw_odds <- function(raw_df) {
     ) |>
     filter(bookmaker %in% c("fanduel", "draftkings"))
 
-  if (nrow(processed) == 0) return(tibble())
+  if (nrow(processed) == 0) return(empty_result)
 
   processed |>
     # For each game × bookmaker, identify fav (min spread) and dog (max spread)
@@ -272,7 +288,9 @@ monday_odds  <- add_team_pair(monday_odds, "home_team", "away_team")
 # --- Sunday match ---
 sched_sunday <- schedules |>
   left_join(
-    sunday_odds |> rename(open_date_used = query_date),
+    sunday_odds |>
+      rename(open_date_used = query_date) |>
+      select(-home_team, -away_team),
     by = c(
       "team_pair",
       "game_date"   = "game_date_et",
@@ -291,7 +309,9 @@ games_need_monday <- sched_sunday |>
 # --- Monday match (for games with no Sunday line) ---
 sched_monday_matched <- games_need_monday |>
   left_join(
-    monday_odds |> rename(open_date_used = query_date),
+    monday_odds |>
+      rename(open_date_used = query_date) |>
+      select(-home_team, -away_team),
     by = c(
       "team_pair",
       "game_date"   = "game_date_et",
