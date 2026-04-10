@@ -25,6 +25,9 @@ jobs:
         run: |
           Rscript -e 'install.packages(c("dplyr", "tidyr", "readr", "janitor", "nflreadr", "httr", "jsonlite", "glue", "lubridate", "purrr", "openxlsx"))'
 
+      - name: Create data directories
+        run: mkdir -p NFL_Odds/Data/cache
+
       - name: Run Line Movement Analysis
         run: Rscript NFL_Odds/R/nfl_line_movement.R
 
