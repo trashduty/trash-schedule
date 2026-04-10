@@ -562,27 +562,29 @@ n_scheduled <- nrow(schedules)
 n_matched   <- nrow(master_sheet)
 n_missing   <- n_scheduled - n_matched
 
-message("")
-message("══════════════════════════════════════════════")
-message("  RESULTS SUMMARY")
-message("══════════════════════════════════════════════")
-message("  Total scheduled games : ", n_scheduled)
-message("  Total matched games   : ", n_matched)
-message("  Missing games         : ", n_missing)
+missing_games <- schedules |>
+  anti_join(movement_df, by = "game_id") |>
+  select(season, week, game_type, game_date, home_team, away_team) |>
+  arrange(season, game_date)
 
-if (n_missing > 0) {
-  missing_games <- schedules |>
-    anti_join(movement_df, by = "game_id") |>
-    select(season, week, game_type, game_date, home_team, away_team) |>
-    arrange(season, game_date)
-
-  message("")
-  message("  Missing games (season | week | home @ away):")
+cat("\n")
+cat("══════════════════════════════════════════════\n")
+cat("  RESULTS SUMMARY\n")
+cat("══════════════════════════════════════════════\n")
+cat(sprintf("  Total scheduled games : %d\n", n_scheduled))
+cat(sprintf("  Total matched games   : %d\n", n_matched))
+cat(sprintf("  Missing games         : %d\n", n_missing))
+cat("\n")
+cat("  Missing games (season | week | type | away @ home):\n")
+if (nrow(missing_games) == 0) {
+  cat("    (none)\n")
+} else {
   for (i in seq_len(nrow(missing_games))) {
     g <- missing_games[i, ]
-    message(sprintf("    %s  Wk%-3s [%s]  %s @ %s",
-                    g$season, g$week, g$game_type,
-                    g$away_team, g$home_team))
+    cat(sprintf("    %s  Wk%-3s [%s]  %s @ %s\n",
+                g$season, g$week, g$game_type,
+                g$away_team, g$home_team))
   }
 }
-message("══════════════════════════════════════════════")
+cat("══════════════════════════════════════════════\n")
+flush.console()

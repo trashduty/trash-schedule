@@ -33,6 +33,7 @@ jobs:
 
       - name: Run Odds Calculation
         run: Rscript NFL_Odds/R/nfl_odds.R
+        continue-on-error: true
 
       - name: Commit and Push results
         run: |
