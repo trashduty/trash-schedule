@@ -53,12 +53,7 @@ CSV_FILE   <- "CFB_Odds/Data/cfb_line_movement.csv"
 if (!dir.exists(DATA_DIR))  dir.create(DATA_DIR,  recursive = TRUE)
 if (!dir.exists(CACHE_DIR)) dir.create(CACHE_DIR, recursive = TRUE)
 
-# Register CFBD API key (cfbfastR picks it up from env var, but explicit is safer)
-if (nchar(CFBD_KEY) > 0) {
-  cfbfastR::register_cfbd(api_key = CFBD_KEY)
-} else {
-  message("Warning: CFBD_API_KEY is not set. CFBD API calls may fail or be rate-limited.")
-}
+message("CFBD_API_KEY set: ", if (nchar(CFBD_KEY) > 0) "TRUE" else "FALSE (CFBD API calls may fail or be rate-limited)")
 
 # ── Helper: parse OddsAPI historical response text ────────────────────────────
 # Returns a tidy data frame with one row per (game × bookmaker × team).
