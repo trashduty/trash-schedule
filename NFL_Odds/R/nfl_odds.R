@@ -25,10 +25,37 @@ get_odds_api <- function(sport = "americanfootball_nfl",
   # Betting data doesn't have the `week` column necessary for NFL data, so 
   # we have to create it. Essentially, I'm pulling the first game of the season
   # here, and regressing that to wednesday of that week. Later, I will use that 
-  # to calculate the NFL week by using a Wednesday to following Tuesday NFL week. 
-  schedule_summary <- nflreadr::load_schedules(seasons = year) |> 
-    filter(game_type == "REG") |> 
-    mutate(gameday = as_date(gameday)) |>
+  # to calculate the NFL week by using a Wednesday to following Tuesday NFL week.
+  
+  # Fall back to the previous season if the current season has no regular-season
+  # schedule data yet (e.g. during the off-season when get_current_season()
+  # returns the upcoming empty season).
+  reg_games <- tryCatch(
+    nflreadr::load_schedules(seasons = year) |>
+      filter(game_type == "REG") |>
+      mutate(gameday = as_date(gameday)) |>
+      filter(!is.na(gameday)),
+    error = function(e) data.frame()
+  )
+  if (nrow(reg_games) == 0) {
+    message("No regular-season schedule data for season ", year,
+            ". Falling back to season ", year - 1L, ".")
+    year <- year - 1L
+    reg_games <- tryCatch(
+      nflreadr::load_schedules(seasons = year) |>
+        filter(game_type == "REG") |>
+        mutate(gameday = as_date(gameday)) |>
+        filter(!is.na(gameday)),
+      error = function(e) data.frame()
+    )
+    if (nrow(reg_games) == 0) {
+      message("No regular-season schedule data available for season ", year,
+              " either. Exiting gracefully.")
+      return(invisible(NULL))
+    }
+  }
+
+  schedule_summary <- reg_games |>
     summarise(first_game_date = min(gameday)) |>
     mutate(
       first_game_weekday = wday(first_game_date, week_start = 1),  # Monday = 1, Sunday = 7
@@ -42,8 +69,9 @@ get_odds_api <- function(sport = "americanfootball_nfl",
     )
 
   if (is.na(schedule_summary$first_game_date) || is.infinite(schedule_summary$first_game_date)) {
-    stop("No regular-season schedule data is available for season ", year,
-         ". The script cannot determine week numbers during the off-season.")
+    message("No regular-season schedule data is available for season ", year,
+            ". The script cannot determine week numbers during the off-season.")
+    return(invisible(NULL))
   }
 
   week_one_wednesday <- schedule_summary |> pull(week_one_wednesday)
@@ -67,11 +95,13 @@ get_odds_api <- function(sport = "americanfootball_nfl",
 
   if (!is.data.frame(api_data)) {
     api_msg <- if (is.list(api_data) && !is.null(api_data$message)) api_data$message else paste("received object of class:", paste(class(api_data), collapse = ", "))
-    stop("Odds API did not return valid game data. ", api_msg)
+    message("Odds API did not return valid game data. ", api_msg)
+    return(invisible(NULL))
   }
 
   if (nrow(api_data) == 0) {
-    stop("Odds API returned an empty dataset. No games are currently available.")
+    message("Odds API returned an empty dataset. No games are currently available.")
+    return(invisible(NULL))
   }
   
   teams <- nflreadr::load_teams() |> 
@@ -107,6 +137,7 @@ get_odds_api <- function(sport = "americanfootball_nfl",
 
 api_data <- get_odds_api()
 
+if (!is.null(api_data)) {
   margin <- read_csv("NFL_Odds/Data/interpolated_2d_margin_probs.csv",
                      show_col_types = FALSE) |>
     janitor::clean_names()
@@ -272,8 +303,8 @@ api_data <- get_odds_api()
       .groups = "drop"
     ) 
   
-
-
-
-write_csv(total_summary, "NFL_Odds/Data/totals_odds.csv")
-write_csv(spread_summary, "NFL_Odds/Data/spreads_odds.csv")
+  write_csv(total_summary, "NFL_Odds/Data/totals_odds.csv")
+  write_csv(spread_summary, "NFL_Odds/Data/spreads_odds.csv")
+} else {
+  message("No active NFL games found. Exiting gracefully (off-season or API unavailable).")
+}
