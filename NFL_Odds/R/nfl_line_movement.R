@@ -6,6 +6,11 @@
 # Opening line logic:
 #   - Query OddsAPI at Sunday 23:59 UTC of the week prior to each game.
 #   - If no line exists for a game on Sunday, fall back to Monday 12:00 UTC.
+#   - If still no line, fall back to Tuesday 12:00 UTC (catches late-published
+#     lines, e.g. after injuries or late Monday Night Football results).
+#   - Super Bowl games use a 14-day lookback (two-week gap before SB); the
+#     standard 7-day logic would land on the bye-week Sunday where no lines exist.
+#   - Pick'em games (spread_line == 0) are included in the analysis.
 #   - Use whichever of FanDuel/DraftKings shows the *smaller* spread for the
 #     favorite at open (i.e. smaller absolute value / fewer points given).
 #
@@ -156,7 +161,7 @@ schedules <- nflreadr::load_schedules(seasons = SEASONS) |>
   mutate(game_date = as_date(gameday)) |>
   select(season, week, game_id, game_date, home_team, away_team,
          spread_line, game_type) |>
-  filter(!is.na(spread_line), spread_line != 0)   # exclude pick'ems
+  filter(!is.na(spread_line))   # keep pick'ems (spread_line == 0)
 
 message("  ", nrow(schedules), " games loaded.")
 
@@ -165,11 +170,20 @@ message("  ", nrow(schedules), " games loaded.")
 # For a Sunday game on D, this gives D - 7 (previous Sunday).
 # For a Thursday TNF game, this gives the Sunday 4 days earlier.
 # Lines open that Sunday evening (after prior-week games end) or Monday morning.
+#
+# Super Bowl exception: the SB is played two weeks after the Conference
+# Championships, so `floor_date - weeks(1)` lands on the bye-week Sunday where
+# no lines exist.  For SB games we use a 14-day lookback instead.
 
 schedules <- schedules |>
   mutate(
-    open_sunday = floor_date(game_date, "week", week_start = 7) - weeks(1),
-    open_monday = open_sunday + days(1)
+    open_sunday = if_else(
+      game_type == "SB",
+      floor_date(game_date, "week", week_start = 7) - weeks(2),
+      floor_date(game_date, "week", week_start = 7) - weeks(1)
+    ),
+    open_monday  = open_sunday + days(1),
+    open_tuesday = open_sunday + days(2)
   )
 
 # ── Step 3: Load team-name mapping ────────────────────────────────────────────
@@ -185,9 +199,11 @@ schedules <- schedules |>
 # ── Step 4: Fetch OddsAPI historical odds ─────────────────────────────────────
 # Sunday snapshot: 23:59 UTC (≈ 7–8 PM ET) – captures lines opened that evening.
 # Monday snapshot: 12:00 UTC (≈ 8 AM ET) – catches lines that opened overnight.
+# Tuesday snapshot: 12:00 UTC – catches late-published lines (injuries, MNF).
 
-unique_sundays <- sort(unique(schedules$open_sunday))
-unique_mondays <- sort(unique(schedules$open_monday))
+unique_sundays  <- sort(unique(schedules$open_sunday))
+unique_mondays  <- sort(unique(schedules$open_monday))
+unique_tuesdays <- sort(unique(schedules$open_tuesday))
 
 message("Fetching Sunday opening odds (", length(unique_sundays), " dates) ...")
 sunday_odds_raw <- map_dfr(unique_sundays, function(sun) {
@@ -207,6 +223,16 @@ monday_odds_raw <- map_dfr(unique_mondays, function(mon) {
   )
   result <- fetch_historical_odds(date_str)
   if (nrow(result) > 0) mutate(result, query_date = mon) else tibble()
+})
+
+message("Fetching Tuesday opening odds (", length(unique_tuesdays), " dates) ...")
+tuesday_odds_raw <- map_dfr(unique_tuesdays, function(tue) {
+  date_str <- format(
+    as.POSIXct(paste0(tue, " 12:00:00"), tz = "UTC"),
+    format = "%Y-%m-%dT%H:%M:%SZ"
+  )
+  result <- fetch_historical_odds(date_str)
+  if (nrow(result) > 0) mutate(result, query_date = tue) else tibble()
 })
 
 # ── Step 5: Process raw odds into game-level favorite/underdog spreads ─────────
@@ -263,8 +289,9 @@ process_raw_odds <- function(raw_df) {
     distinct()
 }
 
-sunday_odds <- process_raw_odds(sunday_odds_raw)
-monday_odds <- process_raw_odds(monday_odds_raw)
+sunday_odds  <- process_raw_odds(sunday_odds_raw)
+monday_odds  <- process_raw_odds(monday_odds_raw)
+tuesday_odds <- process_raw_odds(tuesday_odds_raw)
 
 # ── Step 6: Match schedules to opening odds ───────────────────────────────────
 # OddsAPI and nflreadr may disagree on which team is "home" for a given game,
@@ -282,8 +309,9 @@ add_team_pair <- function(df, col1, col2) {
 }
 
 schedules    <- add_team_pair(schedules, "home_team_name", "away_team_name")
-sunday_odds  <- add_team_pair(sunday_odds, "home_team", "away_team")
-monday_odds  <- add_team_pair(monday_odds, "home_team", "away_team")
+sunday_odds  <- add_team_pair(sunday_odds,  "home_team", "away_team")
+monday_odds  <- add_team_pair(monday_odds,  "home_team", "away_team")
+tuesday_odds <- add_team_pair(tuesday_odds, "home_team", "away_team")
 
 # --- Sunday match ---
 sched_sunday <- schedules |>
@@ -303,7 +331,7 @@ sched_sunday <- schedules |>
 games_need_monday <- sched_sunday |>
   filter(is.na(fav_spread)) |>
   select(season, week, game_id, game_date, home_team, away_team,
-         spread_line, game_type, open_sunday, open_monday,
+         spread_line, game_type, open_sunday, open_monday, open_tuesday,
          home_team_name, away_team_name, team_pair)
 
 # --- Monday match (for games with no Sunday line) ---
@@ -320,12 +348,38 @@ sched_monday_matched <- games_need_monday |>
   ) |>
   mutate(open_day_used = if_else(!is.na(fav_spread), "monday", NA_character_))
 
-# --- Combine: Sunday matches + Monday fills ---
-games_with_sunday <- sched_sunday |>
+# Identify games that still need a Tuesday lookup
+games_need_tuesday <- sched_monday_matched |>
+  filter(is.na(fav_spread)) |>
+  select(season, week, game_id, game_date, home_team, away_team,
+         spread_line, game_type, open_sunday, open_monday, open_tuesday,
+         home_team_name, away_team_name, team_pair)
+
+# --- Tuesday match (for games with no Sunday or Monday line) ---
+sched_tuesday_matched <- games_need_tuesday |>
+  left_join(
+    tuesday_odds |>
+      rename(open_date_used = query_date) |>
+      select(-home_team, -away_team),
+    by = c(
+      "team_pair",
+      "game_date"    = "game_date_et",
+      "open_tuesday" = "open_date_used"
+    )
+  ) |>
+  mutate(open_day_used = if_else(!is.na(fav_spread), "tuesday", NA_character_))
+
+# --- Combine: Sunday matches + Monday fills + Tuesday fills ---
+games_with_sunday  <- sched_sunday |>
   filter(!is.na(fav_spread))
 
-games_combined <- bind_rows(games_with_sunday, sched_monday_matched) |>
-  filter(!is.na(fav_spread))   # drop games with no opening line found
+games_with_monday  <- sched_monday_matched |>
+  filter(!is.na(fav_spread))
+
+games_with_tuesday <- sched_tuesday_matched |>
+  filter(!is.na(fav_spread))
+
+games_combined <- bind_rows(games_with_sunday, games_with_monday, games_with_tuesday)
 
 message(nrow(games_combined), " games matched to opening lines out of ",
         nrow(schedules), " total.")
@@ -502,6 +556,33 @@ setColWidths(wb, "Master Game List", cols = 1:ncol(master_sheet),
 
 saveWorkbook(wb, OUT_FILE, overwrite = TRUE)
 message("Done. Output saved to: ", OUT_FILE)
-message("Games included : ", nrow(master_sheet))
-message("Games excluded (no opening line found): ",
-        nrow(schedules) - nrow(master_sheet))
+
+# ── Enhanced summary report ────────────────────────────────────────────────────
+n_scheduled <- nrow(schedules)
+n_matched   <- nrow(master_sheet)
+n_missing   <- n_scheduled - n_matched
+
+message("")
+message("══════════════════════════════════════════════")
+message("  RESULTS SUMMARY")
+message("══════════════════════════════════════════════")
+message("  Total scheduled games : ", n_scheduled)
+message("  Total matched games   : ", n_matched)
+message("  Missing games         : ", n_missing)
+
+if (n_missing > 0) {
+  missing_games <- schedules |>
+    anti_join(movement_df, by = "game_id") |>
+    select(season, week, game_type, game_date, home_team, away_team) |>
+    arrange(season, game_date)
+
+  message("")
+  message("  Missing games (season | week | home @ away):")
+  for (i in seq_len(nrow(missing_games))) {
+    g <- missing_games[i, ]
+    message(sprintf("    %s  Wk%-3s [%s]  %s @ %s",
+                    g$season, g$week, g$game_type,
+                    g$away_team, g$home_team))
+  }
+}
+message("══════════════════════════════════════════════")
