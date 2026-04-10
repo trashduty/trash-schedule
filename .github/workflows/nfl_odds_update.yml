@@ -45,6 +45,8 @@ jobs:
 
   run-cfb-scripts:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     env:
       CFBD_API_KEY: ${{ secrets.CFBD_API_KEY }}
       ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}

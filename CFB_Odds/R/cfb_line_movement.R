@@ -544,11 +544,11 @@ schedules_with_lines <- schedules |>
   left_join(odds_open_matches, by = "game_id") |>
   mutate(
     # CFBD spread sign: negative = home favored.
-    # Convert to fav/dog: fav = min(home perspective), dog = max.
-    cfbd_fav_open  = if_else(!is.na(cfbd_open),  pmin(cfbd_open,  -cfbd_open,  na.rm = FALSE), NA_real_),
-    cfbd_fav_close = if_else(!is.na(cfbd_close), pmin(cfbd_close, -cfbd_close, na.rm = FALSE), NA_real_),
-    cfbd_dog_open  = if_else(!is.na(cfbd_open),  pmax(cfbd_open,  -cfbd_open,  na.rm = FALSE), NA_real_),
-    cfbd_dog_close = if_else(!is.na(cfbd_close), pmax(cfbd_close, -cfbd_close, na.rm = FALSE), NA_real_),
+    # Normalize to fav/dog perspective: fav spread is always negative, dog always positive.
+    cfbd_fav_open  = if_else(!is.na(cfbd_open),  -abs(cfbd_open),  NA_real_),
+    cfbd_fav_close = if_else(!is.na(cfbd_close), -abs(cfbd_close), NA_real_),
+    cfbd_dog_open  = if_else(!is.na(cfbd_open),   abs(cfbd_open),  NA_real_),
+    cfbd_dog_close = if_else(!is.na(cfbd_close),  abs(cfbd_close), NA_real_),
     # Determine favorite team from CFBD spread (negative = home favored)
     cfbd_fav_team  = case_when(
       !is.na(cfbd_open)  & cfbd_open  < 0 ~ home_team,
@@ -567,8 +567,8 @@ schedules_with_lines <- schedules |>
     # Final opening spread: prefer CFBD, fall back to OddsAPI
     final_fav_open  = coalesce(cfbd_fav_open,  fav_spread_odds),
     final_dog_open  = coalesce(cfbd_dog_open,  dog_spread_odds),
-    final_fav_close = coalesce(cfbd_fav_close, NA_real_),   # close only from CFBD
-    final_dog_close = coalesce(cfbd_dog_close, NA_real_),
+    final_fav_close = cfbd_fav_close,   # close only from CFBD (no OddsAPI closing fallback)
+    final_dog_close = cfbd_dog_close,
     final_fav_team  = coalesce(cfbd_fav_team,  fav_team_odds),
     final_dog_team  = coalesce(cfbd_dog_team,  dog_team_odds),
     open_source     = case_when(
@@ -702,8 +702,8 @@ for (r in seq_len(nrow(master_sheet))) {
   fav_dir  <- master_sheet$`Fav Direction`[r]
   dog_dir  <- master_sheet$`Dog Direction`[r]
 
-  fav_fill <- switch(fav_dir, larger = "#C6EFCE", smaller = "#FFC7CE", "#FFEB9C")
-  dog_fill <- switch(dog_dir, larger = "#C6EFCE", smaller = "#FFC7CE", "#FFEB9C")
+  fav_fill <- switch(fav_dir, larger = "#C6EFCE", smaller = "#FFC7CE", neutral = "#FFEB9C", "#FFEB9C")
+  dog_fill <- switch(dog_dir, larger = "#C6EFCE", smaller = "#FFC7CE", neutral = "#FFEB9C", "#FFEB9C")
 
   addStyle(wb, "Master Game List", createStyle(fgFill = fav_fill),
            rows = data_row, cols = fav_dir_col)
