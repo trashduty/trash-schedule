@@ -30,26 +30,25 @@ get_odds_api <- function(sport = "americanfootball_nfl",
   # Fall back to the previous season if the current season has no regular-season
   # schedule data yet (e.g. during the off-season when get_current_season()
   # returns the upcoming empty season).
-  reg_games <- tryCatch(
-    nflreadr::load_schedules(seasons = year) |>
-      filter(game_type == "REG") |>
-      mutate(gameday = as_date(gameday)) |>
-      filter(!is.na(gameday)),
-    error = function(e) data.frame()
-  )
-  if (nrow(reg_games) == 0) {
-    message("No regular-season schedule data for season ", year,
-            ". Falling back to season ", year - 1L, ".")
-    year <- year - 1L
-    reg_games <- tryCatch(
-      nflreadr::load_schedules(seasons = year) |>
+  load_reg_schedule <- function(yr) {
+    tryCatch(
+      nflreadr::load_schedules(seasons = yr) |>
         filter(game_type == "REG") |>
         mutate(gameday = as_date(gameday)) |>
         filter(!is.na(gameday)),
       error = function(e) data.frame()
     )
+  }
+
+  reg_games   <- load_reg_schedule(year)
+  active_year <- year
+  if (nrow(reg_games) == 0) {
+    active_year <- year - 1L
+    message("No regular-season schedule data for season ", year,
+            ". Falling back to season ", active_year, ".")
+    reg_games <- load_reg_schedule(active_year)
     if (nrow(reg_games) == 0) {
-      message("No regular-season schedule data available for season ", year,
+      message("No regular-season schedule data available for season ", active_year,
               " either. Exiting gracefully.")
       return(invisible(NULL))
     }
@@ -69,7 +68,7 @@ get_odds_api <- function(sport = "americanfootball_nfl",
     )
 
   if (is.na(schedule_summary$first_game_date) || is.infinite(schedule_summary$first_game_date)) {
-    message("No regular-season schedule data is available for season ", year,
+    message("No regular-season schedule data is available for season ", active_year,
             ". The script cannot determine week numbers during the off-season.")
     return(invisible(NULL))
   }
