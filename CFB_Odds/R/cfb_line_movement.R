@@ -235,17 +235,25 @@ if (nrow(schedules_raw) == 0) {
   quit(status = 0)
 }
 
+id_col_candidates <- intersect(c("id", "game_id", "gameId"), names(schedules_raw))
+if (length(id_col_candidates) == 0) {
+  stop("Cannot find game id column in schedule data. Available columns: ",
+       paste(names(schedules_raw), collapse = ", "))
+}
+id_col <- id_col_candidates[1]
+
 schedules <- schedules_raw |>
   filter(!is.na(home_team), !is.na(away_team)) |>
   mutate(
     game_date = as_date(
       with_tz(ymd_hms(start_date, quiet = TRUE), "America/New_York")
-    )
+    ),
+    game_id = as.character(.data[[id_col]])
   ) |>
   select(
     season,
     week,
-    game_id   = id,
+    game_id,
     game_date,
     home_team,
     away_team,
