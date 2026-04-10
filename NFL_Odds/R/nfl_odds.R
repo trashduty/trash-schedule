@@ -92,11 +92,11 @@ get_odds_api <- function(sport = "americanfootball_nfl",
 
 api_data <- get_odds_api()
 
-  margin <- read_csv("interpolated_2d_margin_probs.csv",
+  margin <- read_csv("NFL_Odds/Data/interpolated_2d_margin_probs.csv",
                      show_col_types = FALSE) |>
     janitor::clean_names()
   
-  lookup <- read_csv("NFL_Totals_Lookup_Stratified_By_Spread.csv",
+  lookup <- read_csv("NFL_Odds/Data/NFL_Totals_Lookup_Stratified_By_Spread.csv",
                      show_col_types = FALSE) |>
     janitor::clean_names()
   

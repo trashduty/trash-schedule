@@ -38,8 +38,10 @@ SEASONS    <- 2021:2025
 BOOKMAKERS <- "fanduel,draftkings"
 GAME_TYPES <- c("REG", "WC", "DIV", "CON", "SB")
 CACHE_DIR  <- "NFL_Odds/Data/cache"
+DATA_DIR   <- "NFL_Odds/Data"
 OUT_FILE   <- "NFL_Odds/Data/nfl_line_movement.xlsx"
 
+if (!dir.exists(DATA_DIR)) dir.create(DATA_DIR,  recursive = TRUE)
 if (!dir.exists(CACHE_DIR)) dir.create(CACHE_DIR, recursive = TRUE)
 
 # ── Helper: parse OddsAPI historical response text ─────────────────────────────
@@ -218,15 +220,19 @@ monday_odds_raw <- map_dfr(unique_mondays, function(mon) {
 #   query_date, bookmaker, fav_spread, dog_spread, fav_team, dog_team.
 # Add an ET game date (corrects for UTC↔ET shift on late Monday night games).
 process_raw_odds <- function(raw_df) {
-  if (nrow(raw_df) == 0) return(tibble())
+  if (nrow(raw_df) == 0 || !"home_team" %in% names(raw_df)) return(tibble())
 
-  raw_df |>
+  processed <- raw_df |>
     mutate(
       game_date_et = as_date(
         with_tz(ymd_hms(commence_time, quiet = TRUE), "America/New_York")
       )
     ) |>
-    filter(bookmaker %in% c("fanduel", "draftkings")) |>
+    filter(bookmaker %in% c("fanduel", "draftkings"))
+
+  if (nrow(processed) == 0) return(tibble())
+
+  processed |>
     # For each game × bookmaker, identify fav (min spread) and dog (max spread)
     group_by(api_game_id, bookmaker) |>
     mutate(
