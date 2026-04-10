@@ -26,7 +26,7 @@ get_odds_api <- function(sport = "americanfootball_nfl",
   # we have to create it. Essentially, I'm pulling the first game of the season
   # here, and regressing that to wednesday of that week. Later, I will use that 
   # to calculate the NFL week by using a Wednesday to following Tuesday NFL week. 
-  week_one_wednesday <- nflreadr::load_schedules(seasons = year) |> 
+  schedule_summary <- nflreadr::load_schedules(seasons = year) |> 
     filter(game_type == "REG") |> 
     mutate(gameday = as_date(gameday)) |>
     summarise(first_game_date = min(gameday)) |>
@@ -39,8 +39,14 @@ get_odds_api <- function(sport = "americanfootball_nfl",
         first_game_weekday < 3 ~ first_game_weekday + 4    # If Mon-Tue, go back to previous Wed
       ),
       week_one_wednesday = first_game_date - days(days_back_to_wednesday)
-    ) |>
-    pull(week_one_wednesday)
+    )
+
+  if (is.na(schedule_summary$first_game_date) || is.infinite(schedule_summary$first_game_date)) {
+    stop("No regular-season schedule data is available for season ", year,
+         ". The script cannot determine week numbers during the off-season.")
+  }
+
+  week_one_wednesday <- schedule_summary |> pull(week_one_wednesday)
   
   
   # URL
@@ -58,6 +64,15 @@ get_odds_api <- function(sport = "americanfootball_nfl",
   # parsing and converting JSON into a data frame
   extracted_data <- httr::content(response, "text", encoding = "UTF-8")
   api_data <- jsonlite::fromJSON(extracted_data, flatten = TRUE)
+
+  if (!is.data.frame(api_data)) {
+    api_msg <- if (is.list(api_data) && !is.null(api_data$message)) api_data$message else paste("received object of class:", paste(class(api_data), collapse = ", "))
+    stop("Odds API did not return valid game data. ", api_msg)
+  }
+
+  if (nrow(api_data) == 0) {
+    stop("Odds API returned an empty dataset. No games are currently available.")
+  }
   
   teams <- nflreadr::load_teams() |> 
     select(team_abbr, team_name)
