@@ -1,92 +1,41 @@
-name: NFL Odds Update
+name: Update NFL Aggression Plots
 
 on:
-  schedule:
-    # Runs at 00:00 UTC every Tuesday (after Monday Night Football)
-    - cron: '0 0 * * 2'
-  workflow_dispatch: # Allows you to run it manually from the "Actions" tab
-
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  workflow_dispatch:
 
 jobs:
-  run-r-scripts:
+  update-plots:
     runs-on: ubuntu-latest
-    env:
-      ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
+    permissions:
+      contents: write
     
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup R
+      # 1. Install System Dependencies for 'magick' and 'nflplotR'
+      - name: Install System Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libmagick++-dev
+
+      - name: Set up R
         uses: r-lib/actions/setup-r@v2
         with:
           use-public-rspm: true
 
-      - name: Install dependencies
+      - name: Install R Packages
         run: |
-          Rscript -e 'install.packages(c("dplyr", "tidyr", "readr", "janitor", "nflreadr", "httr", "jsonlite", "glue", "lubridate", "purrr", "openxlsx"))'
+          install.packages(c("tidyverse", "nflfastR", "nflplotR", "scales"))
+        shell: Rscript {0}
 
-      - name: Create data directories
-        run: mkdir -p NFL_Odds/Data/cache
+      - name: Run Plotting Script
+        run: Rscript scripts/generate_nfl_aggression_plots.R
 
-      - name: Run Line Movement Analysis
-        run: Rscript NFL_Odds/R/nfl_line_movement.R
-
-      - name: Run Odds Calculation
-        run: Rscript NFL_Odds/R/nfl_odds.R
-        continue-on-error: true
-
-      - name: Commit and Push results
+      - name: Commit and Push Plots
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add NFL_Odds/Data/
-          if git diff --staged --quiet; then
-            echo "No changes to commit"
-          else
-            git commit -m "Update NFL Odds data [skip ci]"
-            git pull --rebase origin main
-            git push origin main
-          fi
-
-  run-cfb-scripts:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    env:
-      CFBD_API_KEY: ${{ secrets.CFBD_API_KEY }}
-      ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup R
-        uses: r-lib/actions/setup-r@v2
-        with:
-          use-public-rspm: true
-
-      - name: Install CFB dependencies
-        run: |
-          Rscript -e 'install.packages(c("dplyr", "tidyr", "readr", "httr", "jsonlite", "glue", "lubridate", "purrr", "openxlsx", "cfbfastR"))'
-
-      - name: Create CFB data directories
-        run: mkdir -p CFB_Odds/Data/cache
-
-      - name: Run CFB Line Movement Analysis
-        run: Rscript CFB_Odds/R/cfb_line_movement.R
-
-      - name: Commit and Push CFB results
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add CFB_Odds/Data/
-          if git diff --staged --quiet; then
-            echo "No changes to commit"
-          else
-            git commit -m "Update CFB Odds data [skip ci]"
-            git pull --rebase origin main
-            git push origin main
-          fi
+          git add docs/plots/nfl_2025/*.png
+          git commit -m "Update NFL 2025 Aggression Plots [skip ci]" || echo "No changes to commit"
+          git push
