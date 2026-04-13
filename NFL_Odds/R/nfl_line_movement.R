@@ -13,6 +13,11 @@
 #   - Pick'em games (spread_line == 0) are included in the analysis.
 #   - Use whichever of FanDuel/DraftKings shows the *smaller* spread for the
 #     favorite at open (i.e. smaller absolute value / fewer points given).
+#   - Any odds snapshot whose query_date >= game_date is strictly ignored;
+#     opening lines must be recorded before game day (prevents live/game-day
+#     lines from leaking into the "opening" line via cached snapshots).
+#   - Day priority (Sunday > Monday > Tuesday) is enforced: once an opening
+#     line is found on an earlier day, no later-day snapshot can overwrite it.
 #
 # Output: Excel workbook with two sheets
 #   Sheet 1 – Summary statistics (counts and avg movement for favs & dogs)
@@ -270,7 +275,11 @@ process_raw_odds <- function(raw_df) {
         with_tz(ymd_hms(commence_time, quiet = TRUE), "America/New_York")
       )
     ) |>
-    filter(bookmaker %in% c("fanduel", "draftkings"))
+    filter(bookmaker %in% c("fanduel", "draftkings")) |>
+    # Strictly exclude any snapshot taken on or after game day.  A valid
+    # "opening" line must be recorded before kickoff; game-day snapshots can
+    # contain live lines that are not representative of the opening market.
+    filter(query_date < game_date_et)
 
   if (nrow(processed) == 0) return(empty_result)
 
@@ -388,14 +397,42 @@ message(nrow(games_combined), " games matched to opening lines out of ",
 # For each game, pick the bookmaker whose opening favorite spread has the
 # *smaller absolute value* (i.e. fewer points given by the favorite).
 # If only one book has the game, use that book.
+#
+# Day-priority guard: if (due to edge cases) a game appears in more than one
+# day bucket (Sunday / Monday / Tuesday), keep only the rows from the earliest
+# day before applying the spread-size selection.  This ensures a Sunday line
+# can never be overwritten by a later-day line.
 
 best_book_per_game <- games_combined |>
-  group_by(game_id, bookmaker) |>
-  slice(1) |>                        # one row per game × bookmaker
-  ungroup() |>
+  mutate(day_priority = case_when(
+    open_day_used == "sunday"  ~ 1L,
+    open_day_used == "monday"  ~ 2L,
+    open_day_used == "tuesday" ~ 3L,
+    TRUE ~ 99L
+  ))
+
+# Warn immediately if any row has an unrecognised open_day_used value (gets
+# priority 99).  In normal operation this should never fire; if it does, it
+# signals that a new day-label was introduced that the case_when above does not
+# know about.  The check runs *before* filtering so every affected game_id is
+# reported, even those that would otherwise survive as the sole row in their
+# group.
+unexpected_days <- best_book_per_game |>
+  filter(day_priority == 99L) |>
+  pull(game_id) |>
+  unique()
+if (length(unexpected_days) > 0) {
+  message("WARNING: ", length(unexpected_days),
+          " game(s) have unrecognised open_day_used values; check games_combined.",
+          " Game IDs: ", paste(unexpected_days, collapse = ", "))
+}
+
+best_book_per_game <- best_book_per_game |>
   group_by(game_id) |>
+  filter(day_priority == min(day_priority)) |>   # keep only the earliest day
   slice_min(abs(fav_spread), n = 1, with_ties = FALSE) |>   # smaller fav spread
-  ungroup()
+  ungroup() |>
+  select(-day_priority)
 
 # ── Step 8: Compute spread movement (open → close) ────────────────────────────
 # nflreadr spread_line is from the home team's perspective:
