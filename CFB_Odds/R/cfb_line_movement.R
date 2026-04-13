@@ -170,7 +170,8 @@ process_raw_odds <- function(raw_df) {
         with_tz(ymd_hms(commence_time, quiet = TRUE), "America/New_York")
       )
     ) |>
-    filter(bookmaker %in% c("fanduel", "draftkings"))
+    filter(bookmaker %in% c("fanduel", "draftkings")) |>
+    filter(query_date != game_date_et)
 
   if (nrow(processed) == 0) return(empty_result)
 
@@ -480,12 +481,23 @@ sched_tue <- games_need_tue |>
   ) |>
   mutate(open_day_used = if_else(!is.na(fav_spread), "tuesday", NA_character_))
 
-# Combine OddsAPI opening-line matches
+# Combine OddsAPI opening-line matches, enforcing strict day priority
+# (Sunday > Monday > Tuesday) so that a later snapshot never supersedes
+# an earlier one for the same game.
 odds_open_matches <- bind_rows(
   sched_sun |> filter(!is.na(fav_spread)),
   sched_mon |> filter(!is.na(fav_spread)),
   sched_tue |> filter(!is.na(fav_spread))
 ) |>
+  mutate(day_priority = case_when(
+    open_day_used == "sunday"  ~ 1L,
+    open_day_used == "monday"  ~ 2L,
+    open_day_used == "tuesday" ~ 3L,
+    TRUE                       ~ 99L
+  )) |>
+  group_by(game_id) |>
+  filter(day_priority == min(day_priority)) |>
+  ungroup() |>
   select(game_id, bookmaker, fav_spread_odds = fav_spread, dog_spread_odds = dog_spread, fav_team_odds = fav_team, dog_team_odds = dog_team, open_day_used)
 
 # ── Step 8: Build unified spread data ─────────────────────────────────────────
