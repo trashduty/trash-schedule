@@ -27,6 +27,28 @@ TEAM_PLOT_FILES <- c(
   "SF" = file.path(PLOTS_DIR, "SF_ats_1pm_et.png"),
   "LV" = file.path(PLOTS_DIR, "LV_ats_1pm_et.png")
 )
+ROLE_COLORS <- c("Favorite" = "#FF6F61", "Underdog" = "#00CFCF")
+TEXT_COLOR <- "white"
+ANNOTATION_X_OFFSET <- 0.45
+ANNOTATION_Y_POSITION <- 1.08
+LOGO_X_OFFSET <- 0.10
+LOGO_Y_POSITION <- 1.06
+Y_AXIS_UPPER_LIMIT <- 1.12
+
+DARK_THEME <- theme_minimal(base_size = 12) +
+  theme(
+    plot.background = element_rect(fill = "black", color = NA),
+    panel.background = element_rect(fill = "black", color = NA),
+    panel.grid.major = element_line(color = TEXT_COLOR, linewidth = 0.2, alpha = 0.35),
+    panel.grid.minor = element_blank(),
+    axis.text = element_text(color = TEXT_COLOR),
+    axis.title = element_text(color = TEXT_COLOR),
+    plot.title = element_text(color = TEXT_COLOR, face = "bold"),
+    plot.subtitle = element_text(color = TEXT_COLOR),
+    strip.background = element_rect(fill = "black", color = TEXT_COLOR),
+    strip.text = element_text(color = TEXT_COLOR),
+    plot.margin = margin(10, 35, 10, 10)
+  )
 
 normalize_team <- function(team_abbr) {
   recode(team_abbr, !!!WEST_TEAM_MAP, .default = team_abbr)
@@ -239,46 +261,30 @@ if (!can_render_logos) {
   message("Package 'magick' is unavailable; generating plots without team logos.")
 }
 
-role_colors <- c("Favorite" = "#FF6F61", "Underdog" = "#00CFCF")
-dark_theme <- theme_minimal(base_size = 12) +
-  theme(
-    plot.background = element_rect(fill = "black", color = NA),
-    panel.background = element_rect(fill = "black", color = NA),
-    panel.grid.major = element_line(color = "white", linewidth = 0.2, alpha = 0.35),
-    panel.grid.minor = element_blank(),
-    axis.text = element_text(color = "white"),
-    axis.title = element_text(color = "white"),
-    plot.title = element_text(color = "white", face = "bold"),
-    plot.subtitle = element_text(color = "white"),
-    strip.background = element_rect(fill = "black", color = "white"),
-    strip.text = element_text(color = "white"),
-    plot.margin = margin(10, 35, 10, 10)
-  )
-
 overall_role_annotations <- role_totals |>
   mutate(
-    season = max(SEASONS) + 0.45,
-    cover_pct = 1.08
+    season = max(SEASONS) + ANNOTATION_X_OFFSET,
+    cover_pct = ANNOTATION_Y_POSITION
   )
 
 overall_plot <- ggplot(overall_summary, aes(x = season, y = cover_pct, fill = role)) +
   geom_col(width = 0.75, show.legend = FALSE) +
-  geom_text(aes(label = record), vjust = -0.35, size = 3.4, color = "white") +
+  geom_text(aes(label = record), vjust = -0.35, size = 3.4, color = TEXT_COLOR) +
   geom_text(
     data = overall_role_annotations,
     aes(x = season, y = cover_pct, label = role_record),
     inherit.aes = FALSE,
     hjust = 1,
     size = 3.6,
-    color = "white",
+    color = TEXT_COLOR,
     fontface = "bold"
   ) +
   facet_wrap(~role, nrow = 1) +
-  scale_fill_manual(values = role_colors) +
+  scale_fill_manual(values = ROLE_COLORS) +
   scale_x_continuous(breaks = SEASONS, labels = SEASONS) +
   scale_y_continuous(
     labels = scales::percent_format(accuracy = 1),
-    limits = c(0, 1.12),
+    limits = c(0, Y_AXIS_UPPER_LIMIT),
     expand = expansion(mult = c(0, 0))
   ) +
   labs(
@@ -287,7 +293,7 @@ overall_plot <- ggplot(overall_summary, aes(x = season, y = cover_pct, fill = ro
     x = "Year",
     y = "Cover Percentage"
   ) +
-  dark_theme +
+  DARK_THEME +
   coord_cartesian(clip = "off")
 
 team_title_map <- c(
@@ -300,6 +306,13 @@ team_title_map <- c(
 
 ggsave(OVERALL_PLOT_FILE, overall_plot, width = 12, height = 6, dpi = 300)
 
+logo_template <- data.frame(
+  role = c("Favorite", "Underdog"),
+  season = max(SEASONS) + LOGO_X_OFFSET,
+  cover_pct = LOGO_Y_POSITION,
+  stringsAsFactors = FALSE
+)
+
 for (team in names(TEAM_PLOT_FILES)) {
   team_data <- team_summary |>
     filter(west_team == team)
@@ -308,39 +321,39 @@ for (team in names(TEAM_PLOT_FILES)) {
     filter(west_team == team) |>
     pull(record)
 
+  if (nrow(team_data) == 0 || length(team_total) == 0) {
+    warning("No ATS summary data available for team: ", team, ". Skipping plot generation for this team.")
+    next
+  }
+
   team_role_annotation <- team_role_totals |>
     filter(west_team == team) |>
     mutate(
-      season = max(SEASONS) + 0.45,
-      cover_pct = 1.08
+      season = max(SEASONS) + ANNOTATION_X_OFFSET,
+      cover_pct = ANNOTATION_Y_POSITION
     )
 
-  logo_data <- data.frame(
-    role = c("Favorite", "Underdog"),
-    season = max(SEASONS) + 0.10,
-    cover_pct = 1.06,
-    team_abbr = team,
-    stringsAsFactors = FALSE
-  )
+  logo_data <- logo_template |>
+    mutate(team_abbr = team)
 
   team_plot <- ggplot(team_data, aes(x = season, y = cover_pct, fill = role)) +
     geom_col(width = 0.75, show.legend = FALSE) +
-    geom_text(aes(label = record), vjust = -0.35, size = 3.0, color = "white") +
+    geom_text(aes(label = record), vjust = -0.35, size = 3.0, color = TEXT_COLOR) +
     geom_text(
       data = team_role_annotation,
       aes(x = season, y = cover_pct, label = role_record),
       inherit.aes = FALSE,
       hjust = 1,
       size = 3.4,
-      color = "white",
+      color = TEXT_COLOR,
       fontface = "bold"
     ) +
     facet_wrap(~role, nrow = 1) +
-    scale_fill_manual(values = role_colors) +
+    scale_fill_manual(values = ROLE_COLORS) +
     scale_x_continuous(breaks = SEASONS, labels = SEASONS) +
     scale_y_continuous(
       labels = scales::percent_format(accuracy = 1),
-      limits = c(0, 1.12),
+      limits = c(0, Y_AXIS_UPPER_LIMIT),
       expand = expansion(mult = c(0, 0))
     ) +
     labs(
@@ -349,7 +362,7 @@ for (team in names(TEAM_PLOT_FILES)) {
       x = "Year",
       y = "Cover Percentage"
     ) +
-    dark_theme +
+    DARK_THEME +
     coord_cartesian(clip = "off")
 
   if (can_render_logos) {
