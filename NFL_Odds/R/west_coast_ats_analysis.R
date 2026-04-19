@@ -39,7 +39,7 @@ DARK_THEME <- theme_minimal(base_size = 12) +
   theme(
     plot.background = element_rect(fill = "black", color = NA),
     panel.background = element_rect(fill = "black", color = NA),
-    panel.grid.major = element_line(color = TEXT_COLOR, linewidth = 0.2, alpha = 0.35),
+    panel.grid.major = element_line(color = scales::alpha(TEXT_COLOR, 0.35), linewidth = 0.2),
     panel.grid.minor = element_blank(),
     axis.text = element_text(color = TEXT_COLOR),
     axis.title = element_text(color = TEXT_COLOR),
@@ -206,25 +206,25 @@ overall_summary <- plot_base |>
     losses = sum(result_indicator == "Not Covered"),
     games = wins + losses,
     cover_pct = if_else(games > 0, wins / games, NA_real_),
-    record = paste0(wins, "-", losses),
     .groups = "drop"
-  )
+  ) |>
+  mutate(record = paste0(wins, "-", losses))
 
 overall_totals <- plot_base |>
   summarise(
     wins = sum(result_indicator == "Covered"),
-    losses = sum(result_indicator == "Not Covered"),
-    record = paste0(wins, "-", losses)
-  )
+    losses = sum(result_indicator == "Not Covered")
+  ) |>
+  mutate(record = paste0(wins, "-", losses))
 
 role_totals <- plot_base |>
   group_by(role) |>
   summarise(
     wins = sum(result_indicator == "Covered"),
     losses = sum(result_indicator == "Not Covered"),
-    role_record = paste0(role, ": ", wins, "-", losses),
     .groups = "drop"
-  )
+  ) |>
+  mutate(role_record = paste0(role, ": ", wins, "-", losses))
 
 team_summary <- plot_base |>
   group_by(west_team, season, role) |>
@@ -233,28 +233,30 @@ team_summary <- plot_base |>
     losses = sum(result_indicator == "Not Covered"),
     games = wins + losses,
     cover_pct = if_else(games > 0, wins / games, NA_real_),
-    record = paste0(wins, "-", losses),
     .groups = "drop"
   ) |>
-  mutate(west_team = factor(west_team, levels = c("SEA", "LAR", "LAC", "SF", "LV")))
+  mutate(
+    record = paste0(wins, "-", losses),
+    west_team = factor(west_team, levels = c("SEA", "LAR", "LAC", "SF", "LV"))
+  )
 
 team_totals <- plot_base |>
   group_by(west_team) |>
   summarise(
     wins = sum(result_indicator == "Covered"),
     losses = sum(result_indicator == "Not Covered"),
-    record = paste0(wins, "-", losses),
     .groups = "drop"
-  )
+  ) |>
+  mutate(record = paste0(wins, "-", losses))
 
 team_role_totals <- plot_base |>
   group_by(west_team, role) |>
   summarise(
     wins = sum(result_indicator == "Covered"),
     losses = sum(result_indicator == "Not Covered"),
-    role_record = paste0(role, ": ", wins, "-", losses),
     .groups = "drop"
-  )
+  ) |>
+  mutate(role_record = paste0(role, ": ", wins, "-", losses))
 
 can_render_logos <- requireNamespace("magick", quietly = TRUE)
 if (!can_render_logos) {
