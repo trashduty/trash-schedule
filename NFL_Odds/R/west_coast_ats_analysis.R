@@ -4,6 +4,7 @@ library(ggplot2)
 library(scales)
 library(openxlsx)
 library(nflreadr)
+library(nflplotR)
 library(lubridate)
 
 SEASONS <- 2016:2025
@@ -19,7 +20,35 @@ DATA_DIR <- "NFL_Odds/Data"
 EXCEL_FILE <- file.path(DATA_DIR, "WestCoast_ATS_Analysis.xlsx")
 CSV_FILE <- file.path(DATA_DIR, "WestCoast_ATS_Analysis.csv")
 OVERALL_PLOT_FILE <- file.path(PLOTS_DIR, "west_coast_ats_overall_fav_vs_dog.png")
-TEAM_PLOT_FILE <- file.path(PLOTS_DIR, "west_coast_ats_by_team_fav_vs_dog.png")
+TEAM_PLOT_FILES <- c(
+  "SEA" = file.path(PLOTS_DIR, "SEA_ats_1pm_et.png"),
+  "LAR" = file.path(PLOTS_DIR, "LAR_ats_1pm_et.png"),
+  "LAC" = file.path(PLOTS_DIR, "LAC_ats_1pm_et.png"),
+  "SF" = file.path(PLOTS_DIR, "SF_ats_1pm_et.png"),
+  "LV" = file.path(PLOTS_DIR, "LV_ats_1pm_et.png")
+)
+ROLE_COLORS <- c("Favorite" = "#FF6F61", "Underdog" = "#00CFCF")
+TEXT_COLOR <- "white"
+ANNOTATION_X_OFFSET <- 0.45
+ANNOTATION_Y_POSITION <- 1.08
+LOGO_X_OFFSET <- 0.10
+LOGO_Y_POSITION <- 1.06
+Y_AXIS_UPPER_LIMIT <- 1.12
+
+DARK_THEME <- theme_minimal(base_size = 12) +
+  theme(
+    plot.background = element_rect(fill = "black", color = NA),
+    panel.background = element_rect(fill = "black", color = NA),
+    panel.grid.major = element_line(color = TEXT_COLOR, linewidth = 0.2, alpha = 0.35),
+    panel.grid.minor = element_blank(),
+    axis.text = element_text(color = TEXT_COLOR),
+    axis.title = element_text(color = TEXT_COLOR),
+    plot.title = element_text(color = TEXT_COLOR, face = "bold"),
+    plot.subtitle = element_text(color = TEXT_COLOR),
+    strip.background = element_rect(fill = "black", color = TEXT_COLOR),
+    strip.text = element_text(color = TEXT_COLOR),
+    plot.margin = margin(10, 35, 10, 10)
+  )
 
 normalize_team <- function(team_abbr) {
   recode(team_abbr, !!!WEST_TEAM_MAP, .default = team_abbr)
@@ -181,6 +210,22 @@ overall_summary <- plot_base |>
     .groups = "drop"
   )
 
+overall_totals <- plot_base |>
+  summarise(
+    wins = sum(result_indicator == "Covered"),
+    losses = sum(result_indicator == "Not Covered"),
+    record = paste0(wins, "-", losses)
+  )
+
+role_totals <- plot_base |>
+  group_by(role) |>
+  summarise(
+    wins = sum(result_indicator == "Covered"),
+    losses = sum(result_indicator == "Not Covered"),
+    role_record = paste0(role, ": ", wins, "-", losses),
+    .groups = "drop"
+  )
+
 team_summary <- plot_base |>
   group_by(west_team, season, role) |>
   summarise(
@@ -193,45 +238,149 @@ team_summary <- plot_base |>
   ) |>
   mutate(west_team = factor(west_team, levels = c("SEA", "LAR", "LAC", "SF", "LV")))
 
-overall_plot <- ggplot(overall_summary, aes(x = factor(season), y = cover_pct, fill = role)) +
+team_totals <- plot_base |>
+  group_by(west_team) |>
+  summarise(
+    wins = sum(result_indicator == "Covered"),
+    losses = sum(result_indicator == "Not Covered"),
+    record = paste0(wins, "-", losses),
+    .groups = "drop"
+  )
+
+team_role_totals <- plot_base |>
+  group_by(west_team, role) |>
+  summarise(
+    wins = sum(result_indicator == "Covered"),
+    losses = sum(result_indicator == "Not Covered"),
+    role_record = paste0(role, ": ", wins, "-", losses),
+    .groups = "drop"
+  )
+
+can_render_logos <- requireNamespace("magick", quietly = TRUE)
+if (!can_render_logos) {
+  message("Package 'magick' is unavailable; generating plots without team logos.")
+}
+
+overall_role_annotations <- role_totals |>
+  mutate(
+    season = max(SEASONS) + ANNOTATION_X_OFFSET,
+    cover_pct = ANNOTATION_Y_POSITION
+  )
+
+overall_plot <- ggplot(overall_summary, aes(x = season, y = cover_pct, fill = role)) +
   geom_col(width = 0.75, show.legend = FALSE) +
-  geom_text(aes(label = record), vjust = -0.25, size = 3.4) +
+  geom_text(aes(label = record), vjust = -0.35, size = 3.4, color = TEXT_COLOR) +
+  geom_text(
+    data = overall_role_annotations,
+    aes(x = season, y = cover_pct, label = role_record),
+    inherit.aes = FALSE,
+    hjust = 1,
+    size = 3.6,
+    color = TEXT_COLOR,
+    fontface = "bold"
+  ) +
   facet_wrap(~role, nrow = 1) +
+  scale_fill_manual(values = ROLE_COLORS) +
+  scale_x_continuous(breaks = SEASONS, labels = SEASONS) +
   scale_y_continuous(
     labels = scales::percent_format(accuracy = 1),
-    limits = c(0, 1),
-    expand = expansion(mult = c(0, 0.10))
+    limits = c(0, Y_AXIS_UPPER_LIMIT),
+    expand = expansion(mult = c(0, 0))
   ) +
   labs(
     title = "West Coast Teams at ET 1:00 PM - ATS by Role",
-    subtitle = "Regular Season, 2016-2025",
-    x = "Season",
+    subtitle = paste0("Aggregate ATS Record: ", overall_totals$record[[1]], " | Regular Season, 2016-2025"),
+    x = "Year",
     y = "Cover Percentage"
   ) +
-  theme_minimal(base_size = 12)
+  DARK_THEME +
+  coord_cartesian(clip = "off")
 
-team_plot <- ggplot(team_summary, aes(x = factor(season), y = cover_pct, fill = role)) +
-  geom_col(width = 0.75, show.legend = FALSE) +
-  geom_text(aes(label = record), vjust = -0.25, size = 2.8) +
-  facet_grid(west_team ~ role) +
-  scale_y_continuous(
-    labels = scales::percent_format(accuracy = 1),
-    limits = c(0, 1),
-    expand = expansion(mult = c(0, 0.12))
-  ) +
-  labs(
-    title = "West Coast Teams at ET 1:00 PM - ATS by Team and Role",
-    subtitle = "Regular Season, 2016-2025",
-    x = "Season",
-    y = "Cover Percentage"
-  ) +
-  theme_minimal(base_size = 11) +
-  theme(strip.text.y = element_text(angle = 0))
+team_title_map <- c(
+  "SEA" = "Seattle ATS on East Coast at 1PM ET",
+  "LAR" = "LA Rams ATS on East Coast at 1PM ET",
+  "LAC" = "LA Chargers ATS on East Coast at 1PM ET",
+  "SF" = "San Francisco ATS on East Coast at 1PM ET",
+  "LV" = "Las Vegas ATS on East Coast at 1PM ET"
+)
 
 ggsave(OVERALL_PLOT_FILE, overall_plot, width = 12, height = 6, dpi = 300)
-ggsave(TEAM_PLOT_FILE, team_plot, width = 14, height = 12, dpi = 300)
+
+logo_template <- data.frame(
+  role = c("Favorite", "Underdog"),
+  season = max(SEASONS) + LOGO_X_OFFSET,
+  cover_pct = LOGO_Y_POSITION,
+  stringsAsFactors = FALSE
+)
+
+for (team in names(TEAM_PLOT_FILES)) {
+  team_data <- team_summary |>
+    filter(west_team == team)
+
+  team_total <- team_totals |>
+    filter(west_team == team) |>
+    pull(record)
+
+  if (nrow(team_data) == 0 || length(team_total) == 0) {
+    warning("No ATS summary data available for team: ", team, ". Skipping plot generation for this team.")
+    next
+  }
+
+  team_role_annotation <- team_role_totals |>
+    filter(west_team == team) |>
+    mutate(
+      season = max(SEASONS) + ANNOTATION_X_OFFSET,
+      cover_pct = ANNOTATION_Y_POSITION
+    )
+
+  logo_data <- logo_template |>
+    mutate(team_abbr = team)
+
+  team_plot <- ggplot(team_data, aes(x = season, y = cover_pct, fill = role)) +
+    geom_col(width = 0.75, show.legend = FALSE) +
+    geom_text(aes(label = record), vjust = -0.35, size = 3.0, color = TEXT_COLOR) +
+    geom_text(
+      data = team_role_annotation,
+      aes(x = season, y = cover_pct, label = role_record),
+      inherit.aes = FALSE,
+      hjust = 1,
+      size = 3.4,
+      color = TEXT_COLOR,
+      fontface = "bold"
+    ) +
+    facet_wrap(~role, nrow = 1) +
+    scale_fill_manual(values = ROLE_COLORS) +
+    scale_x_continuous(breaks = SEASONS, labels = SEASONS) +
+    scale_y_continuous(
+      labels = scales::percent_format(accuracy = 1),
+      limits = c(0, Y_AXIS_UPPER_LIMIT),
+      expand = expansion(mult = c(0, 0))
+    ) +
+    labs(
+      title = team_title_map[[team]],
+      subtitle = paste0("Total ATS Record: ", team_total[[1]], " | Regular Season, 2016-2025"),
+      x = "Year",
+      y = "Cover Percentage"
+    ) +
+    DARK_THEME +
+    coord_cartesian(clip = "off")
+
+  if (can_render_logos) {
+    team_plot <- team_plot +
+      nflplotR::geom_nfl_logos(
+        data = logo_data,
+        aes(x = season, y = cover_pct, team_abbr = team_abbr),
+        inherit.aes = FALSE,
+        width = 0.085
+      )
+  }
+
+  ggsave(TEAM_PLOT_FILES[[team]], team_plot, width = 12, height = 6, dpi = 300)
+}
 
 message("Saved plot: ", OVERALL_PLOT_FILE)
-message("Saved plot: ", TEAM_PLOT_FILE)
+for (plot_file in TEAM_PLOT_FILES) {
+  message("Saved plot: ", plot_file)
+}
 message("Saved data: ", EXCEL_FILE)
 message("Saved data: ", CSV_FILE)
