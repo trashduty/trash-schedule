@@ -17,6 +17,7 @@ ET_HOME_TEAMS <- c(
 PLOTS_DIR <- "NFL_Odds/Plots/WestCoastATS"
 DATA_DIR <- "NFL_Odds/Data"
 EXCEL_FILE <- file.path(DATA_DIR, "WestCoast_ATS_Analysis.xlsx")
+CSV_FILE <- file.path(DATA_DIR, "WestCoast_ATS_Analysis.csv")
 OVERALL_PLOT_FILE <- file.path(PLOTS_DIR, "west_coast_ats_overall_fav_vs_dog.png")
 TEAM_PLOT_FILE <- file.path(PLOTS_DIR, "west_coast_ats_by_team_fav_vs_dog.png")
 
@@ -58,6 +59,32 @@ is_one_pm_et <- function(kickoff) {
   str_detect(parsed, "^(13:00(:00)?|1:00(:00)?\\s*PM|01:00(:00)?\\s*PM)$")
 }
 
+resolve_west_spread <- function(schedule_df) {
+  oak_bal_reference <- schedule_df |>
+    filter(
+      as.Date(gameday) == as.Date("2016-10-02"),
+      away_team == "OAK",
+      home_team == "BAL",
+      !is.na(spread_line)
+    ) |>
+    slice(1)
+
+  if (nrow(oak_bal_reference) == 1) {
+    ref_line <- oak_bal_reference$spread_line[[1]]
+    if (dplyr::near(ref_line, -3.5)) {
+      message("Detected home-team spread_line perspective; using west_spread = -spread_line")
+      return(-schedule_df$spread_line)
+    }
+    if (dplyr::near(ref_line, 3.5)) {
+      message("Detected away-team spread_line perspective; using west_spread = spread_line")
+      return(schedule_df$spread_line)
+    }
+  }
+
+  message("Could not infer spread_line orientation from OAK @ BAL reference; defaulting to west_spread = -spread_line")
+  -schedule_df$spread_line
+}
+
 if (!dir.exists(PLOTS_DIR)) dir.create(PLOTS_DIR, recursive = TRUE)
 if (!dir.exists(DATA_DIR)) dir.create(DATA_DIR, recursive = TRUE)
 
@@ -65,13 +92,15 @@ message("Loading schedule data...")
 schedules <- nflreadr::load_schedules(seasons = SEASONS)
 
 kickoff_time <- extract_kickoff_time(schedules)
+west_spread <- resolve_west_spread(schedules)
 
 west_games <- schedules |>
   mutate(
     away_team_norm = normalize_team(away_team),
     home_team_norm = normalize_team(home_team),
     kickoff_time = kickoff_time,
-    is_one_pm_et = is_one_pm_et(kickoff_time)
+    is_one_pm_et = is_one_pm_et(kickoff_time),
+    west_spread = west_spread
   ) |>
   filter(
     season %in% SEASONS,
@@ -85,7 +114,6 @@ west_games <- schedules |>
   ) |>
   mutate(
     west_team = away_team_norm,
-    west_spread = -spread_line,
     score_margin = away_score - home_score,
     ats_margin = score_margin + west_spread,
     result_indicator = case_when(
@@ -99,7 +127,6 @@ west_games <- schedules |>
       TRUE ~ "Pick'em"
     ),
     matchup = paste0(away_team, " @ ", home_team),
-    score = paste0(away_score, "-", home_score),
     game_date = as.Date(gameday),
     spread = sprintf("%+.1f", west_spread)
   )
@@ -111,14 +138,34 @@ if (nrow(west_games) == 0) {
 excel_output <- west_games |>
   transmute(
     Date = game_date,
+    Team = west_team,
+    Opponent = home_team_norm,
     Matchup = matchup,
-    Score = score,
+    `Team Score` = away_score,
+    `Opponent Score` = home_score,
     Spread = spread,
     `Result Indicator` = result_indicator
   ) |>
   arrange(Date)
 
 openxlsx::write.xlsx(list(WestCoast_ATS_Games = excel_output), EXCEL_FILE, overwrite = TRUE)
+utils::write.csv(excel_output, CSV_FILE, row.names = FALSE)
+
+oak_bal_verification <- west_games |>
+  filter(
+    game_date == as.Date("2016-10-02"),
+    away_team == "OAK",
+    home_team == "BAL"
+  ) |>
+  slice(1)
+
+if (nrow(oak_bal_verification) == 1 &&
+    (!dplyr::near(oak_bal_verification$west_spread[[1]], 3.5) ||
+      oak_bal_verification$away_score[[1]] != 28 ||
+      oak_bal_verification$home_score[[1]] != 27 ||
+      oak_bal_verification$result_indicator[[1]] != "Covered")) {
+  warning("Reference check failed for 2016-10-02 OAK @ BAL (expected spread +3.5, score 28-27, Covered).")
+}
 
 plot_base <- west_games |>
   filter(role %in% c("Favorite", "Underdog"), result_indicator != "Push")
@@ -187,3 +234,4 @@ ggsave(TEAM_PLOT_FILE, team_plot, width = 14, height = 12, dpi = 300)
 message("Saved plot: ", OVERALL_PLOT_FILE)
 message("Saved plot: ", TEAM_PLOT_FILE)
 message("Saved data: ", EXCEL_FILE)
+message("Saved data: ", CSV_FILE)
