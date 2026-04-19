@@ -18,9 +18,14 @@ jobs:
         with:
           use-public-rspm: true
 
+      - name: Install System Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev libmagick++-dev
+
       - name: Install R Packages
         run: |
-          install.packages(c("dplyr", "stringr", "ggplot2", "scales", "openxlsx", "nflreadr", "lubridate"))
+          install.packages(c("dplyr", "stringr", "ggplot2", "scales", "openxlsx", "nflreadr", "nflplotR", "magick", "lubridate"))
         shell: Rscript {0}
 
       - name: Run West Coast ATS Script
