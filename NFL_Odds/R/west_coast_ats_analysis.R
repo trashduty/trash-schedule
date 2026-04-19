@@ -70,7 +70,7 @@ resolve_west_spread <- function(schedule_df) {
     slice(1)
 
   if (nrow(oak_bal_reference) == 1) {
-    ref_line <- oak_bal_reference$spread_line[[1]]
+    ref_line <- oak_bal_reference$spread_line[1]
     if (dplyr::near(ref_line, -3.5)) {
       message("Detected home-team spread_line perspective; using west_spread = -spread_line")
       return(-schedule_df$spread_line)
@@ -81,7 +81,7 @@ resolve_west_spread <- function(schedule_df) {
     }
   }
 
-  message("Could not infer spread_line orientation from OAK @ BAL reference; defaulting to west_spread = -spread_line")
+  message("Could not infer spread_line orientation from OAK @ BAL reference (game not found or spread_line missing); defaulting to west_spread = -spread_line")
   -schedule_df$spread_line
 }
 
