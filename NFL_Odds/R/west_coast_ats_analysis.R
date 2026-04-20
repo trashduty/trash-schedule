@@ -8,9 +8,9 @@ library(nflplotR)
 library(lubridate)
 
 SEASONS <- 2016:2025
-WEST_COAST_AWAY <- c("SEA", "LAR", "RAM", "LAC", "SDG", "SF", "LV", "OAK")
-WEST_TEAM_MAP <- c("RAM" = "LAR", "SDG" = "LAC", "OAK" = "LV")
-WEST_COAST_TEAMS <- c("SEA", "LAR", "LAC", "SF", "LV")
+WEST_COAST_AWAY <- c("SEA", "LA", "LAC", "SD", "SF", "LV", "OAK")
+WEST_TEAM_MAP <- c("SD" = "LAC", "OAK" = "LV")
+WEST_COAST_TEAMS <- c("SEA", "LA", "LAC", "SF", "LV")
 ET_HOME_TEAMS <- c(
   "BUF", "MIA", "NE", "NYJ", "BAL", "CIN", "CLE", "PIT",
   "IND", "JAX", "NYG", "PHI", "WAS", "DET", "ATL", "CAR", "TB"
@@ -23,7 +23,7 @@ CSV_FILE <- file.path(DATA_DIR, "WestCoast_ATS_Analysis.csv")
 OVERALL_PLOT_FILE <- file.path(PLOTS_DIR, "west_coast_ats_overall_fav_vs_dog.png")
 TEAM_PLOT_FILES <- c(
   "SEA" = file.path(PLOTS_DIR, "SEA_ats_1pm_et.png"),
-  "LAR" = file.path(PLOTS_DIR, "LAR_ats_1pm_et.png"),
+  "LA" = file.path(PLOTS_DIR, "LAR_ats_1pm_et.png"),
   "LAC" = file.path(PLOTS_DIR, "LAC_ats_1pm_et.png"),
   "SF" = file.path(PLOTS_DIR, "SF_ats_1pm_et.png"),
   "LV" = file.path(PLOTS_DIR, "LV_ats_1pm_et.png")
@@ -293,7 +293,7 @@ overall_plot <- ggplot(overall_summary, aes(x = season, y = cover_pct, fill = ro
   ) +
   labs(
     title = "West Coast Teams at ET 1:00 PM - ATS by Role",
-    subtitle = paste0("Aggregate ATS Record: ", overall_totals$record[[1]], " | Regular Season, 2016-2025"),
+    subtitle = paste0("Aggregate ATS Record: ", overall_totals$record[[1]], " | Regu Season, 2016-2025"),
     x = "Year",
     y = "Cover Percentage"
   ) +
@@ -302,7 +302,7 @@ overall_plot <- ggplot(overall_summary, aes(x = season, y = cover_pct, fill = ro
 
 team_title_map <- c(
   "SEA" = "Seattle ATS on East Coast at 1PM ET",
-  "LAR" = "LA Rams ATS on East Coast at 1PM ET",
+  "LA" = "LA Rams ATS on East Coast at 1PM ET",
   "LAC" = "LA Chargers ATS on East Coast at 1PM ET",
   "SF" = "San Francisco ATS on East Coast at 1PM ET",
   "LV" = "Las Vegas ATS on East Coast at 1PM ET"
