@@ -271,13 +271,13 @@ overall_role_annotations <- role_totals |>
 
 overall_plot <- ggplot(overall_summary, aes(x = season, y = cover_pct, fill = role)) +
   geom_col(width = 0.75, show.legend = FALSE) +
-  geom_text(aes(label = record), vjust = -0.35, size = 3.4, color = TEXT_COLOR) +
+  geom_text(aes(label = record), vjust = -0.35, size = 5.4, color = TEXT_COLOR) +
   geom_text(
     data = overall_role_annotations,
     aes(x = season, y = cover_pct, label = role_record),
     inherit.aes = FALSE,
     hjust = 1,
-    size = 3.6,
+    size = 5.6,
     color = TEXT_COLOR,
     fontface = "bold"
   ) +
@@ -340,13 +340,13 @@ for (team in names(TEAM_PLOT_FILES)) {
 
   team_plot <- ggplot(team_data, aes(x = season, y = cover_pct, fill = role)) +
     geom_col(width = 0.75, show.legend = FALSE) +
-    geom_text(aes(label = record), vjust = -0.35, size = 3.0, color = TEXT_COLOR) +
+    geom_text(aes(label = record), vjust = -0.35, size = 5.0, color = TEXT_COLOR) +
     geom_text(
       data = team_role_annotation,
       aes(x = season, y = cover_pct, label = role_record),
       inherit.aes = FALSE,
       hjust = 1,
-      size = 3.4,
+      size = 5.4,
       color = TEXT_COLOR,
       fontface = "bold"
     ) +
