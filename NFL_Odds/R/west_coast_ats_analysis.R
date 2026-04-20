@@ -10,6 +10,7 @@ library(lubridate)
 SEASONS <- 2016:2025
 WEST_COAST_AWAY <- c("SEA", "LAR", "RAM", "LAC", "SDG", "SF", "LV", "OAK")
 WEST_TEAM_MAP <- c("RAM" = "LAR", "SDG" = "LAC", "OAK" = "LV")
+WEST_COAST_TEAMS <- c("SEA", "LAR", "LAC", "SF", "LV")
 ET_HOME_TEAMS <- c(
   "BUF", "MIA", "NE", "NYJ", "BAL", "CIN", "CLE", "PIT",
   "IND", "JAX", "NYG", "PHI", "WAS", "DET", "ATL", "CAR", "TB"
@@ -31,9 +32,10 @@ ROLE_COLORS <- c("Favorite" = "#FF6F61", "Underdog" = "#00CFCF")
 TEXT_COLOR <- "white"
 ANNOTATION_X_OFFSET <- 0.45
 ANNOTATION_Y_POSITION <- 1.08
-LOGO_X_OFFSET <- 0.10
-LOGO_Y_POSITION <- 1.06
-Y_AXIS_UPPER_LIMIT <- 1.12
+LOGO_RIGHT_MARGIN_X_OFFSET <- 1.05
+LOGO_TOP_MARGIN_Y_POSITION <- 1.17
+LOGO_FACET_ROLE <- "Underdog"
+Y_AXIS_UPPER_LIMIT <- 1.18
 
 DARK_THEME <- theme_minimal(base_size = 12) +
   theme(
@@ -47,7 +49,7 @@ DARK_THEME <- theme_minimal(base_size = 12) +
     plot.subtitle = element_text(color = TEXT_COLOR),
     strip.background = element_rect(fill = "black", color = TEXT_COLOR),
     strip.text = element_text(color = TEXT_COLOR),
-    plot.margin = margin(10, 35, 10, 10)
+    plot.margin = margin(18, 120, 10, 10)
   )
 
 normalize_team <- function(team_abbr) {
@@ -134,7 +136,7 @@ west_games <- schedules |>
   filter(
     season %in% SEASONS,
     game_type == "REG",
-    away_team %in% WEST_COAST_AWAY,
+    away_team_norm %in% WEST_COAST_TEAMS,
     home_team %in% ET_HOME_TEAMS,
     is_one_pm_et,
     !is.na(spread_line),
@@ -237,7 +239,7 @@ team_summary <- plot_base |>
   ) |>
   mutate(
     record = paste0(wins, "-", losses),
-    west_team = factor(west_team, levels = c("SEA", "LAR", "LAC", "SF", "LV"))
+    west_team = factor(west_team, levels = WEST_COAST_TEAMS)
   )
 
 team_totals <- plot_base |>
@@ -309,17 +311,24 @@ team_title_map <- c(
 ggsave(OVERALL_PLOT_FILE, overall_plot, width = 12, height = 6, dpi = 300)
 
 logo_template <- data.frame(
-  role = c("Favorite", "Underdog"),
-  season = max(SEASONS) + LOGO_X_OFFSET,
-  cover_pct = LOGO_Y_POSITION,
+  role = LOGO_FACET_ROLE,
+  season = max(SEASONS) + LOGO_RIGHT_MARGIN_X_OFFSET,
+  cover_pct = LOGO_TOP_MARGIN_Y_POSITION,
   stringsAsFactors = FALSE
 )
 
+team_summary_norm <- team_summary |>
+  mutate(west_team = normalize_team(as.character(west_team)))
+team_totals_norm <- team_totals |>
+  mutate(west_team = normalize_team(as.character(west_team)))
+team_role_totals_norm <- team_role_totals |>
+  mutate(west_team = normalize_team(as.character(west_team)))
+
 for (team in names(TEAM_PLOT_FILES)) {
-  team_data <- team_summary |>
+  team_data <- team_summary_norm |>
     filter(west_team == team)
 
-  team_total <- team_totals |>
+  team_total <- team_totals_norm |>
     filter(west_team == team) |>
     pull(record)
 
@@ -328,7 +337,7 @@ for (team in names(TEAM_PLOT_FILES)) {
     next
   }
 
-  team_role_annotation <- team_role_totals |>
+  team_role_annotation <- team_role_totals_norm |>
     filter(west_team == team) |>
     mutate(
       season = max(SEASONS) + ANNOTATION_X_OFFSET,
@@ -365,7 +374,10 @@ for (team in names(TEAM_PLOT_FILES)) {
       y = "Cover Percentage"
     ) +
     DARK_THEME +
-    coord_cartesian(clip = "off")
+    coord_cartesian(
+      xlim = c(min(SEASONS) - 0.5, max(SEASONS) + 0.5),
+      clip = "off"
+    )
 
   if (can_render_logos) {
     team_plot <- team_plot +
@@ -373,7 +385,7 @@ for (team in names(TEAM_PLOT_FILES)) {
         data = logo_data,
         aes(x = season, y = cover_pct, team_abbr = team_abbr),
         inherit.aes = FALSE,
-        width = 0.085
+        width = 0.18
       )
   }
 
