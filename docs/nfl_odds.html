@@ -299,6 +299,15 @@
         }
       }
 
+      const edgeIdx = mapped.findIndex(c => c.csv === 'edge');
+      const gameTimeIdx = mapped.findIndex(c => c.csv === 'game_time_est');
+
+      if (edgeIdx !== -1 && gameTimeIdx !== -1) {
+        const [edgeCol] = mapped.splice(edgeIdx, 1);
+        const updatedGameTimeIdx = mapped.findIndex(c => c.csv === 'game_time_est');
+        mapped.splice(updatedGameTimeIdx + 1, 0, edgeCol);
+      }
+
       columnMapping = mapped;
     }
 
