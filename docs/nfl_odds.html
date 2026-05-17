@@ -145,6 +145,19 @@
       opacity: 0.75;
     }
 
+    .team-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .team-logo {
+      width: 22px;
+      height: 22px;
+      object-fit: contain;
+      vertical-align: middle;
+    }
+
     th {
       background-color: #2c3e50;
       color: white;
@@ -255,7 +268,7 @@
 
     const REFRESH_INTERVAL = 60000;
     const EXCLUDED_COLUMNS = new Set(['team_logo_espn', 'last_update_api', 'game_date_est']);
-    const EDGE_THRESHOLD_PERCENT = 3;
+    const EDGE_THRESHOLD_PERCENT = 4;
 
     let rawData = [];
     let allTeams = [];
@@ -558,15 +571,38 @@
           if (col.csv === 'team') {
             const teamKey = (val || '').toString().trim().toUpperCase();
             const url = TEAM_INJURY_URLS[teamKey];
+            const logoUrl = row['team_logo_espn'];
+
             if (url) {
               const a = document.createElement('a');
               a.href = url;
               a.target = '_blank';
               a.rel = 'noopener noreferrer';
-              a.textContent = formatted;
+              a.className = 'team-link';
+
+              if (logoUrl) {
+                const img = document.createElement('img');
+                img.src = logoUrl;
+                img.alt = `${formatted} logo`;
+                img.className = 'team-logo';
+                a.appendChild(img);
+              }
+
+              const span = document.createElement('span');
+              span.textContent = formatted;
+              a.appendChild(span);
+
               td.appendChild(a);
             } else {
-              td.textContent = formatted;
+              if (logoUrl) {
+                const img = document.createElement('img');
+                img.src = logoUrl;
+                img.alt = `${formatted} logo`;
+                img.className = 'team-logo';
+                td.appendChild(img);
+                td.appendChild(document.createTextNode(' '));
+              }
+              td.appendChild(document.createTextNode(formatted));
             }
           } else if (col.csv === 'game') {
             const url = buildPfrGameUrl(row);
