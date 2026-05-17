@@ -165,7 +165,9 @@
 <body>
   <h2 style="margin-bottom:6px;">NFL Model Outputs</h2>
   <div class="last-updated" id="status">Loading data...</div>
-  <div class="last-updated"><a href="https://www.covers.com/sport/nfl/weather" target="_blank" rel="noopener noreferrer">Weather Reports</a></div>
+  <div class="last-updated">
+    <a href="https://www.covers.com/sport/nfl/weather" target="_blank" rel="noopener noreferrer">Weather Reports</a>
+  </div>
 
   <div class="controls">
     <div>
@@ -338,11 +340,17 @@
     }
 
     function buildPfrGameUrl(row) {
-      const teamKey = (row['team'] || '').toString().trim().toUpperCase();
-      const pfrAbbr = PFR_TEAM_ABBR[teamKey];
+      const game = (row['game'] || '').toString().trim().toUpperCase();
       const gameDate = row['game_date_est'];
 
-      if (!pfrAbbr || !gameDate) return null;
+      if (!game || !gameDate || !game.includes('@')) return null;
+
+      const parts = game.split('@');
+      if (parts.length !== 2) return null;
+
+      const homeTeamAbbr = parts[1].trim();
+      const pfrAbbr = PFR_TEAM_ABBR[homeTeamAbbr];
+      if (!pfrAbbr) return null;
 
       const dateStr = String(gameDate).trim().replace(/-/g, '');
       if (!/^\d{8}$/.test(dateStr)) return null;
