@@ -176,7 +176,6 @@
     <div class="team-summary" id="teamSummary">All teams</div>
   </div>
 
-  <!-- Collapsed by default -->
   <div class="team-picker" id="teamPicker" hidden>
     <div class="team-picker-header">
       <input id="teamFilter" type="text" placeholder="Type to find teams..." oninput="onTeamFilterInput()" />
@@ -247,7 +246,7 @@
       WAS: 'https://www.espn.com/nfl/team/injuries/_/name/wsh/washington-commanders',
     };
     const REFRESH_INTERVAL = 60000;
-    const EXCLUDED_COLUMNS = new Set(['team_logo_espn', 'last_update_api']);
+    const EXCLUDED_COLUMNS = new Set(['team_logo_espn', 'last_update_api', 'game_date_est']);
     const EDGE_THRESHOLD_PERCENT = 3;
 
     let rawData = [];
@@ -257,6 +256,7 @@
     let columnMapping = [];
 
     function formatHeader(csvHeader) {
+      if (csvHeader === 'game_time_est') return 'Game Time';
       return csvHeader
         .split('_')
         .map(word => word.charAt(0).toUpperCase() + word.slice(1))
@@ -267,7 +267,7 @@
       const k = csvKey.toLowerCase();
       if (k.includes('probability')) return 'probability';
       if (k.includes('edge')) return 'spread_edge';
-      if (['week', 'game', 'team'].includes(k) || k.includes('book')) return 'text';
+      if (['week', 'game', 'team', 'game_time_est'].includes(k) || k.includes('book')) return 'text';
       return 'decimal';
     }
 
@@ -331,15 +331,20 @@
       if (csvKey === 'market_price' || csvKey === 'best_price') {
         return Number(value).toFixed(0);
       }
+      if (type === 'text') return String(value);
       if (type === 'decimal') return Number(value).toFixed(2);
       return value;
     }
 
     function buildPfrGameUrl(row) {
       const pfrAbbr = PFR_TEAM_ABBR[(row['team'] || '').toString().trim().toUpperCase()];
-      const week = row['week'];
-      if (!pfrAbbr || week === null || week === undefined || week === '') return null;
-      return `https://www.pro-football-reference.com/teams/${pfrAbbr}/2025.htm`;
+      const gameDate = row['game_date_est'];
+      if (!pfrAbbr || !gameDate) return null;
+
+      const dateStr = String(gameDate).trim().replaceAll('-', '');
+      if (dateStr.length !== 8) return null;
+
+      return `https://www.pro-football-reference.com/boxscores/${dateStr}0${pfrAbbr}.htm`;
     }
 
     function updateTableFromCSV() {
