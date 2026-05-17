@@ -15,21 +15,6 @@ get_odds_api <- function(sport = "americanfootball_nfl",
                          year = nflreadr::get_current_season(roster = TRUE), 
                          oddsFormat = "american"){
   
-  # sport <- "americanfootball_nfl"
-  # apiKey <- Sys.getenv("ODDS_API_KEY")
-  # regions <- "us"
-  # markets <- "spreads,totals"
-  # year <- nflreadr::get_current_season(roster = TRUE)
-  # oddsFormat <- "american"
-  
-  # Betting data doesn't have the `week` column necessary for NFL data, so 
-  # we have to create it. Essentially, I'm pulling the first game of the season
-  # here, and regressing that to wednesday of that week. Later, I will use that 
-  # to calculate the NFL week by using a Wednesday to following Tuesday NFL week.
-  
-  # Fall back to the previous season if the current season has no regular-season
-  # schedule data yet (e.g. during the off-season when get_current_season()
-  # returns the upcoming empty season).
   load_reg_schedule <- function(yr) {
     tryCatch(
       nflreadr::load_schedules(seasons = yr) |>
@@ -57,12 +42,10 @@ get_odds_api <- function(sport = "americanfootball_nfl",
   schedule_summary <- reg_games |>
     summarise(first_game_date = min(gameday)) |>
     mutate(
-      first_game_weekday = wday(first_game_date, week_start = 1),  # Monday = 1, Sunday = 7
-      # Find the Wednesday before (or on) the first game
-      # Wednesday = 3 in this system
+      first_game_weekday = wday(first_game_date, week_start = 1),
       days_back_to_wednesday = case_when(
-        first_game_weekday >= 3 ~ first_game_weekday - 3,  # If Thu-Sun, go back to Wed
-        first_game_weekday < 3 ~ first_game_weekday + 4    # If Mon-Tue, go back to previous Wed
+        first_game_weekday >= 3 ~ first_game_weekday - 3,
+        first_game_weekday < 3 ~ first_game_weekday + 4
       ),
       week_one_wednesday = first_game_date - days(days_back_to_wednesday)
     )
@@ -75,20 +58,16 @@ get_odds_api <- function(sport = "americanfootball_nfl",
 
   week_one_wednesday <- schedule_summary |> pull(week_one_wednesday)
   
-  
-  # URL
   url <- glue::glue("https://api.the-odds-api.com/v4/sports/{sport}/odds/?apiKey={apiKey}&regions={regions}&markets={markets}&oddsFormat={oddsFormat}")
   
   response <- httr::GET(url, httr::add_headers(
     'Accept' = 'application/json',
     'Authorization' = apiKey))
   
-  # check if the request was successful
   if (httr::status_code(response) != 200) {
     print(paste0("Request failed with status ", httr::status_code(response)))
   }
   
-  # parsing and converting JSON into a data frame
   extracted_data <- httr::content(response, "text", encoding = "UTF-8")
   api_data <- jsonlite::fromJSON(extracted_data, flatten = TRUE)
 
@@ -106,7 +85,6 @@ get_odds_api <- function(sport = "americanfootball_nfl",
   teams <- nflreadr::load_teams() |> 
     select(team_abbr, team_name)
   
-  # Unnest the data, which has multiple nested list columns
   api_unnested <- api_data |> 
     unnest(bookmakers, names_repair = "unique") |>
     unnest(markets, names_repair = "unique") |>
@@ -117,27 +95,23 @@ get_odds_api <- function(sport = "americanfootball_nfl",
     filter(bookmaker_id %in% c("betmgm", "betrivers", "draftkings", "fanduel", 
                                "espnbet", "fanatics", "caesars")) |> 
     mutate(
-      commence_time_utc = ymd_hms(commence_time, tz = "UTC"),
-      commence_time_est = with_tz(commence_time_utc, tzone = "America/New_York"),
+      commence_time_parsed = ymd_hms(commence_time, tz = "UTC"),
+      commence_time_est = with_tz(commence_time_parsed, tzone = "America/New_York"),
       game_date_est = as_date(commence_time_est),
       game_time_est = format(commence_time_est, "%I:%M %p"),
-      commence_ny = as_date(commence_time_est),
-      .after = commence_time
+      commence_ny = as_date(commence_time_est)
     ) |> 
     left_join(teams, by = c("home_team" = "team_name")) |> 
     rename(home_abbr = team_abbr) |> 
     left_join(teams, by = c("away_team" = "team_name")) |> 
     rename(away_abbr = team_abbr) |> 
     mutate(week = case_when(
-      commence_ny < week_one_wednesday ~ 0,  # Pre-season or invalid
+      commence_ny < week_one_wednesday ~ 0,
       TRUE ~ as.numeric(floor((commence_ny - week_one_wednesday) / 7) + 1)
     )) |> 
     mutate(week = if_else(week == 23, 22, week)) |> 
     select(
       week,
-      commence_time,
-      commence_time_utc,
-      commence_time_est,
       game_date_est,
       game_time_est,
       commence_ny,
@@ -177,22 +151,10 @@ if (!is.null(api_data)) {
   teams <- nflreadr::load_teams() |> 
     select(team_abbr, team_logo_espn, team_name)
   
-  # margin <- read_csv("https://github.com/trashduty/trash-schedule/raw/refs/heads/main/NFL_Odds/Data/interpolated_2d_margin_probs.csv",
-  #                    show_col_types = FALSE) |>
-  #   janitor::clean_names()
-  # 
-  # lookup <- read_csv("https://github.com/trashduty/trash-schedule/raw/refs/heads/main/NFL_Odds/Data/NFL_Totals_Lookup_Stratified_By_Spread.csv",
-  #                    show_col_types = FALSE) |>
-  #   janitor::clean_names()
-  # 
-  # model_raw <- read_csv("https://github.com/trashduty/trash-schedule/raw/refs/heads/main/Week%201%20model%20pred_updated.csv",
-  #                       show_col_types = FALSE) |>
-  #   janitor::clean_names()
-  
   calc_implied_odds <- function(odds) {
     ifelse(odds < 0,
-           abs(odds) / (abs(odds) + 100),  # Negative odds (favorites)
-           100 / (odds + 100))             # Positive odds (underdogs)
+           abs(odds) / (abs(odds) + 100),
+           100 / (odds + 100))
   }
   
   api_spreads <- api_data |> 
@@ -203,9 +165,6 @@ if (!is.null(api_data)) {
     select(
       week,
       game,
-      commence_time,
-      commence_time_utc,
-      commence_time_est,
       game_date_est,
       game_time_est,
       last_update_api,
@@ -222,14 +181,7 @@ if (!is.null(api_data)) {
   api_totals <- api_data |> 
     filter(market == "totals") |> 
     mutate(game = paste0(away_abbr, "@", home_abbr)) |> 
-    select(
-      week,
-      game,
-      bookmaker,
-      name,
-      total_price = price,
-      total = point
-    )
+    select(week, game, bookmaker, name, total_price = price, total = point)
     
   odds_calculated <- model_raw |> 
     mutate(team = clean_team_abbrs(team)) |> 
@@ -240,9 +192,6 @@ if (!is.null(api_data)) {
         week,
         team,
         game,
-        commence_time,
-        commence_time_utc,
-        commence_time_est,
         game_date_est,
         game_time_est,
         spread,
@@ -272,9 +221,6 @@ if (!is.null(api_data)) {
       team,
       game,
       team_logo_espn,
-      commence_time,
-      commence_time_utc,
-      commence_time_est,
       game_date_est,
       game_time_est,
       true_spread,
@@ -296,9 +242,6 @@ if (!is.null(api_data)) {
   
   spread_summary <- odds_calculated |> 
     summarise(
-      commence_time = first(commence_time),
-      commence_time_utc = first(commence_time_utc),
-      commence_time_est = first(commence_time_est),
       game_date_est = first(game_date_est),
       game_time_est = first(game_time_est),
       last_update_api = max(last_update_api, na.rm = TRUE), 
@@ -365,8 +308,6 @@ if (!is.null(api_data)) {
     group_by(week, game) |> 
     summarise(
       model_prediction = first(true_total),
-      
-      # Median values - taking median across all bets regardless of Over/Under
       median_over_line = first(total[median_edge_row & name == "Over"]),
       median_over_price = first(total_price[median_edge_row & name == "Over"]),
       median_over_cover_probability = first(probability[median_edge_row & name == "Over"]),
@@ -375,14 +316,11 @@ if (!is.null(api_data)) {
       median_under_price = first(total_price[median_edge_row & name == "Under"]),
       median_under_cover_probability = first(probability[median_edge_row & name == "Under"]),
       median_under_edge = first(edge[median_edge_row & name == "Under"]),
-      
-      # Best values by bet type
       best_over_book = first(bookmaker[highest_edge_row & name == "Over"]),
       best_over_line = first(total[highest_edge_row & name == "Over"]),
       best_over_price = first(total_price[highest_edge_row & name == "Over"]),
       best_over_cover_probability = first(probability[highest_edge_row & name == "Over"]),
       best_over_edge = first(edge[highest_edge_row & name == "Over"]),
-      
       best_under_book = first(bookmaker[highest_edge_row & name == "Under"]),
       best_under_line = first(total[highest_edge_row & name == "Under"]),
       best_under_price = first(total_price[highest_edge_row & name == "Under"]),
