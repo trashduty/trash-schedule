@@ -321,6 +321,15 @@
         mapped.splice(updatedGameTimeIdx + 1, 0, edgeCol);
       }
 
+      const marketLineIdx = mapped.findIndex(c => c.csv === 'market_line');
+      const modelPredictionIdx = mapped.findIndex(c => c.csv === 'model_prediction');
+
+      if (marketLineIdx !== -1 && modelPredictionIdx !== -1) {
+        const [marketLineCol] = mapped.splice(marketLineIdx, 1);
+        const updatedModelPredictionIdx = mapped.findIndex(c => c.csv === 'model_prediction');
+        mapped.splice(updatedModelPredictionIdx, 0, marketLineCol);
+      }
+
       columnMapping = mapped;
     }
 
