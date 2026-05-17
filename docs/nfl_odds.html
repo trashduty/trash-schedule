@@ -165,6 +165,7 @@
 <body>
   <h2 style="margin-bottom:6px;">NFL Model Outputs</h2>
   <div class="last-updated" id="status">Loading data...</div>
+  <div class="last-updated"><a href="https://www.covers.com/sport/nfl/weather" target="_blank" rel="noopener noreferrer">Weather Reports</a></div>
 
   <div class="controls">
     <div>
@@ -201,7 +202,6 @@
   <script>
     const CSV_URL = 'https://raw.githubusercontent.com/trashduty/trash-schedule/main/NFL_Odds/Data/spreads_odds.csv';
 
-    // Pro-Football-Reference uses different team abbreviations than the standard NFL ones.
     const PFR_TEAM_ABBR = {
       ARI: 'crd', ATL: 'atl', BAL: 'rav', BUF: 'buf', CAR: 'car',
       CHI: 'chi', CIN: 'cin', CLE: 'cle', DAL: 'dal', DEN: 'den',
@@ -248,8 +248,7 @@
     };
     const REFRESH_INTERVAL = 60000;
     const EXCLUDED_COLUMNS = new Set(['team_logo_espn', 'last_update_api']);
-    const EDGE_THRESHOLD_PERCENT = 3; // minimum edge % considered favorable (green gradient)
-    const NFL_SEASON_YEAR = 2025;
+    const EDGE_THRESHOLD_PERCENT = 3;
 
     let rawData = [];
     let allTeams = [];
@@ -281,7 +280,6 @@
           type: inferType(h)
         }));
 
-      // Insert lookahead_line after market_line if not already present in headers
       if (!headers.includes('lookahead_line')) {
         const mlIdx = mapped.findIndex(c => c.csv === 'market_line');
         if (mlIdx !== -1) {
@@ -309,8 +307,6 @@
       }
     }
 
-    // Returns an HSL color for an edge value. Values >= thresholdPctPoints are green
-    // (darker green for larger positive edges), values below are red (lighter red).
     function getEdgeGradientColor(value, thresholdPctPoints) {
       const pct = value * 100;
       const diff = pct - thresholdPctPoints;
@@ -324,13 +320,26 @@
       return `hsl(0, 80%, ${lightness}%)`;
     }
 
-    function formatValue(value, type) {
+    function formatValue(value, type, csvKey) {
       if (value === null || value === undefined || value === '') return '';
       if (type === 'probability' || type === 'spread_edge') {
         return (Number(value) * 100).toFixed(2) + '%';
       }
+      if (csvKey === 'model_prediction' || csvKey === 'market_line' || csvKey === 'best_line' || csvKey === 'lookahead_line') {
+        return Number(value).toFixed(1);
+      }
+      if (csvKey === 'market_price' || csvKey === 'best_price') {
+        return Number(value).toFixed(0);
+      }
       if (type === 'decimal') return Number(value).toFixed(2);
       return value;
+    }
+
+    function buildPfrGameUrl(row) {
+      const pfrAbbr = PFR_TEAM_ABBR[(row['team'] || '').toString().trim().toUpperCase()];
+      const week = row['week'];
+      if (!pfrAbbr || week === null || week === undefined || week === '') return null;
+      return `https://www.pro-football-reference.com/teams/${pfrAbbr}/2025.htm`;
     }
 
     function updateTableFromCSV() {
@@ -514,7 +523,7 @@
         activeCols.forEach(col => {
           const td = document.createElement('td');
           const val = row[col.csv];
-          const formatted = formatValue(val, col.type);
+          const formatted = formatValue(val, col.type, col.csv);
 
           if (col.csv === 'team') {
             const teamKey = (val || '').toString().trim().toUpperCase();
@@ -530,11 +539,10 @@
               td.textContent = formatted;
             }
           } else if (col.csv === 'game') {
-            const teamKey = (row['team'] || '').toString().trim().toUpperCase();
-            const pfrAbbr = PFR_TEAM_ABBR[teamKey];
-            if (pfrAbbr) {
+            const url = buildPfrGameUrl(row);
+            if (url) {
               const a = document.createElement('a');
-              a.href = `https://www.pro-football-reference.com/teams/${pfrAbbr}/${NFL_SEASON_YEAR}.htm`;
+              a.href = url;
               a.target = '_blank';
               a.rel = 'noopener noreferrer';
               a.textContent = formatted;
