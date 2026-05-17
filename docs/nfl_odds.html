@@ -204,10 +204,10 @@
     const PFR_TEAM_ABBR = {
       ARI: 'crd', ATL: 'atl', BAL: 'rav', BUF: 'buf', CAR: 'car',
       CHI: 'chi', CIN: 'cin', CLE: 'cle', DAL: 'dal', DEN: 'den',
-      DET: 'det', GB:  'gnb', HOU: 'htx', IND: 'clt', JAX: 'jax',
-      KC:  'kan', LAC: 'sdg', LAR: 'ram', LV:  'rai', MIA: 'mia',
-      MIN: 'min', NE:  'nwe', NO:  'nor', NYG: 'nyg', NYJ: 'nyj',
-      PHI: 'phi', PIT: 'pit', SEA: 'sea', SF:  'sfo', TB:  'tam',
+      DET: 'det', GB: 'gnb', HOU: 'htx', IND: 'clt', JAX: 'jax',
+      KC: 'kan', LAC: 'sdg', LAR: 'ram', LV: 'rai', MIA: 'mia',
+      MIN: 'min', NE: 'nwe', NO: 'nor', NYG: 'nyg', NYJ: 'nyj',
+      PHI: 'phi', PIT: 'pit', SF: 'sfo', SEA: 'sea', TB: 'tam',
       TEN: 'oti', WAS: 'was',
     };
 
@@ -245,6 +245,7 @@
       TEN: 'https://www.espn.com/nfl/team/injuries/_/name/ten/tennessee-titans',
       WAS: 'https://www.espn.com/nfl/team/injuries/_/name/wsh/washington-commanders',
     };
+
     const REFRESH_INTERVAL = 60000;
     const EXCLUDED_COLUMNS = new Set(['team_logo_espn', 'last_update_api', 'game_date_est']);
     const EDGE_THRESHOLD_PERCENT = 3;
@@ -337,12 +338,14 @@
     }
 
     function buildPfrGameUrl(row) {
-      const pfrAbbr = PFR_TEAM_ABBR[(row['team'] || '').toString().trim().toUpperCase()];
+      const teamKey = (row['team'] || '').toString().trim().toUpperCase();
+      const pfrAbbr = PFR_TEAM_ABBR[teamKey];
       const gameDate = row['game_date_est'];
+
       if (!pfrAbbr || !gameDate) return null;
 
-      const dateStr = String(gameDate).trim().replaceAll('-', '');
-      if (dateStr.length !== 8) return null;
+      const dateStr = String(gameDate).trim().replace(/-/g, '');
+      if (!/^\d{8}$/.test(dateStr)) return null;
 
       return `https://www.pro-football-reference.com/boxscores/${dateStr}0${pfrAbbr}.htm`;
     }
@@ -563,10 +566,8 @@
             td.classList.add('numeric');
           }
 
-          if (typeof val === 'number') {
-            if (col.type === 'spread_edge') {
-              td.style.backgroundColor = getEdgeGradientColor(val, EDGE_THRESHOLD_PERCENT);
-            }
+          if (typeof val === 'number' && col.type === 'spread_edge') {
+            td.style.backgroundColor = getEdgeGradientColor(val, EDGE_THRESHOLD_PERCENT);
           }
 
           tr.appendChild(td);
