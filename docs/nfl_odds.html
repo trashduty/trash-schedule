@@ -145,6 +145,13 @@
       opacity: 0.75;
     }
 
+    .team-cell {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 3px;
+    }
+
     .team-link {
       display: inline-flex;
       align-items: center;
@@ -156,13 +163,6 @@
       height: 22px;
       object-fit: contain;
       vertical-align: middle;
-    }
-
-    .game-cell {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 3px;
     }
 
     .qb-note {
@@ -631,6 +631,9 @@
             const teamKey = (val || '').toString().trim().toUpperCase();
             const url = TEAM_INJURY_URLS[teamKey];
             const logoUrl = row['team_logo_espn'];
+            const qbName = qbLookup[teamKey];
+            const wrapper = document.createElement('div');
+            wrapper.className = 'team-cell';
 
             if (url) {
               const a = document.createElement('a');
@@ -651,38 +654,21 @@
               span.textContent = formatted;
               a.appendChild(span);
 
-              td.appendChild(a);
+              wrapper.appendChild(a);
             } else {
+              const line = document.createElement('div');
               if (logoUrl) {
                 const img = document.createElement('img');
                 img.src = logoUrl;
                 img.alt = `${formatted} logo`;
                 img.className = 'team-logo';
-                td.appendChild(img);
-                td.appendChild(document.createTextNode(' '));
+                line.appendChild(img);
+                line.appendChild(document.createTextNode(' '));
               }
-              td.appendChild(document.createTextNode(formatted));
-            }
-          } else if (col.csv === 'game') {
-            const wrapper = document.createElement('div');
-            wrapper.className = 'game-cell';
-
-            const url = buildPfrGameUrl(row);
-            if (url) {
-              const a = document.createElement('a');
-              a.href = url;
-              a.target = '_blank';
-              a.rel = 'noopener noreferrer';
-              a.textContent = formatted;
-              wrapper.appendChild(a);
-            } else {
-              const span = document.createElement('span');
-              span.textContent = formatted;
-              wrapper.appendChild(span);
+              line.appendChild(document.createTextNode(formatted));
+              wrapper.appendChild(line);
             }
 
-            const teamKey = normalizeTeamAbbr(row['team']);
-            const qbName = qbLookup[teamKey];
             if (qbName) {
               const note = document.createElement('div');
               note.className = 'qb-note';
@@ -691,6 +677,18 @@
             }
 
             td.appendChild(wrapper);
+          } else if (col.csv === 'game') {
+            const url = buildPfrGameUrl(row);
+            if (url) {
+              const a = document.createElement('a');
+              a.href = url;
+              a.target = '_blank';
+              a.rel = 'noopener noreferrer';
+              a.textContent = formatted;
+              td.appendChild(a);
+            } else {
+              td.textContent = formatted;
+            }
           } else {
             td.textContent = formatted;
           }
