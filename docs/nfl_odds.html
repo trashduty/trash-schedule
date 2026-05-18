@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>NFL Model Outputs</title>
 
-  <!-- Papa Parse for CSV parsing -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
 
   <style>
@@ -130,6 +129,7 @@
       text-align: left;
       border-bottom: 1px solid #ddd;
       white-space: nowrap;
+      vertical-align: top;
     }
 
     td.numeric {
@@ -156,6 +156,21 @@
       height: 22px;
       object-fit: contain;
       vertical-align: middle;
+    }
+
+    .game-cell {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 3px;
+    }
+
+    .qb-note {
+      font-size: 0.72rem;
+      line-height: 1.2;
+      color: #666;
+      white-space: normal;
+      font-style: italic;
     }
 
     th {
@@ -218,7 +233,9 @@
   </div>
 
   <script>
-    const CSV_URL = 'https://raw.githubusercontent.com/trashduty/trash-schedule/main/NFL_Odds/Data/spreads_odds.csv';
+    const SPREADS_CSV_URL = 'https://raw.githubusercontent.com/trashduty/trash-schedule/main/NFL_Odds/Data/spreads_odds.csv';
+    const STARTING_QBS_URL = 'https://raw.githubusercontent.com/trashduty/trash-schedule/main/docs/Starting%20QBs.csv';
+    const MODEL_CSV_URL = 'https://raw.githubusercontent.com/trashduty/trash-schedule/main/Week%201%20model%20pred_updated.csv';
 
     const PFR_TEAM_ABBR = {
       ARI: 'crd', ATL: 'atl', BAL: 'rav', BUF: 'buf', CAR: 'car',
@@ -275,6 +292,67 @@
     let selectedTeams = new Set();
     let sortConfig = { key: null, direction: 'asc' };
     let columnMapping = [];
+    let qbNoteLookup = {};
+
+    function parseCsvFromUrl(url) {
+      return fetch(url + '?t=' + Date.now())
+        .then(response => {
+          if (!response.ok) throw new Error('HTTP ' + response.status + ' for ' + url);
+          return response.text();
+        })
+        .then(csvText => new Promise((resolve, reject) => {
+          Papa.parse(csvText, {
+            header: true,
+            dynamicTyping: true,
+            skipEmptyLines: true,
+            complete: results => resolve(results),
+            error: err => reject(err)
+          });
+        }));
+    }
+
+    function normalizeTeamAbbr(team) {
+      return (team || '').toString().trim().toUpperCase();
+    }
+
+    function normalizeName(name) {
+      return (name || '').toString().trim();
+    }
+
+    function buildQbNoteLookup(modelRows, starterRows) {
+      const starterMap = {};
+
+      starterRows.forEach(row => {
+        const team = normalizeTeamAbbr(row['Team']);
+        if (!team) return;
+
+        starterMap[team] = {
+          normalStarter: normalizeName(row['Normal_Starter']),
+          manualFlag: String(row['Manual Flag'] || '').trim() === '1'
+        };
+      });
+
+      const lookup = {};
+
+      modelRows.forEach(row => {
+        const team = normalizeTeamAbbr(row['Team']);
+        const qbName = normalizeName(row['Qbname']);
+        if (!team || !qbName) return;
+
+        const starterInfo = starterMap[team];
+        if (!starterInfo) return;
+
+        const shouldShow =
+          starterInfo.manualFlag ||
+          (starterInfo.normalStarter && starterInfo.normalStarter !== qbName);
+
+        if (shouldShow) {
+          lookup[team] = `*Assumes ${qbName} is starting`;
+        }
+      });
+
+      return lookup;
+    }
 
     function formatHeader(csvHeader) {
       if (csvHeader === 'game_time_est') return 'Game Time';
@@ -395,30 +473,26 @@
     }
 
     function updateTableFromCSV() {
-      fetch(CSV_URL + '?t=' + Date.now())
-        .then((response) => {
-          if (!response.ok) throw new Error('HTTP ' + response.status);
-          return response.text();
-        })
-        .then((csvText) => {
-          Papa.parse(csvText, {
-            header: true,
-            dynamicTyping: true,
-            skipEmptyLines: true,
-            complete: function (results) {
-              if (results.meta && results.meta.fields) {
-                buildColumnMapping(results.meta.fields);
-              }
-              rawData = results.data || [];
-              hydrateTeams();
-              renderTeamPicker();
-              renderTable();
-              updateTeamSummary();
+      Promise.all([
+        parseCsvFromUrl(SPREADS_CSV_URL),
+        parseCsvFromUrl(STARTING_QBS_URL),
+        parseCsvFromUrl(MODEL_CSV_URL)
+      ])
+        .then(([spreadsResults, startersResults, modelResults]) => {
+          if (spreadsResults.meta && spreadsResults.meta.fields) {
+            buildColumnMapping(spreadsResults.meta.fields);
+          }
 
-              document.getElementById('status').textContent =
-                'Last updated: ' + new Date().toLocaleTimeString();
-            }
-          });
+          rawData = spreadsResults.data || [];
+          qbNoteLookup = buildQbNoteLookup(modelResults.data || [], startersResults.data || []);
+
+          hydrateTeams();
+          renderTeamPicker();
+          renderTable();
+          updateTeamSummary();
+
+          document.getElementById('status').textContent =
+            'Last updated: ' + new Date().toLocaleTimeString();
         })
         .catch((err) => {
           document.getElementById('status').textContent = 'Error loading data: ' + err.message;
@@ -614,6 +688,9 @@
               td.appendChild(document.createTextNode(formatted));
             }
           } else if (col.csv === 'game') {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'game-cell';
+
             const url = buildPfrGameUrl(row);
             if (url) {
               const a = document.createElement('a');
@@ -621,10 +698,23 @@
               a.target = '_blank';
               a.rel = 'noopener noreferrer';
               a.textContent = formatted;
-              td.appendChild(a);
+              wrapper.appendChild(a);
             } else {
-              td.textContent = formatted;
+              const span = document.createElement('span');
+              span.textContent = formatted;
+              wrapper.appendChild(span);
             }
+
+            const teamKey = normalizeTeamAbbr(row['team']);
+            const qbNote = qbNoteLookup[teamKey];
+            if (qbNote) {
+              const note = document.createElement('div');
+              note.className = 'qb-note';
+              note.textContent = qbNote;
+              wrapper.appendChild(note);
+            }
+
+            td.appendChild(wrapper);
           } else {
             td.textContent = formatted;
           }
