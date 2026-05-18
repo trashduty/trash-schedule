@@ -234,7 +234,6 @@
 
   <script>
     const SPREADS_CSV_URL = 'https://raw.githubusercontent.com/trashduty/trash-schedule/main/NFL_Odds/Data/spreads_odds.csv';
-    const STARTING_QBS_URL = 'https://raw.githubusercontent.com/trashduty/trash-schedule/main/docs/Starting%20QBs.csv';
     const MODEL_CSV_URL = 'https://raw.githubusercontent.com/trashduty/trash-schedule/main/Week%201%20model%20pred_updated.csv';
 
     const PFR_TEAM_ABBR = {
@@ -292,7 +291,7 @@
     let selectedTeams = new Set();
     let sortConfig = { key: null, direction: 'asc' };
     let columnMapping = [];
-    let qbNoteLookup = {};
+    let qbLookup = {};
 
     function parseCsvFromUrl(url) {
       return fetch(url + '?t=' + Date.now())
@@ -319,49 +318,14 @@
       return (name || '').toString().trim();
     }
 
-    function buildQbNoteLookup(spreadRows, modelRows, starterRows) {
-      const starterMap = {};
-      const modelMap = {};
+    function buildQbLookup(modelRows) {
       const lookup = {};
-
-      starterRows.forEach(row => {
-        const team = normalizeTeamAbbr(row['Team']);
-        if (!team) return;
-
-        starterMap[team] = {
-          normalStarter: normalizeName(row['Normal_Starter']),
-          manualFlag: String(row['Manual Flag'] || '').trim() === '1'
-        };
-      });
 
       modelRows.forEach(row => {
         const team = normalizeTeamAbbr(row['Team']);
         const qbName = normalizeName(row['Qbname']);
         if (!team || !qbName) return;
-        modelMap[team] = qbName;
-      });
-
-      spreadRows.forEach(row => {
-        const team = normalizeTeamAbbr(row['team']);
-        const game = (row['game'] || '').toString().trim().toUpperCase();
-        if (!team || !game) return;
-
-        const starterInfo = starterMap[team];
-        const qbName = modelMap[team];
-        if (!starterInfo || !qbName) return;
-
-        const shouldShow =
-          starterInfo.manualFlag ||
-          (starterInfo.normalStarter && starterInfo.normalStarter !== qbName);
-
-        if (!shouldShow) return;
-
-        const note = `*Assumes ${qbName} is starting`;
-
-        if (!lookup[game]) lookup[game] = [];
-        if (!lookup[game].includes(note)) {
-          lookup[game].push(note);
-        }
+        lookup[team] = qbName;
       });
 
       return lookup;
@@ -488,20 +452,15 @@
     function updateTableFromCSV() {
       Promise.all([
         parseCsvFromUrl(SPREADS_CSV_URL),
-        parseCsvFromUrl(STARTING_QBS_URL),
         parseCsvFromUrl(MODEL_CSV_URL)
       ])
-        .then(([spreadsResults, startersResults, modelResults]) => {
+        .then(([spreadsResults, modelResults]) => {
           if (spreadsResults.meta && spreadsResults.meta.fields) {
             buildColumnMapping(spreadsResults.meta.fields);
           }
 
           rawData = spreadsResults.data || [];
-          qbNoteLookup = buildQbNoteLookup(
-            spreadsResults.data || [],
-            modelResults.data || [],
-            startersResults.data || []
-          );
+          qbLookup = buildQbLookup(modelResults.data || []);
 
           hydrateTeams();
           renderTeamPicker();
@@ -722,15 +681,14 @@
               wrapper.appendChild(span);
             }
 
-            const gameKey = (row['game'] || '').toString().trim().toUpperCase();
-            const qbNotes = qbNoteLookup[gameKey] || [];
-
-            qbNotes.forEach(qbNote => {
+            const teamKey = normalizeTeamAbbr(row['team']);
+            const qbName = qbLookup[teamKey];
+            if (qbName) {
               const note = document.createElement('div');
               note.className = 'qb-note';
-              note.textContent = qbNote;
+              note.textContent = `*Assumes ${qbName} is starting`;
               wrapper.appendChild(note);
-            });
+            }
 
             td.appendChild(wrapper);
           } else {
