@@ -337,7 +337,8 @@
       modelRows.forEach(row => {
         const team = normalizeTeamAbbr(row['Team']);
         const qbName = normalizeName(row['Qbname']);
-        if (!team || !qbName) return;
+        const game = (row['Game'] || '').toString().trim().toUpperCase();
+        if (!team || !qbName || !game) return;
 
         const starterInfo = starterMap[team];
         if (!starterInfo) return;
@@ -346,8 +347,13 @@
           starterInfo.manualFlag ||
           (starterInfo.normalStarter && starterInfo.normalStarter !== qbName);
 
-        if (shouldShow) {
-          lookup[team] = `*Assumes ${qbName} is starting`;
+        if (!shouldShow) return;
+
+        const note = `*Assumes ${qbName} is starting`;
+
+        if (!lookup[game]) lookup[game] = [];
+        if (!lookup[game].includes(note)) {
+          lookup[game].push(note);
         }
       });
 
@@ -705,14 +711,15 @@
               wrapper.appendChild(span);
             }
 
-            const teamKey = normalizeTeamAbbr(row['team']);
-            const qbNote = qbNoteLookup[teamKey];
-            if (qbNote) {
+            const gameKey = (row['game'] || '').toString().trim().toUpperCase();
+            const qbNotes = qbNoteLookup[gameKey] || [];
+
+            qbNotes.forEach(qbNote => {
               const note = document.createElement('div');
               note.className = 'qb-note';
               note.textContent = qbNote;
               wrapper.appendChild(note);
-            }
+            });
 
             td.appendChild(wrapper);
           } else {
