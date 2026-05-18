@@ -319,8 +319,10 @@
       return (name || '').toString().trim();
     }
 
-    function buildQbNoteLookup(modelRows, starterRows) {
+    function buildQbNoteLookup(spreadRows, modelRows, starterRows) {
       const starterMap = {};
+      const modelMap = {};
+      const lookup = {};
 
       starterRows.forEach(row => {
         const team = normalizeTeamAbbr(row['Team']);
@@ -332,16 +334,21 @@
         };
       });
 
-      const lookup = {};
-
       modelRows.forEach(row => {
         const team = normalizeTeamAbbr(row['Team']);
         const qbName = normalizeName(row['Qbname']);
-        const game = (row['Game'] || '').toString().trim().toUpperCase();
-        if (!team || !qbName || !game) return;
+        if (!team || !qbName) return;
+        modelMap[team] = qbName;
+      });
+
+      spreadRows.forEach(row => {
+        const team = normalizeTeamAbbr(row['team']);
+        const game = (row['game'] || '').toString().trim().toUpperCase();
+        if (!team || !game) return;
 
         const starterInfo = starterMap[team];
-        if (!starterInfo) return;
+        const qbName = modelMap[team];
+        if (!starterInfo || !qbName) return;
 
         const shouldShow =
           starterInfo.manualFlag ||
@@ -490,7 +497,11 @@
           }
 
           rawData = spreadsResults.data || [];
-          qbNoteLookup = buildQbNoteLookup(modelResults.data || [], startersResults.data || []);
+          qbNoteLookup = buildQbNoteLookup(
+            spreadsResults.data || [],
+            modelResults.data || [],
+            startersResults.data || []
+          );
 
           hydrateTeams();
           renderTeamPicker();
