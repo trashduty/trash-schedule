@@ -1,0 +1,42 @@
+<!-- SUBJECT: {{ subject }} -->
+<!-- PREVIEW: {{ preview_text }} -->
+
+---
+
+{{ hook }}
+
+---
+
+## 📊 Model Spotlight: {{ matchup.featured_side_full }} {{ matchup.market_line_display }}
+
+| | |
+|---|---|
+| **Game** | {{ matchup.away_team_full }} @ {{ matchup.home_team_full }} |
+| **Week** | {{ matchup.week }} |
+| **Kickoff** | {{ matchup.kickoff_date_fmt }} · {{ matchup.kickoff_time }} ET |
+| **Featured Side** | **{{ matchup.featured_side }} {{ matchup.market_line_display }}** |
+| **Market Line** | {{ matchup.featured_side }} {{ matchup.market_line_display }} ({{ matchup.market_price_display }}) |
+| **Model Line** | {{ matchup.featured_side }} {{ matchup.model_line_display }} |
+| **Best Available** | {{ matchup.featured_side }} {{ matchup.best_line_display }} @ {{ matchup.best_book }} ({{ matchup.best_price_display }}) |
+| **Cover Probability** | **{{ matchup.best_cover_prob_pct }}** |
+| **Edge** | **{{ matchup.best_edge_pct }}** |
+| **{{ matchup.away_team }} QB** | {{ matchup.away_qb }} |
+| **{{ matchup.home_team }} QB** | {{ matchup.home_qb }} |
+
+---
+
+## Why The Model Sees It This Way
+
+{{ why_model }}
+
+---
+
+## Matchup Bullets
+
+{% for bullet in bullets %}- {{ bullet }}
+{% endfor %}
+---
+
+## Get The Full Week {{ matchup.week }} Edge Board
+
+{{ subscriber_cta }}
