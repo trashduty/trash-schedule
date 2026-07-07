@@ -65,12 +65,18 @@ if (length(unmatched_home_ids) > 0)
 if (length(unmatched_away_ids) > 0)
   warning(glue::glue("away_team_id(s) not found in crosswalk: {paste(unmatched_away_ids, collapse = ', ')}"))
 
+if ("cover_probability" %in% names(model_joined)) {
+  model_joined <- model_joined |>
+    rename(static_cover_probability = cover_probability)
+}
+
 # The model CSV already contains one row per team perspective (both home and away).
 # Map numeric IDs to btb team names so the team column matches api_spreads.
 model_raw <- model_joined |>
   mutate(
     team     = btb_home_name,
-    opponent = btb_away_name
+    opponent = btb_away_name,
+    total_bin = total_bin_close
   ) |>
   select(-btb_home_name, -btb_away_name)
 
@@ -241,7 +247,7 @@ if (nrow(missing_spread_keys) > 0) {
   ))
 }
 
-odds_calculated <- model_raw |>
+odds_lookup_joined <- model_raw |>
   select(-opening_spread) |>
   # Each model team can map to multiple sportsbook spread rows for the same week/team.
   left_join(
@@ -271,14 +277,38 @@ odds_calculated <- model_raw |>
     .after = spread
   ) |>
   mutate(true_spread = round(true_spread * 2) / 2) |>
-  mutate(total_bin = total_bin_close) |>
   mutate(spread = round(spread * 2) / 2, .after = spread) |>
   mutate(implied_odds_spread = calc_implied_odds(spread_price)) |>
   left_join(
     lookup,
-    by = c("total_bin", "spread" = "market_spread", "true_spread")
-  ) |>
-  mutate(implied_odds_spread = calc_implied_odds(spread_price)) |>
+    by = c("total_bin", "spread" = "market_spread", "true_spread"),
+    suffix = c("_model", "")
+  )
+
+missing_lookup_rows <- odds_lookup_joined |>
+  filter(is.na(cover_probability) | is.na(push_probability)) |>
+  distinct(week, game, team, total_bin, spread, true_spread)
+
+if (nrow(missing_lookup_rows) > 0) {
+  overflow_note <- if_else(
+    nrow(missing_lookup_rows) > max_preview_games,
+    glue::glue(" (showing first {max_preview_games} of {nrow(missing_lookup_rows)})"),
+    ""
+  )
+  preview_rows <- missing_lookup_rows |>
+    mutate(
+      lookup_key = glue::glue(
+        "{team} [{game}] total_bin={total_bin}, spread={spread}, true_spread={true_spread}"
+      )
+    ) |>
+    pull(lookup_key)
+  stop(glue::glue(
+    "Spread pricing lookup failed for {nrow(missing_lookup_rows)} row(s){overflow_note}: ",
+    "{paste(head(preview_rows, max_preview_games), collapse = '; ')}"
+  ))
+}
+
+odds_calculated <- odds_lookup_joined |>
   mutate(cover_edge = cover_probability - implied_odds_spread) |>
   mutate(no_cover_edge = (1 - cover_probability) - implied_odds_spread) |>
   group_by(week, game, team) |>
