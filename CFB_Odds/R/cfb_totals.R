@@ -43,6 +43,8 @@ week_zero_start <- as.Date("2026-08-29")
 week_zero_end   <- as.Date("2026-08-31")
 week_one_start  <- as.Date("2026-09-01")
 max_preview_games <- 10
+model_weight <- 0.35
+market_weight <- 0.65
 
 calculate_cfb_week <- function(game_date) {
   case_when(
@@ -192,20 +194,20 @@ safe_max_datetime <- function(x) {
   if (all(is.na(x))) as.POSIXct(NA, tz = "America/New_York") else max(x, na.rm = TRUE)
 }
 
-calculate_drive_bin <- function(model_prediction) {
+calculate_drive_bin <- function(total_value) {
   case_when(
-    !is.na(model_prediction) & model_prediction >= 0 & model_prediction <= 7 ~ 1,
-    !is.na(model_prediction) & model_prediction >= 7.5 & model_prediction <= 17 ~ 2,
-    !is.na(model_prediction) & model_prediction >= 17.5 & model_prediction <= 30 ~ 3,
-    !is.na(model_prediction) & model_prediction > 30 ~ 4,
+    !is.na(total_value) & total_value >= 0 & total_value <= 7 ~ 1,
+    !is.na(total_value) & total_value >= 7.5 & total_value <= 17 ~ 2,
+    !is.na(total_value) & total_value >= 17.5 & total_value <= 30 ~ 3,
+    !is.na(total_value) & total_value > 30 ~ 4,
     TRUE ~ NA_real_
   )
 }
 
 api_totals <- api_data |>
   filter(market == "totals", name == "Over") |>
+  filter(!is.na(home_team), !is.na(away_team)) |>
   mutate(game = paste0(away_team, "@", home_team)) |>
-  filter(game != "NA@UNLV") |>
   select(
     week,
     game,
@@ -262,7 +264,7 @@ totals_lookup_joined <- model_with_game |>
   ) |>
   mutate(median_total = round(median_total_raw * 2) / 2) |>
   mutate(
-    true_total = ((model_prediction * 0.35) + (median_total * 0.65)),
+    true_total = ((model_prediction * model_weight) + (median_total * market_weight)),
     .after = over_under
   ) |>
   mutate(
