@@ -135,6 +135,7 @@ unmatched_diagnostics <- missing_game_rows |>
     reason
   )
 
+# Always overwrite so the file reflects the current run (0 rows = all games matched)
 write_csv(unmatched_diagnostics, unmatched_output_path)
 
 if (nrow(missing_game_rows) > 0) {
@@ -145,8 +146,9 @@ if (nrow(missing_game_rows) > 0) {
   )
   preview_games <- missing_game_rows |>
     mutate(
-      game_key = paste0(team, " vs ", opponent,
-                        " [matched names ", model_team, " / ", model_opponent, "]")
+      game_key = glue::glue(
+        "{team} vs {opponent} [matched names {model_team} / {model_opponent}]"
+      )
     ) |>
     pull(game_key)
   warning(glue::glue(
