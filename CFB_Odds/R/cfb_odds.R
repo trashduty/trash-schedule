@@ -26,6 +26,22 @@ lookup <- read_csv(lookup_path, show_col_types = FALSE) |>
 model_raw <- read_csv(model_output_path, show_col_types = FALSE) |>
   janitor::clean_names()
 
+week_zero_thursday <- as.Date("2026-08-27")
+max_preview_games <- 10
+
+#' Convert game date to CFB week index
+#'
+#' @param game_date Date vector in America/New_York game-date context.
+#' @param week_anchor Date that starts week 0 (inclusive).
+#' @return Numeric week index: -1 before week_anchor, 0 for week_anchor through
+#'   week_anchor + 6 days, and 1 starting week_anchor + 7 days.
+calculate_cfb_week <- function(game_date, week_anchor) {
+  case_when(
+    game_date < week_anchor ~ -1,
+    TRUE ~ as.numeric(floor((game_date - week_anchor) / 7))
+  )
+}
+
 team_id_lookup <- cfb_crosswalk |>
   select(team_id, btb_team_short)
 
@@ -38,7 +54,14 @@ model_raw <- model_raw |>
     rename(team_id_lookup, btb_away_name = btb_team_short),
     by = c("away_team_id" = "team_id")
   ) |>
-  mutate(team = btb_home_name, opponent = btb_away_name) |>
+  mutate(
+    team = btb_home_name,
+    opponent = btb_away_name,
+    # Model CSV exports can type week as character (e.g., with BOM/text parsing); normalize for numeric joins.
+    week = as.numeric(week),
+    # Keep game key format aligned with API: away@home.
+    game = paste0(opponent, "@", team)
+  ) |>
   select(-btb_home_name, -btb_away_name)
 
 unmatched_home_ids <- model_raw |> filter(is.na(team)) |> pull(home_team_id) |> unique()
@@ -80,9 +103,6 @@ get_odds_api <- function(cfb_crosswalk = NULL,
   #     week_one_wednesday = first_game_date - days(days_back_to_wednesday)
   #   ) |>
   #   pull(week_one_wednesday)
-  
-  week_one_wednesday <- as.Date("2026-08-19")
-  
   
   # URL
   url <- glue::glue("https://api.the-odds-api.com/v4/sports/{sport}/odds/?apiKey={apiKey}&regions={regions}&markets={markets}&oddsFormat={oddsFormat}")
@@ -130,11 +150,7 @@ get_odds_api <- function(cfb_crosswalk = NULL,
     left_join(select(cfb_crosswalk, btb_team_short, api_team, logo), 
               by = c("away_team" = "api_team")) |> 
     rename(away_name = btb_team_short, away_logo = logo) |> 
-    mutate(week = case_when(
-      commence_ny < week_one_wednesday ~ 0,  # Pre-season or invalid
-      # TRUE ~ as.numeric(floor((commence_ny - week_one_wednesday) / 7) + 1)
-      TRUE ~ as.numeric(floor((commence_ny - week_one_wednesday) / 7)) # There is a week 0 in college football
-    )) |> 
+    mutate(week = calculate_cfb_week(commence_ny, week_zero_thursday)) |> 
     mutate(week = if_else(week == 23, 22, week)) |> 
     select(week, commence_time, commence_ny, bookmaker_id, 
            bookmaker, last_update_api, last_update_markets, market, 
@@ -160,6 +176,23 @@ calc_implied_odds <- function(odds) {
   ifelse(odds < 0,
          abs(odds) / (abs(odds) + 100),  # Negative odds (favorites)
          100 / (odds + 100))             # Positive odds (underdogs)
+}
+
+#' Median with all-NA safety
+#'
+#' @param x Numeric vector.
+#' @return NA_real_ when all values are NA, otherwise median(x, na.rm = TRUE).
+safe_median <- function(x) {
+  if (all(is.na(x))) NA_real_ else median(x, na.rm = TRUE)
+}
+
+#' Datetime max with all-NA safety
+#'
+#' @param x Datetime vector.
+#' @return POSIXct NA in America/New_York when all values are NA, otherwise
+#'   max(x, na.rm = TRUE).
+safe_max_datetime <- function(x) {
+  if (all(is.na(x))) as.POSIXct(NA, tz = "America/New_York") else max(x, na.rm = TRUE)
 }
 
 api_spreads <- api_data |>
@@ -190,8 +223,31 @@ api_totals <- api_data |>
   mutate(game = paste0(away_name, "@", home_name)) |>
   summarize(median_total = median(point, na.rm = TRUE), .by = c(week, game))
 
+missing_spread_keys <- model_raw |>
+  distinct(week, team, game) |>
+  anti_join(
+    api_spreads |> distinct(week, team),
+    by = c("week", "team")
+  )
+
+if (nrow(missing_spread_keys) > 0) {
+  overflow_note <- if_else(
+    nrow(missing_spread_keys) > max_preview_games,
+    glue::glue(" (showing first {max_preview_games} of {nrow(missing_spread_keys)})"),
+    ""
+  )
+  preview_games <- paste0(
+    paste(head(missing_spread_keys$game, max_preview_games), collapse = ", "),
+    overflow_note
+  )
+  warning(glue::glue(
+    "Model games missing API spread match (week+team): {nrow(missing_spread_keys)} row(s): {preview_games}"
+  ))
+}
+
 odds_calculated <- model_raw |>
   select(-opening_spread) |>
+  # Each model team can map to multiple sportsbook spread rows for the same week/team.
   left_join(
     select(
       api_spreads,
@@ -204,11 +260,11 @@ odds_calculated <- model_raw |>
       bookmaker,
       logo
     ),
-    by = c("week", "team")
+    by = c("week", "team"),
+    relationship = "many-to-many"
   ) |>
-  filter(!is.na(game)) |>
   mutate(
-    median_spread_raw = median(spread, na.rm = TRUE),
+    median_spread_raw = safe_median(spread),
     .by = c(game, team),
     .after = spread
   ) |>
@@ -279,7 +335,7 @@ odds_calculated <- model_raw |>
 
 spread_summary <- odds_calculated |>
   summarise(
-    last_update_api = max(last_update_api, na.rm = TRUE),
+    last_update_api = safe_max_datetime(last_update_api),
     model_prediction = true_spread[median_cover_row],
     market_line = spread[median_cover_row],
     market_price = spread_price[median_cover_row],
