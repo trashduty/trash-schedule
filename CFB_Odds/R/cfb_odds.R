@@ -13,7 +13,20 @@ library(cfbfastR)
 
 options(scipen=999)
 
-get_odds_api <- function(sport = "americanfootball_ncaaf", 
+cfb_crosswalk_path <- "CFB_Odds/Data/CFB Teams Full Crosswalk.csv"
+lookup_path <- "CFB_Odds/Data/Expanded_CFB_Spread_Pricing_Table_Binned.csv"
+model_output_path <- "cfb model output_new.csv"
+
+cfb_crosswalk <- read_csv(cfb_crosswalk_path, show_col_types = FALSE)
+
+lookup <- read_csv(lookup_path, show_col_types = FALSE) |>
+  janitor::clean_names()
+
+model_raw <- read_csv(model_output_path, show_col_types = FALSE) |>
+  janitor::clean_names()
+
+get_odds_api <- function(cfb_crosswalk,
+                         sport = "americanfootball_ncaaf", 
                          apiKey = Sys.getenv("ODDS_API_KEY"), 
                          regions = "us", 
                          markets = "spreads,totals", 
@@ -72,9 +85,6 @@ get_odds_api <- function(sport = "americanfootball_ncaaf",
       str_squish()
   }
   
-  cfb_crosswalk <- read_csv("CFB_Odds/Data/CFB Teams Full Crosswalk.csv", 
-                            show_col_types = FALSE)
-  
   # Unnest the data, which has multiple nested list columns
   api_unnested <- api_data |> 
     unnest(bookmakers, names_repair = "unique") |>
@@ -106,19 +116,7 @@ get_odds_api <- function(sport = "americanfootball_ncaaf",
   return(api_unnested)
 }
 
-api_data <- get_odds_api()
-
-cfb_crosswalk_path <- "CFB_Odds/Data/CFB Teams Full Crosswalk.csv"
-lookup_path <- "CFB_Odds/Data/Expanded_CFB_Spread_Pricing_Table_Binned.csv"
-model_output_path <- "cfb model output_new.csv"
-
-cfb_crosswalk <- read_csv(cfb_crosswalk_path, show_col_types = FALSE)
-
-lookup <- read_csv(lookup_path, show_col_types = FALSE) |>
-  janitor::clean_names()
-
-model_raw <- read_csv(model_output_path, show_col_types = FALSE) |>
-  janitor::clean_names()
+api_data <- get_odds_api(cfb_crosswalk = cfb_crosswalk)
 
 required_model_columns <- c("model_prediction_raw", "team", "opponent", "week", "cover_probability")
 missing_model_columns <- setdiff(required_model_columns, names(model_raw))
@@ -128,20 +126,6 @@ if (length(missing_model_columns) > 0) {
     "Model output file is missing required column(s): {paste(missing_model_columns, collapse = ', ')}"
   ))
 }
-
-clean_team_names <- function(names) {
-  names %>%
-    # Remove various apostrophe types
-    str_replace_all("['']", "") %>%
-    # Convert accented characters to ASCII equivalents
-    iconv(to = "ASCII//TRANSLIT") %>%
-    # Remove any remaining non-alphanumeric characters except spaces and hyphens
-    str_replace_all("[^A-Za-z0-9 -]", "") %>%
-    # Clean up extra spaces
-    str_squish()
-}
-
-
 
 WEEK <- max(model_raw$week)
 
@@ -184,7 +168,7 @@ odds_calculated <- model_raw |>
   left_join(
     select(
       api_spreads,
-      # week,
+      week,
       team,
       game,
       spread,
@@ -193,8 +177,7 @@ odds_calculated <- model_raw |>
       bookmaker,
       logo
     ),
-    # by = c("week", "team")
-    by = c("team")
+    by = c("week", "team")
   ) |>
   filter(!is.na(game)) |>
   mutate(
@@ -219,12 +202,12 @@ odds_calculated <- model_raw |>
     )
   ) |>
   left_join(
-    lookup,
+    select(lookup, -any_of(c("cover_probability", "no_cover_probability"))),
     by = c("total_bin", "spread" = "market_spread", "true_spread")
   ) |>
   mutate(implied_odds_spread = calc_implied_odds(spread_price)) |>
   mutate(cover_edge = cover_probability - implied_odds_spread) |>
-  mutate(no_cover_edge = no_cover_probability - implied_odds_spread) |>
+  mutate(no_cover_edge = (1 - cover_probability) - implied_odds_spread) |>
   # group_by(week, game, team) |>
   group_by(game, team) |>
   mutate(
