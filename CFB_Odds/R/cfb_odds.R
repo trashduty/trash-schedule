@@ -65,27 +65,13 @@ if (length(unmatched_home_ids) > 0)
 if (length(unmatched_away_ids) > 0)
   warning(glue::glue("away_team_id(s) not found in crosswalk: {paste(unmatched_away_ids, collapse = ', ')}"))
 
-# Expand to both team perspectives so each game produces two rows in the output:
-# one for the home team and one for the away team, each matched to their actual API odds.
-model_raw <- bind_rows(
-  # Home team perspective: model values are as-is (home team covers)
-  model_joined |>
-    mutate(
-      team     = btb_home_name,
-      opponent = btb_away_name,
-      # Keep game key format aligned with API: away@home.
-      game = paste0(btb_away_name, "@", btb_home_name)
-    ),
-  # Away team perspective: negate spread, invert cover probability
-  model_joined |>
-    mutate(
-      team                 = btb_away_name,
-      opponent             = btb_home_name,
-      game                 = paste0(btb_away_name, "@", btb_home_name),
-      model_prediction_raw = -model_prediction_raw,
-      cover_probability    = 1 - cover_probability
-    )
-) |>
+# The model CSV already contains one row per team perspective (both home and away).
+# Map numeric IDs to btb team names so the team column matches api_spreads.
+model_raw <- model_joined |>
+  mutate(
+    team     = btb_home_name,
+    opponent = btb_away_name
+  ) |>
   select(-btb_home_name, -btb_away_name)
 
 get_odds_api <- function(cfb_crosswalk = NULL,
@@ -233,12 +219,6 @@ api_spreads <- api_data |>
     logo
   )
 
-cat("model_raw rows for NC/TCU:\n")
-print(model_raw |> filter(grepl("North Carolina", game) | grepl("TCU", game)))
-
-cat("api_spreads rows for NC@TCU:\n")
-print(api_spreads |> filter(grepl("North Carolina", game) & grepl("TCU", game)))
-
 api_totals <- api_data |>
   # filter(market == "totals", name == "Over", week == WEEK) |>
   filter(market == "totals", name == "Over") |>
@@ -246,10 +226,10 @@ api_totals <- api_data |>
   summarize(median_total = median(point, na.rm = TRUE), .by = c(week, game))
 
 missing_spread_keys <- model_raw |>
-  distinct(week, team, game) |>
+  distinct(week, team) |>
   anti_join(
-    api_spreads |> distinct(week, team, game),
-    by = c("week", "team", "game")
+    api_spreads |> distinct(week, team),
+    by = c("week", "team")
   )
 
 if (nrow(missing_spread_keys) > 0) {
@@ -259,11 +239,11 @@ if (nrow(missing_spread_keys) > 0) {
     ""
   )
   preview_games <- paste0(
-    paste(head(missing_spread_keys$game, max_preview_games), collapse = ", "),
+    paste(head(missing_spread_keys$team, max_preview_games), collapse = ", "),
     overflow_note
   )
   warning(glue::glue(
-    "Model games missing API spread match (week+team+game): {nrow(missing_spread_keys)} row(s): {preview_games}"
+    "Model teams missing API spread match (week+team): {nrow(missing_spread_keys)} row(s): {preview_games}"
   ))
 }
 
@@ -282,7 +262,7 @@ odds_calculated <- model_raw |>
       bookmaker,
       logo
     ),
-    by = c("week", "team", "game"),
+    by = c("week", "team"),
     relationship = "many-to-many"
   ) |>
   filter(!is.na(spread), !is.na(spread_price), !is.na(last_update_api), !is.na(logo)) |>
