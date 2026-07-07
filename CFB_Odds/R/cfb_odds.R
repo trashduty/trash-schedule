@@ -46,7 +46,7 @@ calculate_cfb_week <- function(game_date) {
 team_id_lookup <- cfb_crosswalk |>
   select(team_id, btb_team)
 
-model_raw <- model_raw |>
+model_joined <- model_raw |>
   left_join(
     rename(team_id_lookup, btb_home_name = btb_team),
     by = c("home_team_id" = "team_id")
@@ -55,22 +55,38 @@ model_raw <- model_raw |>
     rename(team_id_lookup, btb_away_name = btb_team),
     by = c("away_team_id" = "team_id")
   ) |>
-  mutate(
-    team = btb_home_name,
-    opponent = btb_away_name,
-    # Model CSV exports can type week as character (e.g., with BOM/text parsing); normalize for numeric joins.
-    week = as.numeric(week),
-    # Keep game key format aligned with API: away@home.
-    game = paste0(opponent, "@", team)
-  ) |>
-  select(-btb_home_name, -btb_away_name)
+  # Model CSV exports can type week as character (e.g., with BOM/text parsing); normalize for numeric joins.
+  mutate(week = as.numeric(week))
 
-unmatched_home_ids <- model_raw |> filter(is.na(team)) |> pull(home_team_id) |> unique()
-unmatched_away_ids <- model_raw |> filter(is.na(opponent)) |> pull(away_team_id) |> unique()
+unmatched_home_ids <- model_joined |> filter(is.na(btb_home_name)) |> pull(home_team_id) |> unique()
+unmatched_away_ids <- model_joined |> filter(is.na(btb_away_name)) |> pull(away_team_id) |> unique()
 if (length(unmatched_home_ids) > 0)
   warning(glue::glue("home_team_id(s) not found in crosswalk: {paste(unmatched_home_ids, collapse = ', ')}"))
 if (length(unmatched_away_ids) > 0)
   warning(glue::glue("away_team_id(s) not found in crosswalk: {paste(unmatched_away_ids, collapse = ', ')}"))
+
+# Expand to both team perspectives so each game produces two rows in the output:
+# one for the home team and one for the away team, each matched to their actual API odds.
+model_raw <- bind_rows(
+  # Home team perspective: model values are as-is (home team covers)
+  model_joined |>
+    mutate(
+      team     = btb_home_name,
+      opponent = btb_away_name,
+      # Keep game key format aligned with API: away@home.
+      game = paste0(btb_away_name, "@", btb_home_name)
+    ),
+  # Away team perspective: negate spread, invert cover probability
+  model_joined |>
+    mutate(
+      team                 = btb_away_name,
+      opponent             = btb_home_name,
+      game                 = paste0(btb_away_name, "@", btb_home_name),
+      model_prediction_raw = -model_prediction_raw,
+      cover_probability    = 1 - cover_probability
+    )
+) |>
+  select(-btb_home_name, -btb_away_name)
 
 get_odds_api <- function(cfb_crosswalk = NULL,
                          sport = "americanfootball_ncaaf", 
