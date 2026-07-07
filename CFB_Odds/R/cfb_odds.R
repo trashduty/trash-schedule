@@ -26,7 +26,7 @@ get_odds_api <- function(sport = "americanfootball_ncaaf",
   # to calculate the CFB week by using a Wednesday to following Tuesday CFB week.
   
   
-  # week_one_wednesday <- cfbfastR::espn_cfb_schedule(year = 2025) |> 
+  # week_one_wednesday <- cfbfastR::espn_cfb_schedule(year = 2026) |> 
   #   filter(type == "regular") |> 
   #   summarise(first_game_date = min(game_date)) |>
   #   mutate(
@@ -41,7 +41,7 @@ get_odds_api <- function(sport = "americanfootball_ncaaf",
   #   ) |>
   #   pull(week_one_wednesday)
   
-  week_one_wednesday <- as.Date("2025-08-20")
+  week_one_wednesday <- as.Date("2026-08-26")
   
   
   # URL
