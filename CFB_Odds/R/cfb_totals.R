@@ -106,6 +106,38 @@ missing_game_rows <- model_with_game |>
   filter(is.na(game)) |>
   distinct(team, opponent, model_team, model_opponent)
 
+unmatched_output_path <- "CFB_Odds/Data/unmatched_totals.csv"
+spreads_all_teams <- unique(c(spreads_games$away_team, spreads_games$home_team))
+
+unmatched_diagnostics <- missing_game_rows |>
+  mutate(
+    game_description = paste0(opponent, " @ ", team),
+    reason = case_when(
+      is.na(model_team) & is.na(model_opponent) ~ "Both team IDs not found in crosswalk",
+      is.na(model_team) ~ "Home team ID not found in crosswalk",
+      is.na(model_opponent) ~ "Away team ID not found in crosswalk",
+      model_team %in% spreads_all_teams & model_opponent %in% spreads_all_teams ~
+        "Both teams in spreads_odds but this matchup is not present (game may not be in model output_new.csv)",
+      !(model_team %in% spreads_all_teams) & !(model_opponent %in% spreads_all_teams) ~
+        "Neither team found in spreads_odds.csv",
+      !(model_team %in% spreads_all_teams) ~
+        paste0("Home team '", model_team, "' not found in spreads_odds.csv"),
+      TRUE ~
+        paste0("Away team '", model_opponent, "' not found in spreads_odds.csv")
+    )
+  ) |>
+  select(
+    game_description,
+    cfb_total_output_team = team,
+    cfb_total_output_opponent = opponent,
+    spreads_matched_team = model_team,
+    spreads_matched_opponent = model_opponent,
+    reason
+  )
+
+# Always overwrite so the file reflects the current run (0 rows = all games matched)
+write_csv(unmatched_diagnostics, unmatched_output_path)
+
 if (nrow(missing_game_rows) > 0) {
   overflow_note <- if_else(
     nrow(missing_game_rows) > max_preview_games,
@@ -119,11 +151,15 @@ if (nrow(missing_game_rows) > 0) {
       )
     ) |>
     pull(game_key)
-  stop(glue::glue(
-    "Unable to match totals games to spreads_odds.csv for {nrow(missing_game_rows)} row(s){overflow_note}: ",
+  warning(glue::glue(
+    "{nrow(missing_game_rows)} game(s) in CFB Total Output could not be matched to spreads_odds.csv",
+    " - see {unmatched_output_path}{overflow_note}: ",
     "{paste(head(preview_games, max_preview_games), collapse = '; ')}"
   ))
 }
+
+model_with_game <- model_with_game |>
+  filter(!is.na(game))
 
 get_odds_api <- function(cfb_crosswalk = NULL,
                          sport = "americanfootball_ncaaf",
