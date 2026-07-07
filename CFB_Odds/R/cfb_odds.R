@@ -21,7 +21,7 @@ cfb_crosswalk <- read_csv(cfb_crosswalk_path, show_col_types = FALSE)
 
 lookup <- read_csv(lookup_path, show_col_types = FALSE) |>
   janitor::clean_names() |>
-  select(total_bin, market_spread, true_spread, push_probability)
+  select(total_bin, market_spread, true_spread, cover_probability, push_probability)
 
 model_raw <- read_csv(model_output_path, show_col_types = FALSE) |>
   janitor::clean_names()
@@ -164,7 +164,7 @@ get_odds_api <- function(cfb_crosswalk = NULL,
 
 api_data <- get_odds_api(cfb_crosswalk = cfb_crosswalk)
 
-required_model_columns <- c("model_prediction_raw", "home_team_id", "away_team_id", "team", "opponent", "week", "cover_probability")
+required_model_columns <- c("model_prediction_raw", "home_team_id", "away_team_id", "team", "opponent", "week", "total_bin_close")
 missing_model_columns <- setdiff(required_model_columns, names(model_raw))
 
 if (length(missing_model_columns) > 0) {
@@ -219,12 +219,6 @@ api_spreads <- api_data |>
     logo
   )
 
-api_totals <- api_data |>
-  # filter(market == "totals", name == "Over", week == WEEK) |>
-  filter(market == "totals", name == "Over") |>
-  mutate(game = paste0(away_team, "@", home_team)) |>
-  summarize(median_total = median(point, na.rm = TRUE), .by = c(week, game))
-
 missing_spread_keys <- model_raw |>
   distinct(week, team) |>
   anti_join(
@@ -277,16 +271,9 @@ odds_calculated <- model_raw |>
     .after = spread
   ) |>
   mutate(true_spread = round(true_spread * 2) / 2) |>
+  mutate(total_bin = total_bin_close) |>
   mutate(spread = round(spread * 2) / 2, .after = spread) |>
   mutate(implied_odds_spread = calc_implied_odds(spread_price)) |>
-  left_join(select(api_totals, -week), by = c("game")) |>
-  mutate(
-    total_bin = case_when(
-      abs(median_total) <= 50 ~ 1,
-      abs(median_total) <= 59.6 ~ 2,
-      abs(median_total) >= 60 ~ 3
-    )
-  ) |>
   left_join(
     lookup,
     by = c("total_bin", "spread" = "market_spread", "true_spread")
