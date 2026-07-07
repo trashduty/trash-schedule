@@ -26,6 +26,28 @@ lookup <- read_csv(lookup_path, show_col_types = FALSE) |>
 model_raw <- read_csv(model_output_path, show_col_types = FALSE) |>
   janitor::clean_names()
 
+team_id_lookup <- cfb_crosswalk |>
+  select(team_id, btb_team_short)
+
+model_raw <- model_raw |>
+  left_join(
+    rename(team_id_lookup, btb_home_name = btb_team_short),
+    by = c("home_team_id" = "team_id")
+  ) |>
+  left_join(
+    rename(team_id_lookup, btb_away_name = btb_team_short),
+    by = c("away_team_id" = "team_id")
+  ) |>
+  mutate(team = btb_home_name, opponent = btb_away_name) |>
+  select(-btb_home_name, -btb_away_name)
+
+unmatched_home_ids <- model_raw |> filter(is.na(team)) |> pull(home_team_id) |> unique()
+unmatched_away_ids <- model_raw |> filter(is.na(opponent)) |> pull(away_team_id) |> unique()
+if (length(unmatched_home_ids) > 0)
+  warning(glue::glue("home_team_id(s) not found in crosswalk: {paste(unmatched_home_ids, collapse = ', ')}"))
+if (length(unmatched_away_ids) > 0)
+  warning(glue::glue("away_team_id(s) not found in crosswalk: {paste(unmatched_away_ids, collapse = ', ')}"))
+
 get_odds_api <- function(cfb_crosswalk = NULL,
                          sport = "americanfootball_ncaaf", 
                          apiKey = Sys.getenv("ODDS_API_KEY"), 
@@ -123,7 +145,7 @@ get_odds_api <- function(cfb_crosswalk = NULL,
 
 api_data <- get_odds_api(cfb_crosswalk = cfb_crosswalk)
 
-required_model_columns <- c("model_prediction_raw", "team", "opponent", "week", "cover_probability")
+required_model_columns <- c("model_prediction_raw", "home_team_id", "away_team_id", "team", "opponent", "week", "cover_probability")
 missing_model_columns <- setdiff(required_model_columns, names(model_raw))
 
 if (length(missing_model_columns) > 0) {
