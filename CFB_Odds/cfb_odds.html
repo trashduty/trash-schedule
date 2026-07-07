@@ -263,15 +263,14 @@
     function buildTeamLookup(crosswalkRows) {
       const lookup = {};
       crosswalkRows.forEach(row => {
-        const shortName = (row['btb_team_short'] || '').toString().trim();
         const fullName = (row['btb_team'] || '').toString().trim();
         const logoUrl = (row['logo'] || '').toString().trim();
-        if (!shortName) return;
+        if (!fullName) return;
         const slug = btbTeamToSlug(fullName);
         const injuryUrl = slug
           ? `https://www.covers.com/sport/football/ncaaf/teams/main/${slug}/injuries`
           : null;
-        lookup[shortName] = { displayName: fullName || shortName, injuryUrl, logoUrl };
+        lookup[fullName] = { displayName: fullName, injuryUrl, logoUrl };
       });
       return lookup;
     }
