@@ -145,17 +145,17 @@ get_odds_api <- function(cfb_crosswalk = NULL,
                                "espnbet", "fanatics", "caesars")) |> 
     mutate(commence_ny = lubridate::as_date(lubridate::ymd_hms(commence_time, tz = "America/New_York")), 
            .after = commence_time) |> 
-    left_join(select(cfb_crosswalk, btb_team, btb_team, logo), 
+    left_join(select(cfb_crosswalk, btb_team, logo), 
               by = c("home_team" = "btb_team")) |> 
-    rename(home_name = btb_team, home_logo = logo) |> 
-    left_join(select(cfb_crosswalk, btb_team, btb_team, logo), 
+    rename(home_logo = logo) |> 
+    left_join(select(cfb_crosswalk, btb_team, logo), 
               by = c("away_team" = "btb_team")) |> 
-    rename(away_name = btb_team, away_logo = logo) |> 
+    rename(away_logo = logo) |> 
     mutate(week = calculate_cfb_week(commence_ny)) |> 
     mutate(week = if_else(week == 23, 22, week)) |> 
     select(week, commence_time, commence_ny, bookmaker_id, 
            bookmaker, last_update_api, last_update_markets, market, 
-           home_team, away_team, home_name, home_logo, away_name, away_logo, name, price, point)
+           home_team, away_team, home_logo, away_logo, name, price, point)
   
   return(api_unnested)
 }
@@ -199,13 +199,13 @@ safe_max_datetime <- function(x) {
 api_spreads <- api_data |>
   # filter(market == "spreads", week == WEEK) |>
   filter(market == "spreads") |>
-  mutate(game = paste0(away_name, "@", home_name)) |>
+  mutate(game = paste0(away_team, "@", home_team)) |>
   filter(game != "NA@UNLV") |>
   left_join(
-    select(cfb_crosswalk, btb_team, btb_team, logo),
+    select(cfb_crosswalk, btb_team, logo),
     by = c("name" = "btb_team")
   ) |>
-  rename(team = btb_team) |>
+  rename(team = name) |>
   select(
     week,
     game,
@@ -220,7 +220,7 @@ api_spreads <- api_data |>
 api_totals <- api_data |>
   # filter(market == "totals", name == "Over", week == WEEK) |>
   filter(market == "totals", name == "Over") |>
-  mutate(game = paste0(away_name, "@", home_name)) |>
+  mutate(game = paste0(away_team, "@", home_team)) |>
   summarize(median_total = median(point, na.rm = TRUE), .by = c(week, game))
 
 missing_spread_keys <- model_raw |>
