@@ -145,11 +145,11 @@ get_odds_api <- function(cfb_crosswalk = NULL,
                                "espnbet", "fanatics", "caesars")) |> 
     mutate(commence_ny = lubridate::as_date(lubridate::ymd_hms(commence_time, tz = "America/New_York")), 
            .after = commence_time) |> 
-    left_join(select(cfb_crosswalk, btb_team, api_team, logo), 
-              by = c("home_team" = "api_team")) |> 
+    left_join(select(cfb_crosswalk, btb_team, btb_team, logo), 
+              by = c("home_team" = "btb_team")) |> 
     rename(home_name = btb_team, home_logo = logo) |> 
-    left_join(select(cfb_crosswalk, btb_team, api_team, logo), 
-              by = c("away_team" = "api_team")) |> 
+    left_join(select(cfb_crosswalk, btb_team, btb_team, logo), 
+              by = c("away_team" = "btb_team")) |> 
     rename(away_name = btb_team, away_logo = logo) |> 
     mutate(week = calculate_cfb_week(commence_ny)) |> 
     mutate(week = if_else(week == 23, 22, week)) |> 
@@ -202,8 +202,8 @@ api_spreads <- api_data |>
   mutate(game = paste0(away_name, "@", home_name)) |>
   filter(game != "NA@UNLV") |>
   left_join(
-    select(cfb_crosswalk, btb_team, api_team, logo),
-    by = c("name" = "api_team")
+    select(cfb_crosswalk, btb_team, btb_team, logo),
+    by = c("name" = "btb_team")
   ) |>
   rename(team = btb_team) |>
   select(
