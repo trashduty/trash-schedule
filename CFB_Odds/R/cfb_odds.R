@@ -43,15 +43,15 @@ calculate_cfb_week <- function(game_date, week_anchor) {
 }
 
 team_id_lookup <- cfb_crosswalk |>
-  select(team_id, btb_team_short)
+  select(team_id, btb_team)
 
 model_raw <- model_raw |>
   left_join(
-    rename(team_id_lookup, btb_home_name = btb_team_short),
+    rename(team_id_lookup, btb_home_name = btb_team),
     by = c("home_team_id" = "team_id")
   ) |>
   left_join(
-    rename(team_id_lookup, btb_away_name = btb_team_short),
+    rename(team_id_lookup, btb_away_name = btb_team),
     by = c("away_team_id" = "team_id")
   ) |>
   mutate(
@@ -144,12 +144,12 @@ get_odds_api <- function(cfb_crosswalk = NULL,
                                "espnbet", "fanatics", "caesars")) |> 
     mutate(commence_ny = lubridate::as_date(lubridate::ymd_hms(commence_time, tz = "America/New_York")), 
            .after = commence_time) |> 
-    left_join(select(cfb_crosswalk, btb_team_short, api_team, logo), 
+    left_join(select(cfb_crosswalk, btb_team, api_team, logo), 
               by = c("home_team" = "api_team")) |> 
-    rename(home_name = btb_team_short, home_logo = logo) |> 
-    left_join(select(cfb_crosswalk, btb_team_short, api_team, logo), 
+    rename(home_name = btb_team, home_logo = logo) |> 
+    left_join(select(cfb_crosswalk, btb_team, api_team, logo), 
               by = c("away_team" = "api_team")) |> 
-    rename(away_name = btb_team_short, away_logo = logo) |> 
+    rename(away_name = btb_team, away_logo = logo) |> 
     mutate(week = calculate_cfb_week(commence_ny, week_zero_thursday)) |> 
     mutate(week = if_else(week == 23, 22, week)) |> 
     select(week, commence_time, commence_ny, bookmaker_id, 
@@ -201,17 +201,16 @@ api_spreads <- api_data |>
   mutate(game = paste0(away_name, "@", home_name)) |>
   filter(game != "NA@UNLV") |>
   left_join(
-    select(cfb_crosswalk, btb_team_short, api_team, logo),
+    select(cfb_crosswalk, btb_team, api_team, logo),
     by = c("name" = "api_team")
   ) |>
-  rename(team = btb_team_short) |>
+  rename(team = btb_team) |>
   select(
     week,
     game,
     last_update_api,
     bookmaker,
     team,
-    game,
     spread = point,
     spread_price = price,
     logo
@@ -226,8 +225,8 @@ api_totals <- api_data |>
 missing_spread_keys <- model_raw |>
   distinct(week, team, game) |>
   anti_join(
-    api_spreads |> distinct(week, team),
-    by = c("week", "team")
+    api_spreads |> distinct(week, team, game),
+    by = c("week", "team", "game")
   )
 
 if (nrow(missing_spread_keys) > 0) {
@@ -241,7 +240,7 @@ if (nrow(missing_spread_keys) > 0) {
     overflow_note
   )
   warning(glue::glue(
-    "Model games missing API spread match (week+team): {nrow(missing_spread_keys)} row(s): {preview_games}"
+    "Model games missing API spread match (week+team+game): {nrow(missing_spread_keys)} row(s): {preview_games}"
   ))
 }
 
@@ -260,7 +259,7 @@ odds_calculated <- model_raw |>
       bookmaker,
       logo
     ),
-    by = c("week", "team"),
+    by = c("week", "team", "game"),
     relationship = "many-to-many"
   ) |>
   mutate(
