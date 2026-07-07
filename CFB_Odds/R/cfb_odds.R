@@ -41,7 +41,7 @@ get_odds_api <- function(sport = "americanfootball_ncaaf",
   #   ) |>
   #   pull(week_one_wednesday)
   
-  week_one_wednesday <- as.Date("2025-08-20")
+  week_one_wednesday <- as.Date("2026-08-19")
   
   
   # URL
@@ -108,27 +108,26 @@ get_odds_api <- function(sport = "americanfootball_ncaaf",
 
 api_data <- get_odds_api()
 
-# cfb_crosswalk <- read_csv("https://github.com/trashduty/trash-schedule/raw/refs/heads/main/CFB_Odds/Data/CFB%20Teams%20Full%20Crosswalk.csv", 
-#                           show_col_types = FALSE)
+cfb_crosswalk_path <- "CFB_Odds/Data/CFB Teams Full Crosswalk.csv"
+lookup_path <- "CFB_Odds/Data/Expanded_CFB_Spread_Pricing_Table_Binned.csv"
+model_output_path <- "cfb model output_new.csv"
 
-# lookup <- read_csv("https://github.com/trashduty/trash-schedule/raw/refs/heads/main/CFB_Odds/Data/Expanded_CFB_Spread_Pricing_Table_Binned.csv",
-#                    show_col_types = FALSE) |>
-#   janitor::clean_names()
+cfb_crosswalk <- read_csv(cfb_crosswalk_path, show_col_types = FALSE)
 
-model_raw <- read_csv("https://github.com/trashduty/trash-schedule/raw/refs/heads/main/cfb%20model%20output_new.csv",
-                      show_col_types = FALSE) |>
-  janitor::clean_names() 
-
-cfb_crosswalk <- read_csv("CFB_Odds/Data/CFB Teams Full Crosswalk.csv", 
-                          show_col_types = FALSE)
-
-lookup <- read_csv("CFB_Odds/Data/Expanded_CFB_Spread_Pricing_Table_Binned.csv",
-                   show_col_types = FALSE) |>
+lookup <- read_csv(lookup_path, show_col_types = FALSE) |>
   janitor::clean_names()
 
-model_raw <- read_csv("cfb model output_new.csv",
-                      show_col_types = FALSE) |>
-  janitor::clean_names() 
+model_raw <- read_csv(model_output_path, show_col_types = FALSE) |>
+  janitor::clean_names()
+
+required_model_columns <- c("model_prediction_raw", "team", "opponent", "week", "cover_probability")
+missing_model_columns <- setdiff(required_model_columns, names(model_raw))
+
+if (length(missing_model_columns) > 0) {
+  stop(glue::glue(
+    "Model output file is missing required column(s): {paste(missing_model_columns, collapse = ', ')}"
+  ))
+}
 
 clean_team_names <- function(names) {
   names %>%
