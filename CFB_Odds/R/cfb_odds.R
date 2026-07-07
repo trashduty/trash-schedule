@@ -20,18 +20,23 @@ model_output_path <- "cfb model output_new.csv"
 cfb_crosswalk <- read_csv(cfb_crosswalk_path, show_col_types = FALSE)
 
 lookup <- read_csv(lookup_path, show_col_types = FALSE) |>
-  janitor::clean_names()
+  janitor::clean_names() |>
+  select(total_bin, market_spread, true_spread, push_probability)
 
 model_raw <- read_csv(model_output_path, show_col_types = FALSE) |>
   janitor::clean_names()
 
-get_odds_api <- function(cfb_crosswalk,
+get_odds_api <- function(cfb_crosswalk = NULL,
                          sport = "americanfootball_ncaaf", 
                          apiKey = Sys.getenv("ODDS_API_KEY"), 
                          regions = "us", 
                          markets = "spreads,totals", 
                          year = nflreadr::get_current_season(roster = TRUE), 
                          oddsFormat = "american"){
+  
+  if (is.null(cfb_crosswalk)) {
+    cfb_crosswalk <- read_csv(cfb_crosswalk_path, show_col_types = FALSE)
+  }
   
   # Betting data doesn't have the `week` column necessary for CFB data, so 
   # we have to create it. Essentially, I'm pulling the first game of the season
@@ -202,14 +207,13 @@ odds_calculated <- model_raw |>
     )
   ) |>
   left_join(
-    select(lookup, -any_of(c("cover_probability", "no_cover_probability"))),
+    lookup,
     by = c("total_bin", "spread" = "market_spread", "true_spread")
   ) |>
   mutate(implied_odds_spread = calc_implied_odds(spread_price)) |>
   mutate(cover_edge = cover_probability - implied_odds_spread) |>
   mutate(no_cover_edge = (1 - cover_probability) - implied_odds_spread) |>
-  # group_by(week, game, team) |>
-  group_by(game, team) |>
+  group_by(week, game, team) |>
   mutate(
     median_cover_row = row_number(-cover_edge) == ceiling(n() / 2),
     highest_cover_row = row_number(-cover_edge) == 1,
