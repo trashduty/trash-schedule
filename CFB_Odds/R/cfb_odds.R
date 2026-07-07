@@ -57,7 +57,7 @@ model_raw <- model_raw |>
   mutate(
     team = btb_home_name,
     opponent = btb_away_name,
-    # Model CSV exports can type week as text; normalize for joins/comparisons.
+    # Model CSV exports can type week as character (e.g., with BOM/text parsing); normalize for numeric joins.
     week = as.numeric(week),
     # Keep game key format aligned with API: away@home.
     game = paste0(opponent, "@", team)
@@ -178,10 +178,19 @@ calc_implied_odds <- function(odds) {
          100 / (odds + 100))             # Positive odds (underdogs)
 }
 
+#' Median with all-NA safety
+#'
+#' @param x Numeric vector.
+#' @return NA_real_ when all values are NA, otherwise median(x, na.rm = TRUE).
 safe_median <- function(x) {
   if (all(is.na(x))) NA_real_ else median(x, na.rm = TRUE)
 }
 
+#' Datetime max with all-NA safety
+#'
+#' @param x Datetime vector.
+#' @return POSIXct NA in America/New_York when all values are NA, otherwise
+#'   max(x, na.rm = TRUE).
 safe_max_datetime <- function(x) {
   if (all(is.na(x))) as.POSIXct(NA, tz = "America/New_York") else max(x, na.rm = TRUE)
 }
