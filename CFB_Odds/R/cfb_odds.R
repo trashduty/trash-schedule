@@ -262,6 +262,7 @@ odds_calculated <- model_raw |>
     by = c("week", "team", "game"),
     relationship = "many-to-many"
   ) |>
+  filter(!is.na(spread), !is.na(spread_price), !is.na(last_update_api), !is.na(logo)) |>
   mutate(
     median_spread_raw = safe_median(spread),
     .by = c(game, team),
