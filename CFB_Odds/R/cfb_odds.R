@@ -23,6 +23,14 @@ lookup <- read_csv(lookup_path, show_col_types = FALSE) |>
   janitor::clean_names() |>
   select(total_bin, market_spread, true_spread, cover_probability, push_probability)
 
+required_lookup_columns <- c("total_bin", "market_spread", "true_spread", "cover_probability")
+missing_lookup_columns <- setdiff(required_lookup_columns, names(lookup))
+if (length(missing_lookup_columns) > 0) {
+  stop(glue::glue(
+    "Lookup file is missing required column(s): {paste(missing_lookup_columns, collapse = ', ')}"
+  ))
+}
+
 model_raw <- read_csv(model_output_path, show_col_types = FALSE) |>
   janitor::clean_names()
 
@@ -271,12 +279,11 @@ odds_calculated <- model_raw |>
     .after = spread
   ) |>
   mutate(true_spread = round(true_spread * 2) / 2) |>
-  mutate(total_bin = total_bin_close) |>
   mutate(spread = round(spread * 2) / 2, .after = spread) |>
   mutate(implied_odds_spread = calc_implied_odds(spread_price)) |>
   left_join(
     lookup,
-    by = c("total_bin", "spread" = "market_spread", "true_spread")
+    by = c("total_bin_close" = "total_bin", "spread" = "market_spread", "true_spread")
   ) |>
   mutate(implied_odds_spread = calc_implied_odds(spread_price)) |>
   mutate(cover_edge = cover_probability - implied_odds_spread) |>
