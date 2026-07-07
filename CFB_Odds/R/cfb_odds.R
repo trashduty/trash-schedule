@@ -233,6 +233,9 @@ api_spreads <- api_data |>
     logo
   )
 
+cat("model_raw rows for NC/TCU:\n")
+print(model_raw |> filter(grepl("North Carolina", game) | grepl("TCU", game)))
+
 cat("api_spreads rows for NC@TCU:\n")
 print(api_spreads |> filter(grepl("North Carolina", game) & grepl("TCU", game)))
 
