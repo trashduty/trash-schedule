@@ -43,8 +43,8 @@ week_zero_start <- as.Date("2026-08-29")
 week_zero_end   <- as.Date("2026-08-31")
 week_one_start  <- as.Date("2026-09-01")
 max_preview_games <- 10
-model_weight <- 0.35
-market_weight <- 0.65
+blended_model_weight <- 0.35
+blended_market_weight <- 0.65
 
 calculate_cfb_week <- function(game_date) {
   case_when(
@@ -264,7 +264,7 @@ totals_lookup_joined <- model_with_game |>
   ) |>
   mutate(median_total = round(median_total_raw * 2) / 2) |>
   mutate(
-    true_total = ((model_prediction * model_weight) + (median_total * market_weight)),
+    true_total = ((model_prediction * blended_model_weight) + (median_total * blended_market_weight)),
     .after = over_under
   ) |>
   mutate(
@@ -306,25 +306,25 @@ totals_calculated <- totals_lookup_joined |>
   mutate(edge = over_probability - implied_odds_total) |>
   group_by(week, game) |>
   mutate(
-    median_over_row = row_number(-edge) == ceiling(n() / 2),
-    highest_over_row = row_number(-edge) == 1
+    median_edge_row = row_number(-edge) == ceiling(n() / 2),
+    highest_edge_row = row_number(-edge) == 1
   ) |>
   ungroup()
 
 totals_summary <- totals_calculated |>
   summarise(
-    logo = logo[median_over_row],
+    logo = logo[median_edge_row],
     last_update_api = safe_max_datetime(last_update_api),
-    model_prediction = true_total[median_over_row],
-    market_line = over_under[median_over_row],
-    market_price = market_price[median_over_row],
-    median_over_probability = over_probability[median_over_row],
-    edge = edge[median_over_row],
-    best_book = bookmaker[highest_over_row],
-    best_line = over_under[highest_over_row],
-    best_price = market_price[highest_over_row],
-    best_over_probability = over_probability[highest_over_row],
-    best_edge = edge[highest_over_row],
+    model_prediction = true_total[median_edge_row],
+    market_line = over_under[median_edge_row],
+    market_price = market_price[median_edge_row],
+    median_over_probability = over_probability[median_edge_row],
+    edge = edge[median_edge_row],
+    best_book = bookmaker[highest_edge_row],
+    best_line = over_under[highest_edge_row],
+    best_price = market_price[highest_edge_row],
+    best_over_probability = over_probability[highest_edge_row],
+    best_edge = edge[highest_edge_row],
     .by = c(week, game)
   ) |>
   rename(over_probability = median_over_probability)
