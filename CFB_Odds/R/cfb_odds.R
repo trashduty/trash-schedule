@@ -195,7 +195,7 @@ odds_calculated <- model_raw |>
       logo
     ),
     # by = c("week", "team")
-    by = c("team")
+    by = c("game", "team")
   ) |>
   filter(!is.na(game)) |>
   mutate(
