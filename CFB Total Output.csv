@@ -1,4 +1,4 @@
-﻿game_id,week,home_team,home_team_id,away_team,away_team_id,Home_pts,Away_pts,RAW_total,Predreg,over_under_open,over_under
+﻿game_id,week,team,home_team_id,opponent,away_team_id,Home_pts,Away_pts,model_prediction_raw,model_prediction,over_under_open,over_under
 401856766,1,TCU,2628,North Carolina,153,27,19.5,46.5,49.5,50.5,49.5
 401864494,1,USC,30,San José State,23,44.5,18.5,63,59,57.5,57.5
 401858202,1,Virginia,258,NC State,152,29.5,21.5,51.5,53.5,54.5,54
