@@ -66,22 +66,22 @@ get_odds_api <- function(cfb_crosswalk = NULL,
   # to calculate the CFB week by using a Wednesday to following Tuesday CFB week.
   
   
-  # week_one_wednesday <- cfbfastR::espn_cfb_schedule(year = 2025) |> 
+  # week_one_wednesday <- cfbfastR::espn_cfb_schedule(year = 2026) |> 
   #   filter(type == "regular") |> 
   #   summarise(first_game_date = min(game_date)) |>
   #   mutate(
-  #     first_game_weekday = wday(first_game_date, week_start = 1),  # Monday = 1, Sunday = 7
+  #     first_game_weekday = wday(first_game_date, week_start = 0),  # Monday = 1, Sunday = 7
   #     # Find the Wednesday before (or on) the first game
   #     # Wednesday = 3 in this system
   #     days_back_to_wednesday = case_when(
   #       first_game_weekday >= 3 ~ first_game_weekday - 3,  # If Thu-Sun, go back to Wed
   #       first_game_weekday < 3 ~ first_game_weekday + 4    # If Mon-Tue, go back to previous Wed
   #     ),
-  #     week_one_wednesday = first_game_date - days(days_back_to_wednesday)
+  #     week_zero_wednesday = first_game_date - days(days_back_to_wednesday)
   #   ) |>
-  #   pull(week_one_wednesday)
+  #   pull(week_zero_wednesday)
   
-  week_one_wednesday <- as.Date("2026-08-19")
+  week_zero_wednesday <- as.Date("2026-08-26")
   
   
   # URL
