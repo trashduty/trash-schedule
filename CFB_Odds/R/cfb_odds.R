@@ -233,6 +233,9 @@ api_spreads <- api_data |>
     logo
   )
 
+cat("api_spreads rows for NC@TCU:\n")
+print(api_spreads |> filter(grepl("North Carolina", game) & grepl("TCU", game)))
+
 api_totals <- api_data |>
   # filter(market == "totals", name == "Over", week == WEEK) |>
   filter(market == "totals", name == "Over") |>
