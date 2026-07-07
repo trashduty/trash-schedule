@@ -1,12 +1,7 @@
 week,game,team,logo,last_update_api,model_prediction,market_line,market_price,cover_probability,edge,best_book,best_line,best_price,best_cover_probability,best_edge
-1,North Carolina@TCU,TCU,http://a.espncdn.com/i/teamlogos/ncaa/500/2628.png,2026-07-07T04:58:32Z,-8,-6.5,-110,0.48474619,-0.039063333809523815,BetRivers,-7,-107,0.48474619,-0.032162022560386416
-1,Hawai'i@Stanford,Stanford,http://a.espncdn.com/i/teamlogos/ncaa/500/24.png,2026-07-07T04:58:32Z,5,-4.5,-115,0.52012979,-0.014753930930232473,DraftKings,-3.5,-108,0.52012979,8.990207692307628e-4
-1,San Jose State@USC,USC,http://a.espncdn.com/i/teamlogos/ncaa/500/30.png,2026-07-07T04:58:32Z,-30.5,-35.5,-105,0.48254539,-0.029649731951219505,FanDuel,-35.5,-105,0.49840166,-0.013793461951219499
-1,New Mexico State@Florida State,Florida State,http://a.espncdn.com/i/teamlogos/ncaa/500/52.png,2026-07-07T04:58:32Z,-18,-30.5,-110,0.48669817,-0.03711135380952385,DraftKings,-30.5,-110,0.48669817,-0.03711135380952385
-1,NC State@Virginia,Virginia,http://a.espncdn.com/i/teamlogos/ncaa/500/258.png,2026-07-07T04:58:32Z,-4,-5.5,-110,0.45803931,-0.06577021380952386,DraftKings,-5.5,-108,0.45803931,-0.061191459230769296
-1,Eastern Michigan@San Jose State,Eastern Michigan,http://a.espncdn.com/i/teamlogos/ncaa/500/2199.png,2026-07-07T04:58:32Z,-5,-7.5,-110,0.4556939,-0.06811562380952385,FanDuel,-8.5,-108,0.4556939,-0.06353686923076929
-1,Hawai'i@Stanford,Hawai'i,http://a.espncdn.com/i/teamlogos/ncaa/500/62.png,2026-07-07T04:58:32Z,3.5,3.5,-112,0.50947769,-0.01882419679245284,FanDuel,4.5,-105,0.50947769,-0.00271743195121954
-1,North Carolina@TCU,North Carolina,http://a.espncdn.com/i/teamlogos/ncaa/500/153.png,2026-07-07T04:58:32Z,8,6.5,-110,0.48171617,-0.04209335380952384,DraftKings,6.5,-108,0.48171617,-0.037514599230769274
-1,San Jose State@USC,San Jose State,http://a.espncdn.com/i/teamlogos/ncaa/500/23.png,2026-07-07T04:58:32Z,23.5,35.5,-115,0.52662097,-0.008262750930232543,DraftKings,35.5,-108,0.52662097,0.007390200769230693
-1,NC State@Virginia,NC State,http://a.espncdn.com/i/teamlogos/ncaa/500/152.png,2026-07-07T04:58:32Z,4,5.5,-110,0.53943756,0.015628036190476147,FanDuel,5.5,-110,0.53943756,0.015628036190476147
-1,New Mexico State@Florida State,New Mexico State,http://a.espncdn.com/i/teamlogos/ncaa/500/166.png,2026-07-07T04:58:32Z,30.5,29.5,-110,0.51079157,-0.013017953809523863,DraftKings,30.5,-110,0.51079157,-0.013017953809523863
+1,Hawai'i@Stanford,Stanford,http://a.espncdn.com/i/teamlogos/ncaa/500/24.png,2026-07-07T05:31:25Z,5,-3.5,-110,0.52012979,-0.0036797338095237997,DraftKings,-3.5,-108,0.52012979,8.990207692307628e-4
+1,San Jose State@USC,USC,http://a.espncdn.com/i/teamlogos/ncaa/500/30.png,2026-07-07T05:31:25Z,-30.5,-35.5,-110,0.48254539,-0.04126413380952382,FanDuel,-35.5,-105,0.48254539,-0.029649731951219505
+1,Eastern Michigan@San Jose State,Eastern Michigan,http://a.espncdn.com/i/teamlogos/ncaa/500/2199.png,2026-07-07T05:31:25Z,-5,-7.5,-110,0.4556939,-0.06811562380952385,FanDuel,-8.5,-108,0.4556939,-0.06353686923076929
+1,Hawai'i@Stanford,Hawai'i,http://a.espncdn.com/i/teamlogos/ncaa/500/62.png,2026-07-07T05:31:25Z,3,3.5,-110,0.48896173,-0.03484779380952385,FanDuel,4.5,-105,0.48896173,-0.02323339195121954
+1,New Mexico State@Florida State,Florida State,http://a.espncdn.com/i/teamlogos/ncaa/500/52.png,2026-07-07T05:31:25Z,-18,-29.5,-110,0.48669817,-0.03711135380952385,DraftKings,-30.5,-110,0.48669817,-0.03711135380952385
+1,San Jose State@USC,San Jose State,http://a.espncdn.com/i/teamlogos/ncaa/500/23.png,2026-07-07T05:31:25Z,23.5,35.5,-110,0.52662097,0.00281144619047613,DraftKings,35.5,-108,0.52662097,0.007390200769230693
