@@ -26,19 +26,20 @@ lookup <- read_csv(lookup_path, show_col_types = FALSE) |>
 model_raw <- read_csv(model_output_path, show_col_types = FALSE) |>
   janitor::clean_names()
 
-week_zero_thursday <- as.Date("2026-08-27")
+week_zero_start <- as.Date("2026-08-29")  # Week 0: Sat 8/29 - Mon 8/31
+week_zero_end   <- as.Date("2026-08-31")
+week_one_start  <- as.Date("2026-09-01")  # Week 1 begins Tuesday 9/1
 max_preview_games <- 10
 
 #' Convert game date to CFB week index
 #'
 #' @param game_date Date vector in America/New_York game-date context.
-#' @param week_anchor Date that starts week 0 (inclusive).
-#' @return Numeric week index: -1 before week_anchor, 0 for week_anchor through
-#'   week_anchor + 6 days, and 1 starting week_anchor + 7 days.
-calculate_cfb_week <- function(game_date, week_anchor) {
+#' @return Numeric week index: 0 for week 0 (Sat 8/29 - Mon 8/31), 1 for week 1
+#'   (Tue 9/1 - Mon 9/7), 2 for week 2 (Tue 9/8 - Mon 9/14), and so on.
+calculate_cfb_week <- function(game_date) {
   case_when(
-    game_date < week_anchor ~ -1,
-    TRUE ~ as.numeric(floor((game_date - week_anchor) / 7))
+    game_date >= week_zero_start & game_date <= week_zero_end ~ 0,  # Week 0: Sat-Mon 8/29-8/31
+    TRUE ~ as.numeric(floor((game_date - week_one_start) / 7) + 1)  # Week 1+: starts Tuesday 9/1
   )
 }
 
@@ -150,7 +151,7 @@ get_odds_api <- function(cfb_crosswalk = NULL,
     left_join(select(cfb_crosswalk, btb_team, api_team, logo), 
               by = c("away_team" = "api_team")) |> 
     rename(away_name = btb_team, away_logo = logo) |> 
-    mutate(week = calculate_cfb_week(commence_ny, week_zero_thursday)) |> 
+    mutate(week = calculate_cfb_week(commence_ny)) |> 
     mutate(week = if_else(week == 23, 22, week)) |> 
     select(week, commence_time, commence_ny, bookmaker_id, 
            bookmaker, last_update_api, last_update_markets, market, 
