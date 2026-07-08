@@ -364,6 +364,20 @@
         }));
     }
 
+    function parseEtDateTimeFromRow(row) {
+      const dateStr = (row?.game_date_et || '').toString().trim(); // MM/DD
+      const timeStr = (row?.game_time_et || '').toString().trim(); // h:mm AM/PM
+      if (!dateStr || !timeStr) return Number.POSITIVE_INFINITY;
+
+      const [mm, dd] = dateStr.split('/').map(Number);
+      if (!mm || !dd) return Number.POSITIVE_INFINITY;
+
+      const year = new Date().getFullYear();
+      const dt = new Date(`${year}-${String(mm).padStart(2, '0')}-${String(dd).padStart(2, '0')} ${timeStr}`);
+      const t = dt.getTime();
+      return Number.isNaN(t) ? Number.POSITIVE_INFINITY : t;
+    }
+
     function btbTeamToSlug(btbTeam) {
       return (btbTeam || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
     }
@@ -727,9 +741,16 @@
     function sortGroups(groups, sortConfig) {
       if (!sortConfig || !sortConfig.key) {
         return groups.sort((a, b) => {
-          const wa = Number(a.week ?? 9999);
-          const wb = Number(b.week ?? 9999);
-          if (wa !== wb) return wa - wb;
+          const ta = parseEtDateTimeFromRow({
+            game_date_et: a.game_date_et || a.rows?.[0]?.game_date_et,
+            game_time_et: a.game_time_et || a.rows?.[0]?.game_time_et
+          });
+          const tb = parseEtDateTimeFromRow({
+            game_date_et: b.game_date_et || b.rows?.[0]?.game_date_et,
+            game_time_et: b.game_time_et || b.rows?.[0]?.game_time_et
+          });
+
+          if (ta !== tb) return ta - tb;
           return (a.game || '').localeCompare(b.game || '');
         });
       }
@@ -811,6 +832,16 @@
       }
 
       if (tabId !== 'spreads') {
+        // default chronological for totals when no column sort is active
+        if (!state.sortConfig.key) {
+          processedData = processedData.slice().sort((a, b) => {
+            const ta = parseEtDateTimeFromRow(a);
+            const tb = parseEtDateTimeFromRow(b);
+            if (ta !== tb) return ta - tb;
+            return (a.game || '').toString().localeCompare((b.game || '').toString());
+          });
+        }
+
         if (state.sortConfig.key) {
           processedData = processedData.slice().sort((a, b) => {
             const key = state.sortConfig.key;
@@ -855,6 +886,7 @@
         return;
       }
 
+      // spreads grouped by game
       let groups = createGroupsFromRows(processedData);
       groups = sortGroups(groups, state.sortConfig);
 
@@ -892,7 +924,7 @@
             const val = row[col.csv];
 
             const hideGame = (col.csv === 'game');
-            const hideGameTime = (col.csv === 'game_time_est' || col.csv === 'commence_time'); // add commence_time
+            const hideGameTime = (col.csv === 'game_time_est' || col.csv === 'commence_time');
             const hideWeekOnSecondRow = (col.csv === 'week' && rowIdx > 0);
 
             if (col.csv === 'team') {
