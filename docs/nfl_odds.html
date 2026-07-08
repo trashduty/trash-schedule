@@ -311,7 +311,7 @@
     };
 
     const REFRESH_INTERVAL = 60000;
-    const EXCLUDED_COLUMNS = new Set(['team_logo_espn', 'last_update_api', 'game_time_est', 'game_date_est']);
+    const EXCLUDED_COLUMNS = new Set(['team_logo_espn', 'last_update_api', 'game_date_est']);
     const EDGE_THRESHOLD_PERCENT = 4;
 
     let rawData = [];
@@ -448,7 +448,6 @@
     function buildPfrGameUrl(row) {
       const game = (row['game'] || '').toString().trim().toUpperCase();
       const gameDate = row['game_date_est'];
-
       if (!game || !gameDate || !game.includes('@')) return null;
 
       const parts = game.split('@');
@@ -462,6 +461,24 @@
       if (!/^\d{8}$/.test(dateStr)) return null;
 
       return `https://www.pro-football-reference.com/boxscores/${dateStr}0${pfrAbbr}.htm`;
+    }
+
+    // NEW: kickoff + 5 minutes dropoff
+    function parseKickoffFromRow(row) {
+      const dateStr = (row?.game_date_est || '').toString().trim(); // YYYY-MM-DD
+      const timeStr = (row?.game_time_est || '').toString().trim(); // e.g., 1:00 PM ET
+      if (!dateStr || !timeStr) return Number.POSITIVE_INFINITY;
+
+      const cleanTime = timeStr.replace(/\s*(ET|EST|EDT)\s*$/i, '').trim();
+      const dt = new Date(`${dateStr} ${cleanTime}`);
+      const t = dt.getTime();
+      return Number.isNaN(t) ? Number.POSITIVE_INFINITY : t;
+    }
+
+    function isGameVisible(row) {
+      const kickoff = parseKickoffFromRow(row);
+      if (!Number.isFinite(kickoff)) return true;
+      return Date.now() < (kickoff + 5 * 60 * 1000);
     }
 
     function createGroupsFromRows(rows) {
@@ -506,9 +523,7 @@
         if (aVal === null) return 1;
         if (bVal === null) return -1;
 
-        if (typeof aVal === 'number' && typeof bVal === 'number') {
-          return (aVal < bVal ? -1 : 1) * dir;
-        }
+        if (typeof aVal === 'number' && typeof bVal === 'number') return (aVal < bVal ? -1 : 1) * dir;
         return aVal.toString().localeCompare(bVal.toString()) * dir;
       });
     }
@@ -526,9 +541,7 @@
         if (aVal === null || aVal === undefined || aVal === '') return 1;
         if (bVal === null || bVal === undefined || bVal === '') return -1;
 
-        if (typeof aVal === 'number' && typeof bVal === 'number') {
-          return (aVal < bVal ? -1 : 1) * dir;
-        }
+        if (typeof aVal === 'number' && typeof bVal === 'number') return (aVal < bVal ? -1 : 1) * dir;
         return aVal.toString().localeCompare(bVal.toString()) * dir;
       });
     }
@@ -536,9 +549,7 @@
     function updateTableFromCSV() {
       Promise.all([parseCsvFromUrl(SPREADS_CSV_URL), parseCsvFromUrl(MODEL_CSV_URL)])
         .then(([spreadsResults, modelResults]) => {
-          if (spreadsResults.meta && spreadsResults.meta.fields) {
-            buildColumnMapping(spreadsResults.meta.fields);
-          }
+          if (spreadsResults.meta && spreadsResults.meta.fields) buildColumnMapping(spreadsResults.meta.fields);
 
           rawData = spreadsResults.data || [];
           qbLookup = buildQbLookup(modelResults.data || []);
@@ -567,9 +578,7 @@
       selectedTeams.forEach(t => { if (!existing.has(t)) selectedTeams.delete(t); });
     }
 
-    function onTeamFilterInput() {
-      renderTeamPicker();
-    }
+    function onTeamFilterInput() { renderTeamPicker(); }
 
     function onTeamToggle(team, isChecked) {
       if (isChecked) selectedTeams.add(team);
@@ -642,9 +651,8 @@
     }
 
     function onSort(key) {
-      if (sortConfig.key === key) {
-        sortConfig.direction = sortConfig.direction === 'asc' ? 'desc' : 'asc';
-      } else {
+      if (sortConfig.key === key) sortConfig.direction = sortConfig.direction === 'asc' ? 'desc' : 'asc';
+      else {
         sortConfig.key = key;
         sortConfig.direction = 'asc';
       }
@@ -675,6 +683,9 @@
       if (selectedTeams.size > 0) {
         processedData = rawData.filter(row => selectedTeams.has((row['team'] || '').toString().trim()));
       }
+
+      // NEW: apply 5-min-after-kickoff dropoff
+      processedData = processedData.filter(isGameVisible);
 
       let groups = createGroupsFromRows(processedData);
       groups = sortGroups(groups, sortConfig);
@@ -785,9 +796,7 @@
               td.textContent = formatted;
             }
 
-            if (col.type !== 'text') {
-              td.classList.add('numeric');
-            }
+            if (col.type !== 'text') td.classList.add('numeric');
 
             if (!(hideGame || hideGameTime || hideWeekOnSecondRow) &&
                 typeof val === 'number' &&
