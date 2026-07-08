@@ -356,6 +356,7 @@ odds_calculated <- odds_lookup_joined |>
 spread_summary <- odds_calculated |>
   summarise(
     last_update_api = safe_max_datetime(last_update_api),
+    commence_time = safe_max_datetime(lubridate::ymd_hms(commence_time, tz = "UTC")),
     model_prediction = true_spread[median_cover_row],
     market_line = spread[median_cover_row],
     market_price = spread_price[median_cover_row],
@@ -368,8 +369,12 @@ spread_summary <- odds_calculated |>
     best_edge = cover_edge[highest_cover_row],
     .by = c(week, game, team, logo)
   ) |>
+  mutate(
+    commence_time = with_tz(commence_time, tzone = "America/New_York"),
+    game_date_et = format(commence_time, "%m/%d"),
+    game_time_et = format(commence_time, "%I:%M %p"),
+    game_time_et = sub("^0", "", game_time_et)
+  ) |>
   rename(cover_probability = median_cover_probability)
 
-
 write_csv(spread_summary, "CFB_Odds/Data/spreads_odds.csv")
-# write_csv(spread_summary, "spreads_odds.csv")
