@@ -78,9 +78,7 @@
       font-size: 0.9rem;
     }
 
-    button:hover {
-      background: #f4f4f4;
-    }
+    button:hover { background: #f4f4f4; }
 
     .team-summary {
       font-size: 0.9rem;
@@ -98,9 +96,7 @@
       margin-top: 10px;
     }
 
-    .team-picker[hidden] {
-      display: none;
-    }
+    .team-picker[hidden] { display: none; }
 
     .team-picker-header {
       display: flex;
@@ -143,9 +139,7 @@
       border-bottom: 1px dashed rgba(0,0,0,0.06);
     }
 
-    .team-item:last-child {
-      border-bottom: none;
-    }
+    .team-item:last-child { border-bottom: none; }
 
     .team-count {
       font-size: 0.85rem;
@@ -283,7 +277,6 @@
     <div class="team-picker" id="spreads-teamPicker" hidden>
       <div class="team-picker-header">
         <input class="teamFilter" id="spreads-teamFilter" type="text" placeholder="Type to find teams..." oninput="onTeamFilterInput('spreads')" />
-
         <div class="team-picker-actions">
           <button type="button" onclick="selectVisibleTeams('spreads')">Select visible</button>
           <button type="button" onclick="clearTeamSelection('spreads')">Clear</button>
@@ -317,7 +310,6 @@
     <div class="team-picker" id="totals-teamPicker" hidden>
       <div class="team-picker-header">
         <input class="teamFilter" id="totals-teamFilter" type="text" placeholder="Type to find games..." oninput="onTeamFilterInput('totals')" />
-
         <div class="team-picker-actions">
           <button type="button" onclick="selectVisibleTeams('totals')">Select visible</button>
           <button type="button" onclick="clearTeamSelection('totals')">Clear</button>
@@ -496,7 +488,7 @@
       if (type === 'probability' || type === 'spread_edge') {
         return (Number(value) * 100).toFixed(2) + '%';
       }
-      if (csvKey === 'model_prediction' || csvKey === 'market_line' || csvKey === 'best_line' || csvKey === 'lookahead_line') {
+      if (csvKey === 'model_prediction' || csvKey === 'market_line' || csvKey === 'best_line') {
         return Number(value).toFixed(1);
       }
       if (csvKey === 'market_price' || csvKey === 'best_price') {
@@ -686,7 +678,6 @@
         const span = document.createElement('span');
         span.textContent = displayName;
         a.appendChild(span);
-
         wrapper.appendChild(a);
       } else {
         const line = document.createElement('div');
@@ -721,6 +712,8 @@
             game,
             week,
             game_time_est: time,
+            game_date_et: row.game_date_et || '',
+            game_time_et: row.game_time_et || '',
             rows: []
           });
         }
@@ -737,8 +730,7 @@
           const wa = Number(a.week ?? 9999);
           const wb = Number(b.week ?? 9999);
           if (wa !== wb) return wa - wb;
-          return (a.game_time_est || '').localeCompare(b.game_time_est || '') ||
-                 (a.game || '').localeCompare(b.game || '');
+          return (a.game || '').localeCompare(b.game || '');
         });
       }
 
@@ -818,7 +810,6 @@
         }
       }
 
-      // Totals unchanged
       if (tabId !== 'spreads') {
         if (state.sortConfig.key) {
           processedData = processedData.slice().sort((a, b) => {
@@ -850,10 +841,7 @@
             const formatted = formatValue(val, col.type, col.csv);
             td.textContent = formatted;
 
-            if (col.type !== 'text') {
-              td.classList.add('numeric');
-            }
-
+            if (col.type !== 'text') td.classList.add('numeric');
             if (typeof val === 'number' && col.type === 'spread_edge') {
               td.style.backgroundColor = getEdgeGradientColor(val, EDGE_THRESHOLD_PERCENT);
             }
@@ -867,7 +855,6 @@
         return;
       }
 
-      // Spreads grouped by game, all original columns preserved
       let groups = createGroupsFromRows(processedData);
       groups = sortGroups(groups, state.sortConfig);
 
@@ -884,8 +871,10 @@
 
         const meta = document.createElement('span');
         meta.className = 'game-meta';
-        const timePart = group.game_time_est ? `${group.game_time_est}` : '';
-        meta.textContent = timePart;
+        const datePart = (group.game_date_et || '').toString().trim();
+        const timePart = (group.game_time_et || '').toString().trim();
+        const etDisplay = [datePart, timePart ? `${timePart} ET` : ''].filter(Boolean).join(' • ');
+        meta.textContent = etDisplay;
 
         gameTd.appendChild(title);
         if (meta.textContent) gameTd.appendChild(meta);
@@ -914,9 +903,7 @@
               td.textContent = formatValue(val, col.type, col.csv);
             }
 
-            if (col.type !== 'text') {
-              td.classList.add('numeric');
-            }
+            if (col.type !== 'text') td.classList.add('numeric');
 
             if (!(hideGame || hideGameTime || hideWeekOnSecondRow) &&
                 typeof val === 'number' &&
@@ -973,16 +960,14 @@
         .then(([spreadsResults, totalsResults, crosswalkResults]) => {
           teamLookup = buildTeamLookup(crosswalkResults.data || []);
 
-          // Spreads
           tabState.spreads.rawData = spreadsResults.data || [];
-          tabState.spreads.columnMapping = buildColumnMapping(spreadsResults.meta && spreadsResults.meta.fields ? spreadsResults.meta.fields : []);
+          tabState.spreads.columnMapping = buildColumnMapping(spreadsResults.meta?.fields || []);
           hydrateTeams();
           renderTeamPicker('spreads');
           renderTable('spreads');
 
-          // Totals
           tabState.totals.rawData = totalsResults.data || [];
-          tabState.totals.columnMapping = buildColumnMapping(totalsResults.meta && totalsResults.meta.fields ? totalsResults.meta.fields : []);
+          tabState.totals.columnMapping = buildColumnMapping(totalsResults.meta?.fields || []);
           hydrateGames();
           renderTeamPicker('totals');
           renderTable('totals');
