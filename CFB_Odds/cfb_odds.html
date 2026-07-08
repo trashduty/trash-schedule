@@ -77,7 +77,10 @@
       cursor: pointer;
       font-size: 0.9rem;
     }
-    button:hover { background: #f4f4f4; }
+
+    button:hover {
+      background: #f4f4f4;
+    }
 
     .team-summary {
       font-size: 0.9rem;
@@ -137,6 +140,7 @@
       font-size: 0.9rem;
       border-bottom: 1px dashed rgba(0,0,0,0.06);
     }
+
     .team-item:last-child { border-bottom: none; }
 
     .team-count {
@@ -218,6 +222,33 @@
 
     tr:hover td {
       background-color: rgba(0,0,0,0.04) !important;
+    }
+
+    /* Grouped spreads table styles */
+    .game-group-header td {
+      background: #eef3f8;
+      border-top: 2px solid #d8e2ee;
+      border-bottom: 1px solid #d8e2ee;
+      font-weight: 600;
+      color: #243447;
+    }
+
+    .game-group-title {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+    }
+
+    .game-meta {
+      color: #41566e;
+      font-weight: 500;
+      margin-left: 12px;
+      font-size: 0.82rem;
+    }
+
+    .team-subrow td:first-child {
+      padding-left: 20px;
     }
   </style>
 </head>
@@ -378,17 +409,6 @@
           type: inferType(h)
         }));
 
-      if (!headers.includes('lookahead_line')) {
-        const mlIdx = mapped.findIndex(c => c.csv === 'market_line');
-        if (mlIdx !== -1) {
-          mapped.splice(mlIdx + 1, 0, {
-            csv: 'lookahead_line',
-            display: 'Lookahead Line',
-            type: 'decimal'
-          });
-        }
-      }
-
       const edgeIdx = mapped.findIndex(c => c.csv === 'edge');
       const gameTimeIdx = mapped.findIndex(c => c.csv === 'game_time_est');
 
@@ -423,19 +443,19 @@
         const button = document.createElement('button');
         button.className = 'subtab' + (subtab.id === 'spreads' ? ' active' : '');
         button.textContent = subtab.label;
-        button.onclick = () => switchSubtab(subtab.id);
+        button.onclick = (ev) => switchSubtab(subtab.id, ev);
         container.appendChild(button);
       });
 
       document.getElementById('spreads-content').classList.add('active');
     }
 
-    function switchSubtab(tabId) {
+    function switchSubtab(tabId, ev) {
       document.querySelectorAll('.subtab-content').forEach(el => el.classList.remove('active'));
       document.getElementById(`${tabId}-content`).classList.add('active');
 
       document.querySelectorAll('.subtab').forEach(el => el.classList.remove('active'));
-      event.target.classList.add('active');
+      if (ev && ev.target) ev.target.classList.add('active');
     }
 
     function toggleTeamPicker(tabId, forceOpen) {
@@ -518,7 +538,7 @@
     function selectVisibleTeams(tabId) {
       const state = tabState[tabId];
       const filterText = document.getElementById(`${tabId}-teamFilter`).value.toLowerCase().trim();
-      
+
       if (tabId === 'totals') {
         const visible = state.allGames.filter(g => g.toLowerCase().includes(filterText));
         visible.forEach(g => state.selectedGames.add(g));
@@ -529,7 +549,7 @@
         });
         visible.forEach(t => state.selectedTeams.add(t));
       }
-      
+
       renderTeamPicker(tabId);
       updateTeamSummary(tabId);
       renderTable(tabId);
@@ -565,7 +585,7 @@
       const filterText = document.getElementById(`${tabId}-teamFilter`).value.toLowerCase().trim();
 
       container.innerHTML = '';
-      
+
       if (tabId === 'totals') {
         const filtered = state.allGames.filter(g => g.toLowerCase().includes(filterText));
         filtered.forEach(game => {
@@ -631,6 +651,131 @@
       renderTable(tabId);
     }
 
+    function buildTeamCell(teamName, rowLogo) {
+      const teamKey = (teamName || '').toString().trim();
+      const info = teamLookup[teamKey] || {};
+      const displayName = info.displayName || teamKey;
+      const url = info.injuryUrl || null;
+      const logoUrl = info.logoUrl || rowLogo || null;
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'team-cell';
+
+      if (url) {
+        const a = document.createElement('a');
+        a.href = url;
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        a.className = 'team-link';
+
+        if (logoUrl) {
+          const img = document.createElement('img');
+          img.src = logoUrl;
+          img.alt = `${displayName} logo`;
+          img.className = 'team-logo';
+          a.appendChild(img);
+        }
+
+        const span = document.createElement('span');
+        span.textContent = displayName;
+        a.appendChild(span);
+
+        wrapper.appendChild(a);
+      } else {
+        const line = document.createElement('div');
+        if (logoUrl) {
+          const img = document.createElement('img');
+          img.src = logoUrl;
+          img.alt = `${displayName} logo`;
+          img.className = 'team-logo';
+          line.appendChild(img);
+          line.appendChild(document.createTextNode(' '));
+        }
+        line.appendChild(document.createTextNode(displayName));
+        wrapper.appendChild(line);
+      }
+
+      return wrapper;
+    }
+
+    function createGroupsFromRows(rows) {
+      const map = new Map();
+
+      rows.forEach((row, idx) => {
+        const game = (row.game || '').toString().trim();
+        const week = (row.week || '').toString().trim();
+        const time = (row.game_time_est || '').toString().trim();
+        const fallback = `${week}|${time}|${idx}`;
+        const key = game || fallback;
+
+        if (!map.has(key)) {
+          map.set(key, {
+            key,
+            game,
+            week,
+            game_time_est: time,
+            rows: []
+          });
+        }
+
+        map.get(key).rows.push(row);
+      });
+
+      return Array.from(map.values());
+    }
+
+    function sortGroups(groups, sortConfig) {
+      if (!sortConfig || !sortConfig.key) {
+        return groups.sort((a, b) => {
+          const wa = Number(a.week ?? 9999);
+          const wb = Number(b.week ?? 9999);
+          if (wa !== wb) return wa - wb;
+          return (a.game_time_est || '').localeCompare(b.game_time_est || '') ||
+                 (a.game || '').localeCompare(b.game || '');
+        });
+      }
+
+      const dir = sortConfig.direction === 'desc' ? -1 : 1;
+      const key = sortConfig.key;
+
+      return groups.sort((a, b) => {
+        const aVals = a.rows.map(r => r[key]).filter(v => v !== null && v !== undefined && v !== '');
+        const bVals = b.rows.map(r => r[key]).filter(v => v !== null && v !== undefined && v !== '');
+
+        const aVal = aVals.length ? aVals[0] : null;
+        const bVal = bVals.length ? bVals[0] : null;
+
+        if (aVal === bVal) return 0;
+        if (aVal === null) return 1;
+        if (bVal === null) return -1;
+
+        if (typeof aVal === 'number' && typeof bVal === 'number') {
+          return (aVal < bVal ? -1 : 1) * dir;
+        }
+        return aVal.toString().localeCompare(bVal.toString()) * dir;
+      });
+    }
+
+    function sortRowsWithinGroup(rows, sortConfig) {
+      if (!sortConfig || !sortConfig.key) return rows;
+      const key = sortConfig.key;
+      const dir = sortConfig.direction === 'desc' ? -1 : 1;
+
+      return rows.slice().sort((a, b) => {
+        const aVal = a[key];
+        const bVal = b[key];
+
+        if (aVal === bVal) return 0;
+        if (aVal === null || aVal === undefined || aVal === '') return 1;
+        if (bVal === null || bVal === undefined || bVal === '') return -1;
+
+        if (typeof aVal === 'number' && typeof bVal === 'number') {
+          return (aVal < bVal ? -1 : 1) * dir;
+        }
+        return aVal.toString().localeCompare(bVal.toString()) * dir;
+      });
+    }
+
     function renderTable(tabId) {
       const state = tabState[tabId];
       const head = document.getElementById(`${tabId}-tableHead`);
@@ -655,7 +800,7 @@
       });
 
       let processedData = state.rawData;
-      
+
       if (tabId === 'totals') {
         if (state.selectedGames.size > 0) {
           processedData = state.rawData.filter(row => state.selectedGames.has((row['game'] || '').toString().trim()));
@@ -666,96 +811,111 @@
         }
       }
 
-      if (state.sortConfig.key) {
-        processedData = processedData.slice().sort((a, b) => {
-          const key = state.sortConfig.key;
-          const valA = a[key];
-          const valB = b[key];
+      // Totals unchanged
+      if (tabId !== 'spreads') {
+        if (state.sortConfig.key) {
+          processedData = processedData.slice().sort((a, b) => {
+            const key = state.sortConfig.key;
+            const valA = a[key];
+            const valB = b[key];
 
-          if (valA === valB) return 0;
-          if (valA === null || valA === undefined) return 1;
-          if (valB === null || valB === undefined) return -1;
+            if (valA === valB) return 0;
+            if (valA === null || valA === undefined) return 1;
+            if (valB === null || valB === undefined) return -1;
 
-          let comparison;
-          if (typeof valA === 'number' && typeof valB === 'number') {
-            comparison = valA < valB ? -1 : 1;
-          } else {
-            comparison = valA.toString().localeCompare(valB.toString());
-          }
-
-          return state.sortConfig.direction === 'asc' ? comparison : -comparison;
-        });
-      }
-
-      processedData.forEach(row => {
-        const tr = document.createElement('tr');
-
-        activeCols.forEach(col => {
-          const td = document.createElement('td');
-          const val = row[col.csv];
-          const formatted = formatValue(val, col.type, col.csv);
-
-          if (col.csv === 'team' && tabId === 'spreads') {
-            const teamKey = (val || '').toString().trim();
-            const info = teamLookup[teamKey] || {};
-            const displayName = info.displayName || teamKey;
-            const url = info.injuryUrl || null;
-            const logoUrl = info.logoUrl || row['logo'] || null;
-
-            const wrapper = document.createElement('div');
-            wrapper.className = 'team-cell';
-
-            if (url) {
-              const a = document.createElement('a');
-              a.href = url;
-              a.target = '_blank';
-              a.rel = 'noopener noreferrer';
-              a.className = 'team-link';
-
-              if (logoUrl) {
-                const img = document.createElement('img');
-                img.src = logoUrl;
-                img.alt = `${displayName} logo`;
-                img.className = 'team-logo';
-                a.appendChild(img);
-              }
-
-              const span = document.createElement('span');
-              span.textContent = displayName;
-              a.appendChild(span);
-
-              wrapper.appendChild(a);
+            let comparison;
+            if (typeof valA === 'number' && typeof valB === 'number') {
+              comparison = valA < valB ? -1 : 1;
             } else {
-              const line = document.createElement('div');
-              if (logoUrl) {
-                const img = document.createElement('img');
-                img.src = logoUrl;
-                img.alt = `${displayName} logo`;
-                img.className = 'team-logo';
-                line.appendChild(img);
-                line.appendChild(document.createTextNode(' '));
-              }
-              line.appendChild(document.createTextNode(displayName));
-              wrapper.appendChild(line);
+              comparison = valA.toString().localeCompare(valB.toString());
             }
 
-            td.appendChild(wrapper);
-          } else {
+            return state.sortConfig.direction === 'asc' ? comparison : -comparison;
+          });
+        }
+
+        processedData.forEach(row => {
+          const tr = document.createElement('tr');
+
+          activeCols.forEach(col => {
+            const td = document.createElement('td');
+            const val = row[col.csv];
+            const formatted = formatValue(val, col.type, col.csv);
             td.textContent = formatted;
-          }
 
-          if (col.type !== 'text') {
-            td.classList.add('numeric');
-          }
+            if (col.type !== 'text') {
+              td.classList.add('numeric');
+            }
 
-          if (typeof val === 'number' && col.type === 'spread_edge') {
-            td.style.backgroundColor = getEdgeGradientColor(val, EDGE_THRESHOLD_PERCENT);
-          }
+            if (typeof val === 'number' && col.type === 'spread_edge') {
+              td.style.backgroundColor = getEdgeGradientColor(val, EDGE_THRESHOLD_PERCENT);
+            }
 
-          tr.appendChild(td);
+            tr.appendChild(td);
+          });
+
+          body.appendChild(tr);
         });
 
-        body.appendChild(tr);
+        return;
+      }
+
+      // Spreads grouped by game, all original columns preserved
+      let groups = createGroupsFromRows(processedData);
+      groups = sortGroups(groups, state.sortConfig);
+
+      groups.forEach(group => {
+        const gameHeaderTr = document.createElement('tr');
+        gameHeaderTr.className = 'game-group-header';
+
+        const gameTd = document.createElement('td');
+        gameTd.colSpan = activeCols.length;
+
+        const title = document.createElement('span');
+        title.className = 'game-group-title';
+        title.textContent = group.game || 'Matchup';
+
+        const meta = document.createElement('span');
+        meta.className = 'game-meta';
+        const weekPart = group.week ? `Week ${group.week}` : '';
+        const timePart = group.game_time_est ? `${group.game_time_est}` : '';
+        meta.textContent = [weekPart, timePart].filter(Boolean).join(' • ');
+
+        gameTd.appendChild(title);
+        if (meta.textContent) gameTd.appendChild(meta);
+        gameHeaderTr.appendChild(gameTd);
+        body.appendChild(gameHeaderTr);
+
+        const sortedRows = sortRowsWithinGroup(group.rows, state.sortConfig);
+
+        sortedRows.forEach(row => {
+          const tr = document.createElement('tr');
+          tr.className = 'team-subrow';
+
+          activeCols.forEach(col => {
+            const td = document.createElement('td');
+            const val = row[col.csv];
+            const formatted = formatValue(val, col.type, col.csv);
+
+            if (col.csv === 'team') {
+              td.appendChild(buildTeamCell(row.team, row.logo));
+            } else {
+              td.textContent = formatted;
+            }
+
+            if (col.type !== 'text') {
+              td.classList.add('numeric');
+            }
+
+            if (typeof val === 'number' && col.type === 'spread_edge') {
+              td.style.backgroundColor = getEdgeGradientColor(val, EDGE_THRESHOLD_PERCENT);
+            }
+
+            tr.appendChild(td);
+          });
+
+          body.appendChild(tr);
+        });
       });
     }
 
@@ -802,14 +962,14 @@
 
           // Spreads
           tabState.spreads.rawData = spreadsResults.data || [];
-          tabState.spreads.columnMapping = buildColumnMapping(spreadsResults.meta?.fields || []);
+          tabState.spreads.columnMapping = buildColumnMapping(spreadsResults.meta && spreadsResults.meta.fields ? spreadsResults.meta.fields : []);
           hydrateTeams();
           renderTeamPicker('spreads');
           renderTable('spreads');
 
           // Totals
           tabState.totals.rawData = totalsResults.data || [];
-          tabState.totals.columnMapping = buildColumnMapping(totalsResults.meta?.fields || []);
+          tabState.totals.columnMapping = buildColumnMapping(totalsResults.meta && totalsResults.meta.fields ? totalsResults.meta.fields : []);
           hydrateGames();
           renderTeamPicker('totals');
           renderTable('totals');
