@@ -552,7 +552,7 @@
           const displayName = (teamLookup[t]?.displayName || t).toLowerCase();
           return displayName.includes(filterText) || t.toLowerCase().includes(filterText);
         });
-        visible.forEach(t => state.selectedTeams.add(t);
+        visible.forEach(t => state.selectedTeams.add(t));
       }
 
       renderTeamPicker(tabId);
