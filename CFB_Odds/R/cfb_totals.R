@@ -390,7 +390,8 @@ totals_median_summary <- totals_calculated |>
     over_probability,
     under_probability,
     over_edge,
-    under_edge
+    under_edge,
+    drive_bin
   )
 
 totals_best_summary <- totals_calculated |>
