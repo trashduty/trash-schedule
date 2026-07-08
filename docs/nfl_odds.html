@@ -195,7 +195,6 @@
       background-color: rgba(0,0,0,0.04) !important;
     }
 
-    /* Grouped NFL table styles */
     .game-group-header td {
       background: #eef3f8;
       border-top: 2px solid #d8e2ee;
@@ -243,7 +242,6 @@
   <div class="team-picker" id="teamPicker" hidden>
     <div class="team-picker-header">
       <input id="teamFilter" type="text" placeholder="Type to find teams..." oninput="onTeamFilterInput()" />
-
       <div class="team-picker-actions">
         <button type="button" onclick="selectVisibleTeams()">Select visible</button>
         <button type="button" onclick="clearTeamSelection()">Clear</button>
@@ -397,7 +395,6 @@
 
       const edgeIdx = mapped.findIndex(c => c.csv === 'edge');
       const gameTimeIdx = mapped.findIndex(c => c.csv === 'game_time_est');
-
       if (edgeIdx !== -1 && gameTimeIdx !== -1) {
         const [edgeCol] = mapped.splice(edgeIdx, 1);
         const updatedGameTimeIdx = mapped.findIndex(c => c.csv === 'game_time_est');
@@ -406,7 +403,6 @@
 
       const marketLineIdx = mapped.findIndex(c => c.csv === 'market_line');
       const modelPredictionIdx = mapped.findIndex(c => c.csv === 'model_prediction');
-
       if (marketLineIdx !== -1 && modelPredictionIdx !== -1) {
         const [marketLineCol] = mapped.splice(marketLineIdx, 1);
         const updatedModelPredictionIdx = mapped.findIndex(c => c.csv === 'model_prediction');
@@ -452,6 +448,7 @@
     function buildPfrGameUrl(row) {
       const game = (row['game'] || '').toString().trim().toUpperCase();
       const gameDate = row['game_date_est'];
+
       if (!game || !gameDate || !game.includes('@')) return null;
 
       const parts = game.split('@');
@@ -469,7 +466,6 @@
 
     function createGroupsFromRows(rows) {
       const map = new Map();
-
       rows.forEach((row, idx) => {
         const game = (row.game || '').toString().trim();
         const week = (row.week || '').toString().trim();
@@ -503,7 +499,6 @@
       return groups.sort((a, b) => {
         const aVals = a.rows.map(r => r[key]).filter(v => v !== null && v !== undefined && v !== '');
         const bVals = b.rows.map(r => r[key]).filter(v => v !== null && v !== undefined && v !== '');
-
         const aVal = aVals.length ? aVals[0] : null;
         const bVal = bVals.length ? bVals[0] : null;
 
@@ -572,7 +567,9 @@
       selectedTeams.forEach(t => { if (!existing.has(t)) selectedTeams.delete(t); });
     }
 
-    function onTeamFilterInput() { renderTeamPicker(); }
+    function onTeamFilterInput() {
+      renderTeamPicker();
+    }
 
     function onTeamToggle(team, isChecked) {
       if (isChecked) selectedTeams.add(team);
@@ -645,8 +642,9 @@
     }
 
     function onSort(key) {
-      if (sortConfig.key === key) sortConfig.direction = sortConfig.direction === 'asc' ? 'desc' : 'asc';
-      else {
+      if (sortConfig.key === key) {
+        sortConfig.direction = sortConfig.direction === 'asc' ? 'desc' : 'asc';
+      } else {
         sortConfig.key = key;
         sortConfig.direction = 'asc';
       }
@@ -690,7 +688,21 @@
 
         const title = document.createElement('span');
         title.className = 'game-group-title';
-        title.textContent = group.game || 'Matchup';
+
+        const firstRow = group.rows && group.rows.length ? group.rows[0] : null;
+        const pfrUrl = firstRow ? buildPfrGameUrl(firstRow) : null;
+        const gameText = group.game || 'Matchup';
+
+        if (pfrUrl) {
+          const a = document.createElement('a');
+          a.href = pfrUrl;
+          a.target = '_blank';
+          a.rel = 'noopener noreferrer';
+          a.textContent = gameText;
+          title.appendChild(a);
+        } else {
+          title.textContent = gameText;
+        }
 
         const meta = document.createElement('span');
         meta.className = 'game-meta';
@@ -769,23 +781,13 @@
               td.appendChild(wrapper);
             } else if (hideGame || hideGameTime || hideWeekOnSecondRow) {
               td.textContent = '';
-            } else if (col.csv === 'game') {
-              const url = buildPfrGameUrl(row);
-              if (url) {
-                const a = document.createElement('a');
-                a.href = url;
-                a.target = '_blank';
-                a.rel = 'noopener noreferrer';
-                a.textContent = formatted;
-                td.appendChild(a);
-              } else {
-                td.textContent = formatted;
-              }
             } else {
               td.textContent = formatted;
             }
 
-            if (col.type !== 'text') td.classList.add('numeric');
+            if (col.type !== 'text') {
+              td.classList.add('numeric');
+            }
 
             if (!(hideGame || hideGameTime || hideWeekOnSecondRow) &&
                 typeof val === 'number' &&
