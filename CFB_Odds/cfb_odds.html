@@ -153,6 +153,8 @@
 
     .table-container {
       overflow-x: auto;
+      overflow-y: auto;
+      max-height: 72vh;
       box-shadow: 0 4px 6px rgba(0,0,0,0.1);
       border-radius: 8px;
       background: white;
@@ -210,6 +212,7 @@
       color: white;
       position: sticky;
       top: 0;
+      z-index: 5;
       cursor: pointer;
       user-select: none;
     }
@@ -421,10 +424,10 @@
       const marketLineIdx = mapped.findIndex(c => c.csv === 'market_line');
       const modelPredictionIdx = mapped.findIndex(c => c.csv === 'model_prediction');
 
-      if (marketLineIdx !== -1 && modelPredictionIdx !== -1) {
-        const [marketLineCol] = mapped.splice(marketLineIdx, 1);
-        const updatedModelPredictionIdx = mapped.findIndex(c => c.csv === 'model_prediction');
-        mapped.splice(updatedModelPredictionIdx, 0, marketLineCol);
+      if (marketLineIdx !== -1 && modelPredictionIdx !== -1 && modelPredictionIdx > marketLineIdx) {
+        const [modelCol] = mapped.splice(modelPredictionIdx, 1);
+        const updatedMarketIdx = mapped.findIndex(c => c.csv === 'market_line');
+        mapped.splice(updatedMarketIdx, 0, modelCol);
       }
 
       return mapped;
@@ -877,9 +880,8 @@
 
         const meta = document.createElement('span');
         meta.className = 'game-meta';
-        const weekPart = group.week ? `Week ${group.week}` : '';
         const timePart = group.game_time_est ? `${group.game_time_est}` : '';
-        meta.textContent = [weekPart, timePart].filter(Boolean).join(' • ');
+        meta.textContent = timePart;
 
         gameTd.appendChild(title);
         if (meta.textContent) gameTd.appendChild(meta);
@@ -895,19 +897,19 @@
           activeCols.forEach(col => {
             const td = document.createElement('td');
             const val = row[col.csv];
-            const formatted = formatValue(val, col.type, col.csv);
+            const hideInTeamRows = (col.csv === 'week' || col.csv === 'game' || col.csv === 'game_time_est');
 
             if (col.csv === 'team') {
               td.appendChild(buildTeamCell(row.team, row.logo));
             } else {
-              td.textContent = formatted;
+              td.textContent = hideInTeamRows ? '' : formatValue(val, col.type, col.csv);
             }
 
             if (col.type !== 'text') {
               td.classList.add('numeric');
             }
 
-            if (typeof val === 'number' && col.type === 'spread_edge') {
+            if (!hideInTeamRows && typeof val === 'number' && col.type === 'spread_edge') {
               td.style.backgroundColor = getEdgeGradientColor(val, EDGE_THRESHOLD_PERCENT);
             }
 
