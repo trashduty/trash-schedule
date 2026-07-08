@@ -21,7 +21,7 @@ cfb_crosswalk <- read_csv(cfb_crosswalk_path, show_col_types = FALSE)
 
 lookup <- read_csv(lookup_path, show_col_types = FALSE) |>
   janitor::clean_names() |>
-  select(drive_bin, market_total, true_total, over_probability, push_probability)
+  select(drive_bin, market_total, true_total, over_probability, under_probability, push_probability)
 
 model_raw <- read_csv(
   model_output_path,
@@ -343,7 +343,7 @@ totals_lookup_joined <- model_with_game |>
   )
 
 missing_lookup_rows <- totals_lookup_joined |>
-  filter(is.na(over_probability) | is.na(push_probability)) |>
+  filter(is.na(over_probability) | is.na(under_probability)) |>
   distinct(week, game, drive_bin, total, true_total)
 
 if (nrow(missing_lookup_rows) > 0) {
@@ -366,8 +366,9 @@ if (nrow(missing_lookup_rows) > 0) {
 }
 
 totals_calculated <- totals_lookup_joined |>
-  mutate(edge = over_probability - implied_odds_total) |>
   mutate(
+    over_edge = over_probability - implied_odds_total,
+    under_edge = under_probability - implied_odds_total,
     median_distance = abs(total - median_total)
   )
 
@@ -378,7 +379,7 @@ totals_last_update <- totals_calculated |>
   )
 
 totals_median_summary <- totals_calculated |>
-  select_totals_row(median_distance, desc(edge)) |>
+  select_totals_row(median_distance, desc(over_edge)) |>
   transmute(
     week,
     game,
@@ -387,11 +388,13 @@ totals_median_summary <- totals_calculated |>
     market_line = total,
     market_price = total_price,
     over_probability,
-    edge
+    under_probability,
+    over_edge,
+    under_edge
   )
 
 totals_best_summary <- totals_calculated |>
-  select_totals_row(desc(edge)) |>
+  select_totals_row(desc(over_edge)) |>
   transmute(
     week,
     game,
@@ -399,7 +402,9 @@ totals_best_summary <- totals_calculated |>
     best_line = total,
     best_price = total_price,
     best_over_probability = over_probability,
-    best_edge = edge
+    best_under_probability = under_probability,
+    best_over_edge = over_edge,
+    best_under_edge = under_edge
   )
 
 totals_summary <- totals_last_update |>
