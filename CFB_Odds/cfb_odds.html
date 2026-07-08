@@ -225,7 +225,6 @@
       background-color: rgba(0,0,0,0.04) !important;
     }
 
-    /* Grouped spreads table styles */
     .game-group-header td {
       background: #eef3f8;
       border-top: 2px solid #d8e2ee;
@@ -263,13 +262,10 @@
 
   <div class="subtabs" id="subtabs"></div>
 
-  <!-- Spreads Tab -->
   <div class="subtab-content" id="spreads-content">
     <div class="controls">
       <div>
-        <button type="button" id="spreads-toggleTeamPickerBtn" onclick="toggleTeamPicker('spreads')">
-          Select teams…
-        </button>
+        <button type="button" id="spreads-toggleTeamPickerBtn" onclick="toggleTeamPicker('spreads')">Select teams…</button>
       </div>
       <div class="team-summary" id="spreads-teamSummary">All teams</div>
     </div>
@@ -283,7 +279,6 @@
           <button type="button" onclick="toggleTeamPicker('spreads', false)">Close</button>
         </div>
       </div>
-
       <div class="team-list" id="spreads-teamList"></div>
       <div class="team-count" id="spreads-teamCount">Teams: 0 • Selected: 0</div>
     </div>
@@ -296,13 +291,10 @@
     </div>
   </div>
 
-  <!-- Totals Tab -->
   <div class="subtab-content" id="totals-content">
     <div class="controls">
       <div>
-        <button type="button" id="totals-toggleTeamPickerBtn" onclick="toggleTeamPicker('totals')">
-          Select games…
-        </button>
+        <button type="button" id="totals-toggleTeamPickerBtn" onclick="toggleTeamPicker('totals')">Select games…</button>
       </div>
       <div class="team-summary" id="totals-teamSummary">All games</div>
     </div>
@@ -316,7 +308,6 @@
           <button type="button" onclick="toggleTeamPicker('totals', false)">Close</button>
         </div>
       </div>
-
       <div class="team-list" id="totals-teamList"></div>
       <div class="team-count" id="totals-teamCount">Games: 0 • Selected: 0</div>
     </div>
@@ -365,8 +356,8 @@
     }
 
     function parseEtDateTimeFromRow(row) {
-      const dateStr = (row?.game_date_et || '').toString().trim(); // MM/DD
-      const timeStr = (row?.game_time_et || '').toString().trim(); // h:mm AM/PM
+      const dateStr = (row?.game_date_et || '').toString().trim();
+      const timeStr = (row?.game_time_et || '').toString().trim();
       if (!dateStr || !timeStr) return Number.POSITIVE_INFINITY;
 
       const [mm, dd] = dateStr.split('/').map(Number);
@@ -376,6 +367,13 @@
       const dt = new Date(`${year}-${String(mm).padStart(2, '0')}-${String(dd).padStart(2, '0')} ${timeStr}`);
       const t = dt.getTime();
       return Number.isNaN(t) ? Number.POSITIVE_INFINITY : t;
+    }
+
+    // NEW: hide game 5 minutes after kickoff
+    function isGameVisible(row) {
+      const t = parseEtDateTimeFromRow(row);
+      if (!Number.isFinite(t)) return true;
+      return Date.now() < (t + 5 * 60 * 1000);
     }
 
     function btbTeamToSlug(btbTeam) {
@@ -389,9 +387,7 @@
         const logoUrl = (row['logo'] || '').toString().trim();
         if (!fullName) return;
         const slug = btbTeamToSlug(fullName);
-        const injuryUrl = slug
-          ? `https://www.covers.com/sport/football/ncaaf/teams/main/${slug}/injuries`
-          : null;
+        const injuryUrl = slug ? `https://www.covers.com/sport/football/ncaaf/teams/main/${slug}/injuries` : null;
         lookup[fullName] = { displayName: fullName, injuryUrl, logoUrl };
       });
       return lookup;
@@ -399,10 +395,7 @@
 
     function formatHeader(csvHeader) {
       if (csvHeader === 'game_time_est') return 'Game Time';
-      return csvHeader
-        .split('_')
-        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-        .join(' ');
+      return csvHeader.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
     }
 
     function inferType(csvKey) {
@@ -416,15 +409,10 @@
     function buildColumnMapping(headers) {
       const mapped = headers
         .filter(h => !EXCLUDED_COLUMNS.has(h))
-        .map(h => ({
-          csv: h,
-          display: formatHeader(h),
-          type: inferType(h)
-        }));
+        .map(h => ({ csv: h, display: formatHeader(h), type: inferType(h) }));
 
       const edgeIdx = mapped.findIndex(c => c.csv === 'edge');
       const gameTimeIdx = mapped.findIndex(c => c.csv === 'game_time_est');
-
       if (edgeIdx !== -1 && gameTimeIdx !== -1) {
         const [edgeCol] = mapped.splice(edgeIdx, 1);
         const updatedGameTimeIdx = mapped.findIndex(c => c.csv === 'game_time_est');
@@ -433,7 +421,6 @@
 
       const marketLineIdx = mapped.findIndex(c => c.csv === 'market_line');
       const modelPredictionIdx = mapped.findIndex(c => c.csv === 'model_prediction');
-
       if (marketLineIdx !== -1 && modelPredictionIdx !== -1 && modelPredictionIdx > marketLineIdx) {
         const [modelCol] = mapped.splice(modelPredictionIdx, 1);
         const updatedMarketIdx = mapped.findIndex(c => c.csv === 'market_line');
@@ -446,11 +433,7 @@
     function setupSubtabs() {
       const container = document.getElementById('subtabs');
       container.innerHTML = '';
-
-      const subtabs = [
-        { id: 'spreads', label: 'Spreads' },
-        { id: 'totals', label: 'Totals' }
-      ];
+      const subtabs = [{ id: 'spreads', label: 'Spreads' }, { id: 'totals', label: 'Totals' }];
 
       subtabs.forEach(subtab => {
         const button = document.createElement('button');
@@ -466,7 +449,6 @@
     function switchSubtab(tabId, ev) {
       document.querySelectorAll('.subtab-content').forEach(el => el.classList.remove('active'));
       document.getElementById(`${tabId}-content`).classList.add('active');
-
       document.querySelectorAll('.subtab').forEach(el => el.classList.remove('active'));
       if (ev && ev.target) ev.target.classList.add('active');
     }
@@ -487,65 +469,44 @@
     function getEdgeGradientColor(value, thresholdPctPoints) {
       const pct = value * 100;
       const diff = pct - thresholdPctPoints;
-
       if (diff >= 0) {
         const lightness = Math.max(95 - diff * 8, 30);
         return `hsl(120, 70%, ${lightness}%)`;
       }
-
       const lightness = Math.max(95 - Math.abs(diff) * 8, 75);
       return `hsl(0, 80%, ${lightness}%)`;
     }
 
     function formatValue(value, type, csvKey) {
       if (value === null || value === undefined || value === '') return '';
-      if (type === 'probability' || type === 'spread_edge') {
-        return (Number(value) * 100).toFixed(2) + '%';
-      }
-      if (csvKey === 'model_prediction' || csvKey === 'market_line' || csvKey === 'best_line') {
-        return Number(value).toFixed(1);
-      }
-      if (csvKey === 'market_price' || csvKey === 'best_price') {
-        return Number(value).toFixed(0);
-      }
+      if (type === 'probability' || type === 'spread_edge') return (Number(value) * 100).toFixed(2) + '%';
+      if (csvKey === 'model_prediction' || csvKey === 'market_line' || csvKey === 'best_line') return Number(value).toFixed(1);
+      if (csvKey === 'market_price' || csvKey === 'best_price') return Number(value).toFixed(0);
       if (type === 'text') return String(value);
       if (type === 'decimal') return Number(value).toFixed(2);
       return value;
     }
 
-    function onTeamFilterInput(tabId) {
-      renderTeamPicker(tabId);
-    }
+    function onTeamFilterInput(tabId) { renderTeamPicker(tabId); }
 
     function onTeamToggle(tabId, team, isChecked) {
       const state = tabState[tabId];
-      if (isChecked) state.selectedTeams.add(team);
-      else state.selectedTeams.delete(team);
-
-      updateTeamCount(tabId);
-      updateTeamSummary(tabId);
-      renderTable(tabId);
+      if (isChecked) state.selectedTeams.add(team); else state.selectedTeams.delete(team);
+      updateTeamCount(tabId); updateTeamSummary(tabId); renderTable(tabId);
     }
 
     function onGameToggle(tabId, game, isChecked) {
       const state = tabState[tabId];
-      if (isChecked) state.selectedGames.add(game);
-      else state.selectedGames.delete(game);
-
-      updateTeamCount(tabId);
-      updateTeamSummary(tabId);
-      renderTable(tabId);
+      if (isChecked) state.selectedGames.add(game); else state.selectedGames.delete(game);
+      updateTeamCount(tabId); updateTeamSummary(tabId); renderTable(tabId);
     }
 
     function clearTeamSelection(tabId) {
       const state = tabState[tabId];
-      state.selectedTeams.clear();
-      state.selectedGames.clear();
+      state.selectedTeams.clear(); state.selectedGames.clear();
       const filterEl = document.getElementById(`${tabId}-teamFilter`);
       if (filterEl) filterEl.value = '';
-      renderTeamPicker(tabId);
-      updateTeamSummary(tabId);
-      renderTable(tabId);
+      renderTeamPicker(tabId); updateTeamSummary(tabId); renderTable(tabId);
     }
 
     function selectVisibleTeams(tabId) {
@@ -553,30 +514,25 @@
       const filterText = document.getElementById(`${tabId}-teamFilter`).value.toLowerCase().trim();
 
       if (tabId === 'totals') {
-        const visible = state.allGames.filter(g => g.toLowerCase().includes(filterText));
-        visible.forEach(g => state.selectedGames.add(g));
+        state.allGames.filter(g => g.toLowerCase().includes(filterText)).forEach(g => state.selectedGames.add(g));
       } else {
-        const visible = state.allTeams.filter(t => {
-          const displayName = (teamLookup[t]?.displayName || t).toLowerCase();
-          return displayName.includes(filterText) || t.toLowerCase().includes(filterText);
-        });
-        visible.forEach(t => state.selectedTeams.add(t));
+        state.allTeams
+          .filter(t => {
+            const displayName = (teamLookup[t]?.displayName || t).toLowerCase();
+            return displayName.includes(filterText) || t.toLowerCase().includes(filterText);
+          })
+          .forEach(t => state.selectedTeams.add(t));
       }
 
-      renderTeamPicker(tabId);
-      updateTeamSummary(tabId);
-      renderTable(tabId);
+      renderTeamPicker(tabId); updateTeamSummary(tabId); renderTable(tabId);
     }
 
     function updateTeamCount(tabId) {
       const state = tabState[tabId];
       const countEl = document.getElementById(`${tabId}-teamCount`);
       if (!countEl) return;
-      if (tabId === 'totals') {
-        countEl.textContent = `Games: ${state.allGames.length} • Selected: ${state.selectedGames.size}`;
-      } else {
-        countEl.textContent = `Teams: ${state.allTeams.length} • Selected: ${state.selectedTeams.size}`;
-      }
+      if (tabId === 'totals') countEl.textContent = `Games: ${state.allGames.length} • Selected: ${state.selectedGames.size}`;
+      else countEl.textContent = `Teams: ${state.allTeams.length} • Selected: ${state.selectedTeams.size}`;
     }
 
     function updateTeamSummary(tabId) {
@@ -584,10 +540,7 @@
       const el = document.getElementById(`${tabId}-teamSummary`);
       if (!el) return;
       const isSelected = tabId === 'totals' ? state.selectedGames.size : state.selectedTeams.size;
-      if (isSelected === 0) {
-        el.textContent = tabId === 'totals' ? 'All games' : 'All teams';
-        return;
-      }
+      if (isSelected === 0) { el.textContent = tabId === 'totals' ? 'All games' : 'All teams'; return; }
       el.textContent = `${isSelected} ${tabId === 'totals' ? 'game' : 'team'}${isSelected === 1 ? '' : 's'} selected`;
     }
 
@@ -596,58 +549,32 @@
       const container = document.getElementById(`${tabId}-teamList`);
       if (!container) return;
       const filterText = document.getElementById(`${tabId}-teamFilter`).value.toLowerCase().trim();
-
       container.innerHTML = '';
 
       if (tabId === 'totals') {
-        const filtered = state.allGames.filter(g => g.toLowerCase().includes(filterText));
-        filtered.forEach(game => {
+        state.allGames.filter(g => g.toLowerCase().includes(filterText)).forEach(game => {
           const id = `${tabId}_game_${game.replace(/[^a-z0-9]/gi, '_')}`;
-
-          const row = document.createElement('div');
-          row.className = 'team-item';
-
-          const cb = document.createElement('input');
-          cb.type = 'checkbox';
-          cb.id = id;
-          cb.checked = state.selectedGames.has(game);
+          const row = document.createElement('div'); row.className = 'team-item';
+          const cb = document.createElement('input'); cb.type = 'checkbox'; cb.id = id; cb.checked = state.selectedGames.has(game);
           cb.onchange = () => onGameToggle(tabId, game, cb.checked);
-
-          const label = document.createElement('label');
-          label.htmlFor = id;
-          label.textContent = game;
-
-          row.appendChild(cb);
-          row.appendChild(label);
-          container.appendChild(row);
+          const label = document.createElement('label'); label.htmlFor = id; label.textContent = game;
+          row.appendChild(cb); row.appendChild(label); container.appendChild(row);
         });
       } else {
-        const filtered = state.allTeams.filter(t => {
-          const displayName = (teamLookup[t]?.displayName || t).toLowerCase();
-          return displayName.includes(filterText) || t.toLowerCase().includes(filterText);
-        });
-
-        filtered.forEach(team => {
-          const displayName = teamLookup[team]?.displayName || team;
-          const id = `${tabId}_team_${team.replace(/[^a-z0-9]/gi, '_')}`;
-
-          const row = document.createElement('div');
-          row.className = 'team-item';
-
-          const cb = document.createElement('input');
-          cb.type = 'checkbox';
-          cb.id = id;
-          cb.checked = state.selectedTeams.has(team);
-          cb.onchange = () => onTeamToggle(tabId, team, cb.checked);
-
-          const label = document.createElement('label');
-          label.htmlFor = id;
-          label.textContent = displayName;
-
-          row.appendChild(cb);
-          row.appendChild(label);
-          container.appendChild(row);
-        });
+        state.allTeams
+          .filter(t => {
+            const displayName = (teamLookup[t]?.displayName || t).toLowerCase();
+            return displayName.includes(filterText) || t.toLowerCase().includes(filterText);
+          })
+          .forEach(team => {
+            const displayName = teamLookup[team]?.displayName || team;
+            const id = `${tabId}_team_${team.replace(/[^a-z0-9]/gi, '_')}`;
+            const row = document.createElement('div'); row.className = 'team-item';
+            const cb = document.createElement('input'); cb.type = 'checkbox'; cb.id = id; cb.checked = state.selectedTeams.has(team);
+            cb.onchange = () => onTeamToggle(tabId, team, cb.checked);
+            const label = document.createElement('label'); label.htmlFor = id; label.textContent = displayName;
+            row.appendChild(cb); row.appendChild(label); container.appendChild(row);
+          });
       }
 
       updateTeamCount(tabId);
@@ -655,12 +582,8 @@
 
     function onSort(tabId, key) {
       const state = tabState[tabId];
-      if (state.sortConfig.key === key) {
-        state.sortConfig.direction = state.sortConfig.direction === 'asc' ? 'desc' : 'asc';
-      } else {
-        state.sortConfig.key = key;
-        state.sortConfig.direction = 'asc';
-      }
+      if (state.sortConfig.key === key) state.sortConfig.direction = state.sortConfig.direction === 'asc' ? 'desc' : 'asc';
+      else { state.sortConfig.key = key; state.sortConfig.direction = 'asc'; }
       renderTable(tabId);
     }
 
@@ -676,35 +599,22 @@
 
       if (url) {
         const a = document.createElement('a');
-        a.href = url;
-        a.target = '_blank';
-        a.rel = 'noopener noreferrer';
-        a.className = 'team-link';
-
+        a.href = url; a.target = '_blank'; a.rel = 'noopener noreferrer'; a.className = 'team-link';
         if (logoUrl) {
           const img = document.createElement('img');
-          img.src = logoUrl;
-          img.alt = `${displayName} logo`;
-          img.className = 'team-logo';
+          img.src = logoUrl; img.alt = `${displayName} logo`; img.className = 'team-logo';
           a.appendChild(img);
         }
-
         const span = document.createElement('span');
-        span.textContent = displayName;
-        a.appendChild(span);
-        wrapper.appendChild(a);
+        span.textContent = displayName; a.appendChild(span); wrapper.appendChild(a);
       } else {
         const line = document.createElement('div');
         if (logoUrl) {
           const img = document.createElement('img');
-          img.src = logoUrl;
-          img.alt = `${displayName} logo`;
-          img.className = 'team-logo';
-          line.appendChild(img);
-          line.appendChild(document.createTextNode(' '));
+          img.src = logoUrl; img.alt = `${displayName} logo`; img.className = 'team-logo';
+          line.appendChild(img); line.appendChild(document.createTextNode(' '));
         }
-        line.appendChild(document.createTextNode(displayName));
-        wrapper.appendChild(line);
+        line.appendChild(document.createTextNode(displayName)); wrapper.appendChild(line);
       }
 
       return wrapper;
@@ -722,10 +632,7 @@
 
         if (!map.has(key)) {
           map.set(key, {
-            key,
-            game,
-            week,
-            game_time_est: time,
+            key, game, week, game_time_est: time,
             game_date_et: row.game_date_et || '',
             game_time_et: row.game_time_et || '',
             rows: []
@@ -741,15 +648,8 @@
     function sortGroups(groups, sortConfig) {
       if (!sortConfig || !sortConfig.key) {
         return groups.sort((a, b) => {
-          const ta = parseEtDateTimeFromRow({
-            game_date_et: a.game_date_et || a.rows?.[0]?.game_date_et,
-            game_time_et: a.game_time_et || a.rows?.[0]?.game_time_et
-          });
-          const tb = parseEtDateTimeFromRow({
-            game_date_et: b.game_date_et || b.rows?.[0]?.game_date_et,
-            game_time_et: b.game_time_et || b.rows?.[0]?.game_time_et
-          });
-
+          const ta = parseEtDateTimeFromRow({ game_date_et: a.game_date_et || a.rows?.[0]?.game_date_et, game_time_et: a.game_time_et || a.rows?.[0]?.game_time_et });
+          const tb = parseEtDateTimeFromRow({ game_date_et: b.game_date_et || b.rows?.[0]?.game_date_et, game_time_et: b.game_time_et || b.rows?.[0]?.game_time_et });
           if (ta !== tb) return ta - tb;
           return (a.game || '').localeCompare(b.game || '');
         });
@@ -761,17 +661,12 @@
       return groups.sort((a, b) => {
         const aVals = a.rows.map(r => r[key]).filter(v => v !== null && v !== undefined && v !== '');
         const bVals = b.rows.map(r => r[key]).filter(v => v !== null && v !== undefined && v !== '');
-
         const aVal = aVals.length ? aVals[0] : null;
         const bVal = bVals.length ? bVals[0] : null;
-
         if (aVal === bVal) return 0;
         if (aVal === null) return 1;
         if (bVal === null) return -1;
-
-        if (typeof aVal === 'number' && typeof bVal === 'number') {
-          return (aVal < bVal ? -1 : 1) * dir;
-        }
+        if (typeof aVal === 'number' && typeof bVal === 'number') return (aVal < bVal ? -1 : 1) * dir;
         return aVal.toString().localeCompare(bVal.toString()) * dir;
       });
     }
@@ -784,14 +679,10 @@
       return rows.slice().sort((a, b) => {
         const aVal = a[key];
         const bVal = b[key];
-
         if (aVal === bVal) return 0;
         if (aVal === null || aVal === undefined || aVal === '') return 1;
         if (bVal === null || bVal === undefined || bVal === '') return -1;
-
-        if (typeof aVal === 'number' && typeof bVal === 'number') {
-          return (aVal < bVal ? -1 : 1) * dir;
-        }
+        if (typeof aVal === 'number' && typeof bVal === 'number') return (aVal < bVal ? -1 : 1) * dir;
         return aVal.toString().localeCompare(bVal.toString()) * dir;
       });
     }
@@ -800,12 +691,10 @@
       const state = tabState[tabId];
       const head = document.getElementById(`${tabId}-tableHead`);
       const body = document.getElementById(`${tabId}-tableBody`);
-
       if (!head || !body) return;
 
       head.innerHTML = '';
       body.innerHTML = '';
-
       if (!state.rawData || state.rawData.length === 0) return;
 
       const activeCols = state.columnMapping.filter(col =>
@@ -822,17 +711,15 @@
       let processedData = state.rawData;
 
       if (tabId === 'totals') {
-        if (state.selectedGames.size > 0) {
-          processedData = state.rawData.filter(row => state.selectedGames.has((row['game'] || '').toString().trim()));
-        }
+        if (state.selectedGames.size > 0) processedData = state.rawData.filter(row => state.selectedGames.has((row['game'] || '').toString().trim()));
       } else {
-        if (state.selectedTeams.size > 0) {
-          processedData = state.rawData.filter(row => state.selectedTeams.has((row['team'] || '').toString().trim()));
-        }
+        if (state.selectedTeams.size > 0) processedData = state.rawData.filter(row => state.selectedTeams.has((row['team'] || '').toString().trim()));
       }
 
+      // NEW: drop games 5 minutes after kickoff
+      processedData = processedData.filter(isGameVisible);
+
       if (tabId !== 'spreads') {
-        // default chronological for totals when no column sort is active
         if (!state.sortConfig.key) {
           processedData = processedData.slice().sort((a, b) => {
             const ta = parseEtDateTimeFromRow(a);
@@ -847,17 +734,13 @@
             const key = state.sortConfig.key;
             const valA = a[key];
             const valB = b[key];
-
             if (valA === valB) return 0;
             if (valA === null || valA === undefined) return 1;
             if (valB === null || valB === undefined) return -1;
 
             let comparison;
-            if (typeof valA === 'number' && typeof valB === 'number') {
-              comparison = valA < valB ? -1 : 1;
-            } else {
-              comparison = valA.toString().localeCompare(valB.toString());
-            }
+            if (typeof valA === 'number' && typeof valB === 'number') comparison = valA < valB ? -1 : 1;
+            else comparison = valA.toString().localeCompare(valB.toString());
 
             return state.sortConfig.direction === 'asc' ? comparison : -comparison;
           });
@@ -865,28 +748,19 @@
 
         processedData.forEach(row => {
           const tr = document.createElement('tr');
-
           activeCols.forEach(col => {
             const td = document.createElement('td');
             const val = row[col.csv];
-            const formatted = formatValue(val, col.type, col.csv);
-            td.textContent = formatted;
-
+            td.textContent = formatValue(val, col.type, col.csv);
             if (col.type !== 'text') td.classList.add('numeric');
-            if (typeof val === 'number' && col.type === 'spread_edge') {
-              td.style.backgroundColor = getEdgeGradientColor(val, EDGE_THRESHOLD_PERCENT);
-            }
-
+            if (typeof val === 'number' && col.type === 'spread_edge') td.style.backgroundColor = getEdgeGradientColor(val, EDGE_THRESHOLD_PERCENT);
             tr.appendChild(td);
           });
-
           body.appendChild(tr);
         });
-
         return;
       }
 
-      // spreads grouped by game
       let groups = createGroupsFromRows(processedData);
       groups = sortGroups(groups, state.sortConfig);
 
@@ -905,8 +779,7 @@
         meta.className = 'game-meta';
         const datePart = (group.game_date_et || '').toString().trim();
         const timePart = (group.game_time_et || '').toString().trim();
-        const etDisplay = [datePart, timePart ? `${timePart} ET` : ''].filter(Boolean).join(' • ');
-        meta.textContent = etDisplay;
+        meta.textContent = [datePart, timePart ? `${timePart} ET` : ''].filter(Boolean).join(' • ');
 
         gameTd.appendChild(title);
         if (meta.textContent) gameTd.appendChild(meta);
@@ -927,19 +800,12 @@
             const hideGameTime = (col.csv === 'game_time_est' || col.csv === 'commence_time');
             const hideWeekOnSecondRow = (col.csv === 'week' && rowIdx > 0);
 
-            if (col.csv === 'team') {
-              td.appendChild(buildTeamCell(row.team, row.logo));
-            } else if (hideGame || hideGameTime || hideWeekOnSecondRow) {
-              td.textContent = '';
-            } else {
-              td.textContent = formatValue(val, col.type, col.csv);
-            }
+            if (col.csv === 'team') td.appendChild(buildTeamCell(row.team, row.logo));
+            else if (hideGame || hideGameTime || hideWeekOnSecondRow) td.textContent = '';
+            else td.textContent = formatValue(val, col.type, col.csv);
 
             if (col.type !== 'text') td.classList.add('numeric');
-
-            if (!(hideGame || hideGameTime || hideWeekOnSecondRow) &&
-                typeof val === 'number' &&
-                col.type === 'spread_edge') {
+            if (!(hideGame || hideGameTime || hideWeekOnSecondRow) && typeof val === 'number' && col.type === 'spread_edge') {
               td.style.backgroundColor = getEdgeGradientColor(val, EDGE_THRESHOLD_PERCENT);
             }
 
@@ -1004,8 +870,7 @@
           renderTeamPicker('totals');
           renderTable('totals');
 
-          document.getElementById('status').textContent =
-            'Last updated: ' + new Date().toLocaleTimeString();
+          document.getElementById('status').textContent = 'Last updated: ' + new Date().toLocaleTimeString();
         })
         .catch((err) => {
           document.getElementById('status').textContent = 'Error loading data: ' + err.message;
