@@ -77,7 +77,6 @@
       cursor: pointer;
       font-size: 0.9rem;
     }
-
     button:hover { background: #f4f4f4; }
 
     .team-summary {
@@ -138,7 +137,6 @@
       font-size: 0.9rem;
       border-bottom: 1px dashed rgba(0,0,0,0.06);
     }
-
     .team-item:last-child { border-bottom: none; }
 
     .team-count {
@@ -151,8 +149,6 @@
 
     .table-container {
       overflow-x: auto;
-      overflow-y: auto;
-      max-height: 72vh;
       box-shadow: 0 4px 6px rgba(0,0,0,0.1);
       border-radius: 8px;
       background: white;
@@ -210,7 +206,6 @@
       color: white;
       position: sticky;
       top: 0;
-      z-index: 5;
       cursor: pointer;
       user-select: none;
     }
@@ -223,33 +218,6 @@
 
     tr:hover td {
       background-color: rgba(0,0,0,0.04) !important;
-    }
-
-    /* Grouped spreads table styles */
-    .game-group-header td {
-      background: #eef3f8;
-      border-top: 2px solid #d8e2ee;
-      border-bottom: 1px solid #d8e2ee;
-      font-weight: 600;
-      color: #243447;
-    }
-
-    .game-group-title {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      font-weight: 700;
-    }
-
-    .game-meta {
-      color: #41566e;
-      font-weight: 500;
-      margin-left: 12px;
-      font-size: 0.82rem;
-    }
-
-    .team-subrow td:first-child {
-      padding-left: 20px;
     }
   </style>
 </head>
@@ -277,6 +245,7 @@
     <div class="team-picker" id="spreads-teamPicker" hidden>
       <div class="team-picker-header">
         <input class="teamFilter" id="spreads-teamFilter" type="text" placeholder="Type to find teams..." oninput="onTeamFilterInput('spreads')" />
+
         <div class="team-picker-actions">
           <button type="button" onclick="selectVisibleTeams('spreads')">Select visible</button>
           <button type="button" onclick="clearTeamSelection('spreads')">Clear</button>
@@ -310,6 +279,7 @@
     <div class="team-picker" id="totals-teamPicker" hidden>
       <div class="team-picker-header">
         <input class="teamFilter" id="totals-teamFilter" type="text" placeholder="Type to find games..." oninput="onTeamFilterInput('totals')" />
+
         <div class="team-picker-actions">
           <button type="button" onclick="selectVisibleTeams('totals')">Select visible</button>
           <button type="button" onclick="clearTeamSelection('totals')">Clear</button>
@@ -337,7 +307,7 @@
     };
 
     const REFRESH_INTERVAL = 60000;
-    const EXCLUDED_COLUMNS = new Set(['logo', 'last_update_api', 'commence_time', 'game_date_et', 'game_time_et', 'drive_bin']);
+    const EXCLUDED_COLUMNS = new Set(['logo', 'last_update_api', 'game_date_est', 'drive_bin']);
     const EDGE_THRESHOLD_PERCENT = 3;
 
     const tabState = {
@@ -362,6 +332,33 @@
             error: err => reject(err)
           });
         }));
+    }
+
+    function parseEtDateTime(row) {
+      const dateStr = (row.game_date_et || '').toString().trim(); // MM/DD
+      const timeStr = (row.game_time_et || '').toString().trim(); // h:mm AM/PM
+      if (!dateStr || !timeStr) return Number.POSITIVE_INFINITY;
+
+      const [mm, dd] = dateStr.split('/').map(Number);
+      if (!mm || !dd) return Number.POSITIVE_INFINITY;
+
+      const now = new Date();
+      const year = now.getFullYear();
+      const d = new Date(`${year}-${String(mm).padStart(2, '0')}-${String(dd).padStart(2, '0')} ${timeStr}`);
+      const t = d.getTime();
+      return Number.isNaN(t) ? Number.POSITIVE_INFINITY : t;
+    }
+
+    function sortByChronoDefault(rows) {
+      return rows.slice().sort((a, b) => {
+        const ta = parseEtDateTime(a);
+        const tb = parseEtDateTime(b);
+        if (ta !== tb) return ta - tb;
+
+        const ga = (a.game || '').toString();
+        const gb = (b.game || '').toString();
+        return ga.localeCompare(gb);
+      });
     }
 
     function btbTeamToSlug(btbTeam) {
@@ -408,6 +405,17 @@
           type: inferType(h)
         }));
 
+      if (!headers.includes('lookahead_line')) {
+        const mlIdx = mapped.findIndex(c => c.csv === 'market_line');
+        if (mlIdx !== -1) {
+          mapped.splice(mlIdx + 1, 0, {
+            csv: 'lookahead_line',
+            display: 'Lookahead Line',
+            type: 'decimal'
+          });
+        }
+      }
+
       const edgeIdx = mapped.findIndex(c => c.csv === 'edge');
       const gameTimeIdx = mapped.findIndex(c => c.csv === 'game_time_est');
 
@@ -420,10 +428,10 @@
       const marketLineIdx = mapped.findIndex(c => c.csv === 'market_line');
       const modelPredictionIdx = mapped.findIndex(c => c.csv === 'model_prediction');
 
-      if (marketLineIdx !== -1 && modelPredictionIdx !== -1 && modelPredictionIdx > marketLineIdx) {
-        const [modelCol] = mapped.splice(modelPredictionIdx, 1);
-        const updatedMarketIdx = mapped.findIndex(c => c.csv === 'market_line');
-        mapped.splice(updatedMarketIdx, 0, modelCol);
+      if (marketLineIdx !== -1 && modelPredictionIdx !== -1) {
+        const [marketLineCol] = mapped.splice(marketLineIdx, 1);
+        const updatedModelPredictionIdx = mapped.findIndex(c => c.csv === 'model_prediction');
+        mapped.splice(updatedModelPredictionIdx, 0, marketLineCol);
       }
 
       return mapped;
@@ -442,19 +450,19 @@
         const button = document.createElement('button');
         button.className = 'subtab' + (subtab.id === 'spreads' ? ' active' : '');
         button.textContent = subtab.label;
-        button.onclick = (ev) => switchSubtab(subtab.id, ev);
+        button.onclick = () => switchSubtab(subtab.id);
         container.appendChild(button);
       });
 
       document.getElementById('spreads-content').classList.add('active');
     }
 
-    function switchSubtab(tabId, ev) {
+    function switchSubtab(tabId) {
       document.querySelectorAll('.subtab-content').forEach(el => el.classList.remove('active'));
       document.getElementById(`${tabId}-content`).classList.add('active');
 
       document.querySelectorAll('.subtab').forEach(el => el.classList.remove('active'));
-      if (ev && ev.target) ev.target.classList.add('active');
+      event.target.classList.add('active');
     }
 
     function toggleTeamPicker(tabId, forceOpen) {
@@ -488,7 +496,7 @@
       if (type === 'probability' || type === 'spread_edge') {
         return (Number(value) * 100).toFixed(2) + '%';
       }
-      if (csvKey === 'model_prediction' || csvKey === 'market_line' || csvKey === 'best_line') {
+      if (csvKey === 'model_prediction' || csvKey === 'market_line' || csvKey === 'best_line' || csvKey === 'lookahead_line') {
         return Number(value).toFixed(1);
       }
       if (csvKey === 'market_price' || csvKey === 'best_price') {
@@ -650,131 +658,6 @@
       renderTable(tabId);
     }
 
-    function buildTeamCell(teamName, rowLogo) {
-      const teamKey = (teamName || '').toString().trim();
-      const info = teamLookup[teamKey] || {};
-      const displayName = info.displayName || teamKey;
-      const url = info.injuryUrl || null;
-      const logoUrl = info.logoUrl || rowLogo || null;
-
-      const wrapper = document.createElement('div');
-      wrapper.className = 'team-cell';
-
-      if (url) {
-        const a = document.createElement('a');
-        a.href = url;
-        a.target = '_blank';
-        a.rel = 'noopener noreferrer';
-        a.className = 'team-link';
-
-        if (logoUrl) {
-          const img = document.createElement('img');
-          img.src = logoUrl;
-          img.alt = `${displayName} logo`;
-          img.className = 'team-logo';
-          a.appendChild(img);
-        }
-
-        const span = document.createElement('span');
-        span.textContent = displayName;
-        a.appendChild(span);
-        wrapper.appendChild(a);
-      } else {
-        const line = document.createElement('div');
-        if (logoUrl) {
-          const img = document.createElement('img');
-          img.src = logoUrl;
-          img.alt = `${displayName} logo`;
-          img.className = 'team-logo';
-          line.appendChild(img);
-          line.appendChild(document.createTextNode(' '));
-        }
-        line.appendChild(document.createTextNode(displayName));
-        wrapper.appendChild(line);
-      }
-
-      return wrapper;
-    }
-
-    function createGroupsFromRows(rows) {
-      const map = new Map();
-
-      rows.forEach((row, idx) => {
-        const game = (row.game || '').toString().trim();
-        const week = (row.week || '').toString().trim();
-        const time = (row.game_time_est || '').toString().trim();
-        const fallback = `${week}|${time}|${idx}`;
-        const key = game || fallback;
-
-        if (!map.has(key)) {
-          map.set(key, {
-            key,
-            game,
-            week,
-            game_time_est: time,
-            game_date_et: row.game_date_et || '',
-            game_time_et: row.game_time_et || '',
-            rows: []
-          });
-        }
-
-        map.get(key).rows.push(row);
-      });
-
-      return Array.from(map.values());
-    }
-
-    function sortGroups(groups, sortConfig) {
-      if (!sortConfig || !sortConfig.key) {
-        return groups.sort((a, b) => {
-          const wa = Number(a.week ?? 9999);
-          const wb = Number(b.week ?? 9999);
-          if (wa !== wb) return wa - wb;
-          return (a.game || '').localeCompare(b.game || '');
-        });
-      }
-
-      const dir = sortConfig.direction === 'desc' ? -1 : 1;
-      const key = sortConfig.key;
-
-      return groups.sort((a, b) => {
-        const aVals = a.rows.map(r => r[key]).filter(v => v !== null && v !== undefined && v !== '');
-        const bVals = b.rows.map(r => r[key]).filter(v => v !== null && v !== undefined && v !== '');
-
-        const aVal = aVals.length ? aVals[0] : null;
-        const bVal = bVals.length ? bVals[0] : null;
-
-        if (aVal === bVal) return 0;
-        if (aVal === null) return 1;
-        if (bVal === null) return -1;
-
-        if (typeof aVal === 'number' && typeof bVal === 'number') {
-          return (aVal < bVal ? -1 : 1) * dir;
-        }
-        return aVal.toString().localeCompare(bVal.toString()) * dir;
-      });
-    }
-
-    function sortRowsWithinGroup(rows, sortConfig) {
-      if (!sortConfig || !sortConfig.key) return rows;
-      const key = sortConfig.key;
-      const dir = sortConfig.direction === 'desc' ? -1 : 1;
-
-      return rows.slice().sort((a, b) => {
-        const aVal = a[key];
-        const bVal = b[key];
-
-        if (aVal === bVal) return 0;
-        if (aVal === null || aVal === undefined || aVal === '') return 1;
-        if (bVal === null || bVal === undefined || bVal === '') return -1;
-
-        if (typeof aVal === 'number' && typeof bVal === 'number') {
-          return (aVal < bVal ? -1 : 1) * dir;
-        }
-        return aVal.toString().localeCompare(bVal.toString()) * dir;
-      });
-    }
-
     function renderTable(tabId) {
       const state = tabState[tabId];
       const head = document.getElementById(`${tabId}-tableHead`);
@@ -810,112 +693,101 @@
         }
       }
 
-      if (tabId !== 'spreads') {
-        if (state.sortConfig.key) {
-          processedData = processedData.slice().sort((a, b) => {
-            const key = state.sortConfig.key;
-            const valA = a[key];
-            const valB = b[key];
-
-            if (valA === valB) return 0;
-            if (valA === null || valA === undefined) return 1;
-            if (valB === null || valB === undefined) return -1;
-
-            let comparison;
-            if (typeof valA === 'number' && typeof valB === 'number') {
-              comparison = valA < valB ? -1 : 1;
-            } else {
-              comparison = valA.toString().localeCompare(valB.toString());
-            }
-
-            return state.sortConfig.direction === 'asc' ? comparison : -comparison;
-          });
-        }
-
-        processedData.forEach(row => {
-          const tr = document.createElement('tr');
-
-          activeCols.forEach(col => {
-            const td = document.createElement('td');
-            const val = row[col.csv];
-            const formatted = formatValue(val, col.type, col.csv);
-            td.textContent = formatted;
-
-            if (col.type !== 'text') td.classList.add('numeric');
-            if (typeof val === 'number' && col.type === 'spread_edge') {
-              td.style.backgroundColor = getEdgeGradientColor(val, EDGE_THRESHOLD_PERCENT);
-            }
-
-            tr.appendChild(td);
-          });
-
-          body.appendChild(tr);
-        });
-
-        return;
+      // default chronological order when no manual sort selected
+      if (!state.sortConfig.key) {
+        processedData = sortByChronoDefault(processedData);
       }
 
-      let groups = createGroupsFromRows(processedData);
-      groups = sortGroups(groups, state.sortConfig);
+      if (state.sortConfig.key) {
+        processedData = processedData.slice().sort((a, b) => {
+          const key = state.sortConfig.key;
+          const valA = a[key];
+          const valB = b[key];
 
-      groups.forEach(group => {
-        const gameHeaderTr = document.createElement('tr');
-        gameHeaderTr.className = 'game-group-header';
+          if (valA === valB) return 0;
+          if (valA === null || valA === undefined) return 1;
+          if (valB === null || valB === undefined) return -1;
 
-        const gameTd = document.createElement('td');
-        gameTd.colSpan = activeCols.length;
+          let comparison;
+          if (typeof valA === 'number' && typeof valB === 'number') {
+            comparison = valA < valB ? -1 : 1;
+          } else {
+            comparison = valA.toString().localeCompare(valB.toString());
+          }
 
-        const title = document.createElement('span');
-        title.className = 'game-group-title';
-        title.textContent = group.game || 'Matchup';
-
-        const meta = document.createElement('span');
-        meta.className = 'game-meta';
-        const datePart = (group.game_date_et || '').toString().trim();
-        const timePart = (group.game_time_et || '').toString().trim();
-        const etDisplay = [datePart, timePart ? `${timePart} ET` : ''].filter(Boolean).join(' • ');
-        meta.textContent = etDisplay;
-
-        gameTd.appendChild(title);
-        if (meta.textContent) gameTd.appendChild(meta);
-        gameHeaderTr.appendChild(gameTd);
-        body.appendChild(gameHeaderTr);
-
-        const sortedRows = sortRowsWithinGroup(group.rows, state.sortConfig);
-
-        sortedRows.forEach((row, rowIdx) => {
-          const tr = document.createElement('tr');
-          tr.className = 'team-subrow';
-
-          activeCols.forEach(col => {
-            const td = document.createElement('td');
-            const val = row[col.csv];
-
-            const hideGame = (col.csv === 'game');
-            const hideGameTime = (col.csv === 'game_time_est' || col.csv === 'commence_time'); // add commence_time
-            const hideWeekOnSecondRow = (col.csv === 'week' && rowIdx > 0);
-
-            if (col.csv === 'team') {
-              td.appendChild(buildTeamCell(row.team, row.logo));
-            } else if (hideGame || hideGameTime || hideWeekOnSecondRow) {
-              td.textContent = '';
-            } else {
-              td.textContent = formatValue(val, col.type, col.csv);
-            }
-
-            if (col.type !== 'text') td.classList.add('numeric');
-
-            if (!(hideGame || hideGameTime || hideWeekOnSecondRow) &&
-                typeof val === 'number' &&
-                col.type === 'spread_edge') {
-              td.style.backgroundColor = getEdgeGradientColor(val, EDGE_THRESHOLD_PERCENT);
-            }
-
-            tr.appendChild(td);
-          });
-
-          body.appendChild(tr);
+          return state.sortConfig.direction === 'asc' ? comparison : -comparison;
         });
+      }
+
+      processedData.forEach(row => {
+        const tr = document.createElement('tr');
+
+        activeCols.forEach(col => {
+          const td = document.createElement('td');
+          const val = row[col.csv];
+          const formatted = formatValue(val, col.type, col.csv);
+
+          if (col.csv === 'team' && tabId === 'spreads') {
+            const teamKey = (val || '').toString().trim();
+            const info = teamLookup[teamKey] || {};
+            const displayName = info.displayName || teamKey;
+            const url = info.injuryUrl || null;
+            const logoUrl = info.logoUrl || row['logo'] || null;
+
+            const wrapper = document.createElement('div');
+            wrapper.className = 'team-cell';
+
+            if (url) {
+              const a = document.createElement('a');
+              a.href = url;
+              a.target = '_blank';
+              a.rel = 'noopener noreferrer';
+              a.className = 'team-link';
+
+              if (logoUrl) {
+                const img = document.createElement('img');
+                img.src = logoUrl;
+                img.alt = `${displayName} logo`;
+                img.className = 'team-logo';
+                a.appendChild(img);
+              }
+
+              const span = document.createElement('span');
+              span.textContent = displayName;
+              a.appendChild(span);
+
+              wrapper.appendChild(a);
+            } else {
+              const line = document.createElement('div');
+              if (logoUrl) {
+                const img = document.createElement('img');
+                img.src = logoUrl;
+                img.alt = `${displayName} logo`;
+                img.className = 'team-logo';
+                line.appendChild(img);
+                line.appendChild(document.createTextNode(' '));
+              }
+              line.appendChild(document.createTextNode(displayName));
+              wrapper.appendChild(line);
+            }
+
+            td.appendChild(wrapper);
+          } else {
+            td.textContent = formatted;
+          }
+
+          if (col.type !== 'text') {
+            td.classList.add('numeric');
+          }
+
+          if (typeof val === 'number' && col.type === 'spread_edge') {
+            td.style.backgroundColor = getEdgeGradientColor(val, EDGE_THRESHOLD_PERCENT);
+          }
+
+          tr.appendChild(td);
+        });
+
+        body.appendChild(tr);
       });
     }
 
@@ -960,12 +832,14 @@
         .then(([spreadsResults, totalsResults, crosswalkResults]) => {
           teamLookup = buildTeamLookup(crosswalkResults.data || []);
 
+          // Spreads
           tabState.spreads.rawData = spreadsResults.data || [];
           tabState.spreads.columnMapping = buildColumnMapping(spreadsResults.meta?.fields || []);
           hydrateTeams();
           renderTeamPicker('spreads');
           renderTable('spreads');
 
+          // Totals
           tabState.totals.rawData = totalsResults.data || [];
           tabState.totals.columnMapping = buildColumnMapping(totalsResults.meta?.fields || []);
           hydrateGames();
