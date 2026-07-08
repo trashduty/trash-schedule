@@ -8,6 +8,11 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
 
   <style>
+    html {
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+    }
+
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       margin: 20px;
@@ -244,7 +249,8 @@
       color: #41566e;
       font-weight: 500;
       margin-left: 12px;
-      font-size: 0.82rem;
+      font-size: 0.82rem !important;
+      line-height: 1.15;
     }
 
     .team-subrow td:first-child {
@@ -355,25 +361,27 @@
         }));
     }
 
+    // Mobile-safe strict parser
     function parseEtDateTimeFromRow(row) {
-      const dateStr = (row?.game_date_et || '').toString().trim();
-      const timeStr = (row?.game_time_et || '').toString().trim();
+      const dateStr = String(row?.game_date_et ?? '').trim(); // MM/DD
+      const timeStr = String(row?.game_time_et ?? '').trim(); // h:mm AM/PM
       if (!dateStr || !timeStr) return Number.POSITIVE_INFINITY;
 
-      const [mm, dd] = dateStr.split('/').map(Number);
-      if (!mm || !dd) return Number.POSITIVE_INFINITY;
+      const m = dateStr.match(/^(\d{1,2})\/(\d{1,2})$/);
+      const t = timeStr.match(/^(\d{1,2}):(\d{2})\s*([AP]M)$/i);
+      if (!m || !t) return Number.POSITIVE_INFINITY;
+
+      const month = Number(m[1]);
+      const day = Number(m[2]);
+      let hour = Number(t[1]);
+      const minute = Number(t[2]);
+      const ampm = t[3].toUpperCase();
+
+      if (hour === 12) hour = 0;
+      if (ampm === 'PM') hour += 12;
 
       const year = new Date().getFullYear();
-      const dt = new Date(`${year}-${String(mm).padStart(2, '0')}-${String(dd).padStart(2, '0')} ${timeStr}`);
-      const t = dt.getTime();
-      return Number.isNaN(t) ? Number.POSITIVE_INFINITY : t;
-    }
-
-    // NEW: hide game 5 minutes after kickoff
-    function isGameVisible(row) {
-      const t = parseEtDateTimeFromRow(row);
-      if (!Number.isFinite(t)) return true;
-      return Date.now() < (t + 5 * 60 * 1000);
+      return new Date(year, month - 1, day, hour, minute, 0, 0).getTime();
     }
 
     function btbTeamToSlug(btbTeam) {
@@ -433,7 +441,11 @@
     function setupSubtabs() {
       const container = document.getElementById('subtabs');
       container.innerHTML = '';
-      const subtabs = [{ id: 'spreads', label: 'Spreads' }, { id: 'totals', label: 'Totals' }];
+
+      const subtabs = [
+        { id: 'spreads', label: 'Spreads' },
+        { id: 'totals', label: 'Totals' }
+      ];
 
       subtabs.forEach(subtab => {
         const button = document.createElement('button');
@@ -540,7 +552,10 @@
       const el = document.getElementById(`${tabId}-teamSummary`);
       if (!el) return;
       const isSelected = tabId === 'totals' ? state.selectedGames.size : state.selectedTeams.size;
-      if (isSelected === 0) { el.textContent = tabId === 'totals' ? 'All games' : 'All teams'; return; }
+      if (isSelected === 0) {
+        el.textContent = tabId === 'totals' ? 'All games' : 'All teams';
+        return;
+      }
       el.textContent = `${isSelected} ${tabId === 'totals' ? 'game' : 'team'}${isSelected === 1 ? '' : 's'} selected`;
     }
 
@@ -549,6 +564,7 @@
       const container = document.getElementById(`${tabId}-teamList`);
       if (!container) return;
       const filterText = document.getElementById(`${tabId}-teamFilter`).value.toLowerCase().trim();
+
       container.innerHTML = '';
 
       if (tabId === 'totals') {
@@ -583,7 +599,10 @@
     function onSort(tabId, key) {
       const state = tabState[tabId];
       if (state.sortConfig.key === key) state.sortConfig.direction = state.sortConfig.direction === 'asc' ? 'desc' : 'asc';
-      else { state.sortConfig.key = key; state.sortConfig.direction = 'asc'; }
+      else {
+        state.sortConfig.key = key;
+        state.sortConfig.direction = 'asc';
+      }
       renderTable(tabId);
     }
 
@@ -648,9 +667,21 @@
     function sortGroups(groups, sortConfig) {
       if (!sortConfig || !sortConfig.key) {
         return groups.sort((a, b) => {
-          const ta = parseEtDateTimeFromRow({ game_date_et: a.game_date_et || a.rows?.[0]?.game_date_et, game_time_et: a.game_time_et || a.rows?.[0]?.game_time_et });
-          const tb = parseEtDateTimeFromRow({ game_date_et: b.game_date_et || b.rows?.[0]?.game_date_et, game_time_et: b.game_time_et || b.rows?.[0]?.game_time_et });
+          const ta = parseEtDateTimeFromRow({
+            game_date_et: a.game_date_et || a.rows?.[0]?.game_date_et,
+            game_time_et: a.game_time_et || a.rows?.[0]?.game_time_et
+          });
+          const tb = parseEtDateTimeFromRow({
+            game_date_et: b.game_date_et || b.rows?.[0]?.game_date_et,
+            game_time_et: b.game_time_et || b.rows?.[0]?.game_time_et
+          });
+
           if (ta !== tb) return ta - tb;
+
+          const wa = Number(a.week ?? 9999);
+          const wb = Number(b.week ?? 9999);
+          if (wa !== wb) return wa - wb;
+
           return (a.game || '').localeCompare(b.game || '');
         });
       }
@@ -661,11 +692,14 @@
       return groups.sort((a, b) => {
         const aVals = a.rows.map(r => r[key]).filter(v => v !== null && v !== undefined && v !== '');
         const bVals = b.rows.map(r => r[key]).filter(v => v !== null && v !== undefined && v !== '');
+
         const aVal = aVals.length ? aVals[0] : null;
         const bVal = bVals.length ? bVals[0] : null;
+
         if (aVal === bVal) return 0;
         if (aVal === null) return 1;
         if (bVal === null) return -1;
+
         if (typeof aVal === 'number' && typeof bVal === 'number') return (aVal < bVal ? -1 : 1) * dir;
         return aVal.toString().localeCompare(bVal.toString()) * dir;
       });
@@ -679,9 +713,11 @@
       return rows.slice().sort((a, b) => {
         const aVal = a[key];
         const bVal = b[key];
+
         if (aVal === bVal) return 0;
         if (aVal === null || aVal === undefined || aVal === '') return 1;
         if (bVal === null || bVal === undefined || bVal === '') return -1;
+
         if (typeof aVal === 'number' && typeof bVal === 'number') return (aVal < bVal ? -1 : 1) * dir;
         return aVal.toString().localeCompare(bVal.toString()) * dir;
       });
@@ -711,13 +747,14 @@
       let processedData = state.rawData;
 
       if (tabId === 'totals') {
-        if (state.selectedGames.size > 0) processedData = state.rawData.filter(row => state.selectedGames.has((row['game'] || '').toString().trim()));
+        if (state.selectedGames.size > 0) {
+          processedData = state.rawData.filter(row => state.selectedGames.has((row['game'] || '').toString().trim()));
+        }
       } else {
-        if (state.selectedTeams.size > 0) processedData = state.rawData.filter(row => state.selectedTeams.has((row['team'] || '').toString().trim()));
+        if (state.selectedTeams.size > 0) {
+          processedData = state.rawData.filter(row => state.selectedTeams.has((row['team'] || '').toString().trim()));
+        }
       }
-
-      // NEW: drop games 5 minutes after kickoff
-      processedData = processedData.filter(isGameVisible);
 
       if (tabId !== 'spreads') {
         if (!state.sortConfig.key) {
@@ -734,6 +771,7 @@
             const key = state.sortConfig.key;
             const valA = a[key];
             const valB = b[key];
+
             if (valA === valB) return 0;
             if (valA === null || valA === undefined) return 1;
             if (valB === null || valB === undefined) return -1;
@@ -748,16 +786,23 @@
 
         processedData.forEach(row => {
           const tr = document.createElement('tr');
+
           activeCols.forEach(col => {
             const td = document.createElement('td');
             const val = row[col.csv];
             td.textContent = formatValue(val, col.type, col.csv);
+
             if (col.type !== 'text') td.classList.add('numeric');
-            if (typeof val === 'number' && col.type === 'spread_edge') td.style.backgroundColor = getEdgeGradientColor(val, EDGE_THRESHOLD_PERCENT);
+            if (typeof val === 'number' && col.type === 'spread_edge') {
+              td.style.backgroundColor = getEdgeGradientColor(val, EDGE_THRESHOLD_PERCENT);
+            }
+
             tr.appendChild(td);
           });
+
           body.appendChild(tr);
         });
+
         return;
       }
 
@@ -800,12 +845,19 @@
             const hideGameTime = (col.csv === 'game_time_est' || col.csv === 'commence_time');
             const hideWeekOnSecondRow = (col.csv === 'week' && rowIdx > 0);
 
-            if (col.csv === 'team') td.appendChild(buildTeamCell(row.team, row.logo));
-            else if (hideGame || hideGameTime || hideWeekOnSecondRow) td.textContent = '';
-            else td.textContent = formatValue(val, col.type, col.csv);
+            if (col.csv === 'team') {
+              td.appendChild(buildTeamCell(row.team, row.logo));
+            } else if (hideGame || hideGameTime || hideWeekOnSecondRow) {
+              td.textContent = '';
+            } else {
+              td.textContent = formatValue(val, col.type, col.csv);
+            }
 
             if (col.type !== 'text') td.classList.add('numeric');
-            if (!(hideGame || hideGameTime || hideWeekOnSecondRow) && typeof val === 'number' && col.type === 'spread_edge') {
+
+            if (!(hideGame || hideGameTime || hideWeekOnSecondRow) &&
+                typeof val === 'number' &&
+                col.type === 'spread_edge') {
               td.style.backgroundColor = getEdgeGradientColor(val, EDGE_THRESHOLD_PERCENT);
             }
 
@@ -844,7 +896,6 @@
       });
 
       state.allGames = Array.from(set).sort((a, b) => a.localeCompare(b));
-
       const existing = new Set(state.allGames);
       state.selectedGames.forEach(g => { if (!existing.has(g)) state.selectedGames.delete(g); });
     }
