@@ -63,7 +63,7 @@ team_id_lookup <- cfb_crosswalk |>
 home_logo_lookup <- cfb_crosswalk |>
   select(btb_team, logo)
 
-required_model_columns <- c("model_prediction", "home_team_id", "away_team_id", "team", "opponent", "week")
+required_model_columns <- c("model_prediction_raw", "home_team_id", "away_team_id", "team", "opponent", "week")
 missing_model_columns <- setdiff(required_model_columns, names(model_raw))
 
 if (length(missing_model_columns) > 0) {
@@ -83,7 +83,7 @@ model_joined <- model_raw |>
   ) |>
   mutate(
     week = as.numeric(week),
-    model_prediction = as.numeric(model_prediction),
+    model_prediction_raw = as.numeric(model_prediction_raw),
     matchup_key = paste(pmin(model_team, model_opponent), pmax(model_team, model_opponent), sep = "|")
   )
 
@@ -281,7 +281,7 @@ api_totals_bookmaker <- api_data |>
   )
 
 missing_total_keys <- model_with_game |>
-  filter(!is.na(model_prediction)) |>
+  filter(!is.na(model_prediction_raw)) |>
   distinct(game) |>
   anti_join(
     api_totals_bookmaker |> distinct(game),
@@ -304,7 +304,7 @@ if (nrow(missing_total_keys) > 0) {
 }
 
 totals_lookup_joined <- model_with_game |>
-  filter(!is.na(model_prediction), !is.na(game)) |>
+  filter(!is.na(model_prediction_raw), !is.na(game)) |>
   left_join(
     select(
       api_totals_bookmaker,
@@ -327,7 +327,7 @@ totals_lookup_joined <- model_with_game |>
   ) |>
   mutate(median_total = round(median_total_raw * 2) / 2) |>
   mutate(
-    true_total = ((model_prediction * blended_model_weight) + (median_total * blended_market_weight)),
+    true_total = ((model_prediction_raw * blended_model_weight) + (median_total * blended_market_weight)),
     .after = total
   ) |>
   mutate(
