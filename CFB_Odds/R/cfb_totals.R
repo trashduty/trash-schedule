@@ -303,13 +303,15 @@ if (nrow(missing_total_keys) > 0) {
   ))
 }
 
-# Extract spread predictions per game for bin calculation
-spreads_predictions <- model_with_game |>
-  distinct(game, model_prediction)
+# Extract spread predictions per game from spreads_odds.csv
+spreads_predictions <- read_csv(spreads_output_path, show_col_types = FALSE) |>
+  janitor::clean_names() |>
+  select(game, model_prediction) |>
+  distinct()
 
 totals_lookup_joined <- model_with_game |>
   filter(!is.na(model_prediction_raw), !is.na(game)) |>
-  select(week, game, logo) |>
+  select(week, game, logo, model_prediction_raw) |>
   distinct() |>
   left_join(
     select(
@@ -326,12 +328,6 @@ totals_lookup_joined <- model_with_game |>
   ) |>
   left_join(
     spreads_predictions,
-    by = "game"
-  ) |>
-  left_join(
-    model_with_game |>
-      select(game, model_prediction_raw) |>
-      distinct(),
     by = "game"
   ) |>
   filter(!is.na(total), !is.na(total_price), !is.na(last_update_api)) |>
