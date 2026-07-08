@@ -257,12 +257,12 @@ select_totals_row <- function(data, ...) {
     slice_head(n = 1, by = c(week, game))
 }
 
-calculate_drive_bin <- function(total_value) {
+calculate_drive_bin <- function(spread_value) {
   case_when(
-    !is.na(total_value) & total_value >= 0 & total_value <= 7 ~ 1,
-    !is.na(total_value) & total_value >= 7.5 & total_value <= 17 ~ 2,
-    !is.na(total_value) & total_value >= 17.5 & total_value <= 30 ~ 3,
-    !is.na(total_value) & total_value > 30 ~ 4,
+    !is.na(spread_value) & abs(spread_value) >= 0 & abs(spread_value) <= 7 ~ 1,
+    !is.na(spread_value) & abs(spread_value) >= 7.5 & abs(spread_value) <= 17 ~ 2,
+    !is.na(spread_value) & abs(spread_value) >= 17.5 & abs(spread_value) <= 30 ~ 3,
+    !is.na(spread_value) & abs(spread_value) > 30 ~ 4,
     TRUE ~ NA_real_
   )
 }
@@ -333,7 +333,7 @@ totals_lookup_joined <- model_with_game |>
   mutate(
     true_total = round(true_total * 2) / 2,
     total = round(total * 2) / 2,
-    drive_bin = calculate_drive_bin(true_total),
+    drive_bin = calculate_drive_bin(model_prediction),
     implied_odds_total = calc_implied_odds(total_price)
   ) |>
   left_join(
