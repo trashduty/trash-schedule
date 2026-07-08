@@ -1,0 +1,5 @@
+game_description,cfb_total_output_team,cfb_total_output_opponent,spreads_matched_team,spreads_matched_opponent,reason
+Jacksonville State @ North Dakota State,North Dakota State,Jacksonville State,NA,Jacksonville State Gamecocks,Home team ID not found in crosswalk
+Sacramento State @ Eastern Michigan,Eastern Michigan,Sacramento State,Eastern Michigan Eagles,NA,Away team ID not found in crosswalk
+UMass @ Rutgers,Rutgers,UMass,Rutgers Scarlet Knights,UMass Minutemen,Neither team found in spreads_odds.csv
+Central Michigan @ New Mexico,New Mexico,Central Michigan,New Mexico Lobos,Central Michigan Chippewas,Neither team found in spreads_odds.csv
