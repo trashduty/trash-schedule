@@ -77,10 +77,7 @@
       cursor: pointer;
       font-size: 0.9rem;
     }
-
-    button:hover {
-      background: #f4f4f4;
-    }
+    button:hover { background: #f4f4f4; }
 
     .team-summary {
       font-size: 0.9rem;
@@ -93,14 +90,12 @@
       background: #fff;
       border: 1px solid #ddd;
       border-radius: 8px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.06);
+      box-shadow: 0 4px 6px rgba(0,0,0,0.06);
       overflow: hidden;
       margin-top: 10px;
     }
 
-    .team-picker[hidden] {
-      display: none;
-    }
+    .team-picker[hidden] { display: none; }
 
     .team-picker-header {
       display: flex;
@@ -140,12 +135,9 @@
       gap: 8px;
       padding: 5px 2px;
       font-size: 0.9rem;
-      border-bottom: 1px dashed rgba(0, 0, 0, 0.06);
+      border-bottom: 1px dashed rgba(0,0,0,0.06);
     }
-
-    .team-item:last-child {
-      border-bottom: none;
-    }
+    .team-item:last-child { border-bottom: none; }
 
     .team-count {
       font-size: 0.85rem;
@@ -157,7 +149,7 @@
 
     .table-container {
       overflow-x: auto;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
       border-radius: 8px;
       background: white;
     }
@@ -165,12 +157,10 @@
     table {
       border-collapse: collapse;
       width: auto;
-      min-width: 100%;
       font-size: 0.85rem;
     }
 
-    th,
-    td {
+    th, td {
       padding: 10px;
       text-align: left;
       border-bottom: 1px solid #ddd;
@@ -218,7 +208,6 @@
       top: 0;
       cursor: pointer;
       user-select: none;
-      z-index: 2;
     }
 
     th:after {
@@ -228,45 +217,7 @@
     }
 
     tr:hover td {
-      background-color: rgba(0, 0, 0, 0.04) !important;
-    }
-
-    /* Grouped spreads table styles */
-    .game-group-header td {
-      background: #eef3f8;
-      border-top: 2px solid #d8e2ee;
-      border-bottom: 1px solid #d8e2ee;
-      font-weight: 600;
-      color: #243447;
-    }
-
-    .game-group-title {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      font-weight: 700;
-    }
-
-    .game-meta {
-      color: #41566e;
-      font-weight: 500;
-      margin-left: 12px;
-      font-size: 0.82rem;
-    }
-
-    .team-subrow td:first-child {
-      padding-left: 20px;
-    }
-
-    .team-role {
-      display: inline-block;
-      font-size: 0.72rem;
-      padding: 2px 6px;
-      border-radius: 999px;
-      background: #e7edf5;
-      color: #334e68;
-      margin-left: 8px;
-      vertical-align: middle;
+      background-color: rgba(0,0,0,0.04) !important;
     }
   </style>
 </head>
@@ -472,19 +423,19 @@
         const button = document.createElement('button');
         button.className = 'subtab' + (subtab.id === 'spreads' ? ' active' : '');
         button.textContent = subtab.label;
-        button.onclick = (ev) => switchSubtab(subtab.id, ev);
+        button.onclick = () => switchSubtab(subtab.id);
         container.appendChild(button);
       });
 
       document.getElementById('spreads-content').classList.add('active');
     }
 
-    function switchSubtab(tabId, ev) {
+    function switchSubtab(tabId) {
       document.querySelectorAll('.subtab-content').forEach(el => el.classList.remove('active'));
       document.getElementById(`${tabId}-content`).classList.add('active');
 
       document.querySelectorAll('.subtab').forEach(el => el.classList.remove('active'));
-      if (ev?.target) ev.target.classList.add('active');
+      event.target.classList.add('active');
     }
 
     function toggleTeamPicker(tabId, forceOpen) {
@@ -567,7 +518,7 @@
     function selectVisibleTeams(tabId) {
       const state = tabState[tabId];
       const filterText = document.getElementById(`${tabId}-teamFilter`).value.toLowerCase().trim();
-
+      
       if (tabId === 'totals') {
         const visible = state.allGames.filter(g => g.toLowerCase().includes(filterText));
         visible.forEach(g => state.selectedGames.add(g));
@@ -578,7 +529,7 @@
         });
         visible.forEach(t => state.selectedTeams.add(t));
       }
-
+      
       renderTeamPicker(tabId);
       updateTeamSummary(tabId);
       renderTable(tabId);
@@ -614,7 +565,7 @@
       const filterText = document.getElementById(`${tabId}-teamFilter`).value.toLowerCase().trim();
 
       container.innerHTML = '';
-
+      
       if (tabId === 'totals') {
         const filtered = state.allGames.filter(g => g.toLowerCase().includes(filterText));
         filtered.forEach(game => {
@@ -680,257 +631,7 @@
       renderTable(tabId);
     }
 
-    function buildTeamCell(teamName, rowLogo) {
-      const teamKey = (teamName || '').toString().trim();
-      const info = teamLookup[teamKey] || {};
-      const displayName = info.displayName || teamKey;
-      const url = info.injuryUrl || null;
-      const logoUrl = info.logoUrl || rowLogo || null;
-
-      const wrapper = document.createElement('div');
-      wrapper.className = 'team-cell';
-
-      if (url) {
-        const a = document.createElement('a');
-        a.href = url;
-        a.target = '_blank';
-        a.rel = 'noopener noreferrer';
-        a.className = 'team-link';
-
-        if (logoUrl) {
-          const img = document.createElement('img');
-          img.src = logoUrl;
-          img.alt = `${displayName} logo`;
-          img.className = 'team-logo';
-          a.appendChild(img);
-        }
-
-        const span = document.createElement('span');
-        span.textContent = displayName;
-        a.appendChild(span);
-
-        wrapper.appendChild(a);
-      } else {
-        const line = document.createElement('div');
-        if (logoUrl) {
-          const img = document.createElement('img');
-          img.src = logoUrl;
-          img.alt = `${displayName} logo`;
-          img.className = 'team-logo';
-          line.appendChild(img);
-          line.appendChild(document.createTextNode(' '));
-        }
-        line.appendChild(document.createTextNode(displayName));
-        wrapper.appendChild(line);
-      }
-
-      return wrapper;
-    }
-
-    function getSpreadsGroupHeaderColumns() {
-      return [
-        { key: 'team', label: 'Team', sortable: false },
-        { key: 'model_prediction', label: 'Model', sortable: true },
-        { key: 'market_line', label: 'Market', sortable: true },
-        { key: 'lookahead_line', label: 'Lookahead', sortable: true },
-        { key: 'edge', label: 'Edge', sortable: true },
-        { key: 'best_line', label: 'Best Line', sortable: true },
-        { key: 'best_price', label: 'Best Price', sortable: true }
-      ];
-    }
-
-    function createGroupsFromRows(rows) {
-      const map = new Map();
-      rows.forEach((row, idx) => {
-        const game = (row.game || '').toString().trim();
-        const week = (row.week || '').toString().trim();
-        const time = (row.game_time_est || '').toString().trim();
-        const fallback = `${week}|${time}|${idx}`;
-        const key = game || fallback;
-
-        if (!map.has(key)) {
-          map.set(key, {
-            key,
-            game,
-            week,
-            game_time_est: time,
-            rows: []
-          });
-        }
-        map.get(key).rows.push(row);
-      });
-
-      return Array.from(map.values());
-    }
-
-    function sortGroups(groups, sortConfig) {
-      if (!sortConfig?.key) {
-        return groups.sort((a, b) => {
-          const wa = Number(a.week ?? 9999);
-          const wb = Number(b.week ?? 9999);
-          if (wa !== wb) return wa - wb;
-          return (a.game_time_est || '').localeCompare(b.game_time_est || '') || (a.game || '').localeCompare(b.game || '');
-        });
-      }
-
-      const dir = sortConfig.direction === 'desc' ? -1 : 1;
-      const key = sortConfig.key;
-
-      return groups.sort((a, b) => {
-        const aVals = a.rows.map(r => r[key]).filter(v => v !== null && v !== undefined && v !== '');
-        const bVals = b.rows.map(r => r[key]).filter(v => v !== null && v !== undefined && v !== '');
-
-        const aVal = aVals.length ? aVals[0] : null;
-        const bVal = bVals.length ? bVals[0] : null;
-
-        if (aVal === bVal) return 0;
-        if (aVal === null) return 1;
-        if (bVal === null) return -1;
-
-        if (typeof aVal === 'number' && typeof bVal === 'number') {
-          return (aVal < bVal ? -1 : 1) * dir;
-        }
-        return aVal.toString().localeCompare(bVal.toString()) * dir;
-      });
-    }
-
-    function sortRowsWithinGroup(rows, sortConfig) {
-      if (!sortConfig?.key) return rows;
-      const key = sortConfig.key;
-      const dir = sortConfig.direction === 'desc' ? -1 : 1;
-
-      return rows.slice().sort((a, b) => {
-        const aVal = a[key];
-        const bVal = b[key];
-
-        if (aVal === bVal) return 0;
-        if (aVal === null || aVal === undefined || aVal === '') return 1;
-        if (bVal === null || bVal === undefined || bVal === '') return -1;
-
-        if (typeof aVal === 'number' && typeof bVal === 'number') {
-          return (aVal < bVal ? -1 : 1) * dir;
-        }
-        return aVal.toString().localeCompare(bVal.toString()) * dir;
-      });
-    }
-
-    function renderSpreadsTable() {
-      const state = tabState.spreads;
-      const head = document.getElementById('spreads-tableHead');
-      const body = document.getElementById('spreads-tableBody');
-      if (!head || !body) return;
-
-      head.innerHTML = '';
-      body.innerHTML = '';
-
-      if (!state.rawData || state.rawData.length === 0) return;
-
-      const cols = getSpreadsGroupHeaderColumns();
-
-      cols.forEach(col => {
-        const th = document.createElement('th');
-        th.textContent = col.label;
-        if (col.sortable) {
-          th.onclick = () => onSort('spreads', col.key);
-        } else {
-          th.style.cursor = 'default';
-          th.style.opacity = '0.95';
-        }
-        head.appendChild(th);
-      });
-
-      let filteredRows = state.rawData;
-      if (state.selectedTeams.size > 0) {
-        filteredRows = filteredRows.filter(row => state.selectedTeams.has((row.team || '').toString().trim()));
-      }
-
-      let groups = createGroupsFromRows(filteredRows);
-      groups = sortGroups(groups, state.sortConfig);
-
-      groups.forEach(group => {
-        const gameHeaderTr = document.createElement('tr');
-        gameHeaderTr.className = 'game-group-header';
-
-        const gameTd = document.createElement('td');
-        gameTd.colSpan = cols.length;
-
-        const title = document.createElement('span');
-        title.className = 'game-group-title';
-        title.textContent = group.game || 'Matchup';
-
-        const meta = document.createElement('span');
-        meta.className = 'game-meta';
-        const weekPart = group.week ? `Week ${group.week}` : '';
-        const timePart = group.game_time_est ? `${group.game_time_est}` : '';
-        meta.textContent = [weekPart, timePart].filter(Boolean).join(' • ');
-
-        gameTd.appendChild(title);
-        if (meta.textContent) gameTd.appendChild(meta);
-
-        gameHeaderTr.appendChild(gameTd);
-        body.appendChild(gameHeaderTr);
-
-        const sortedRows = sortRowsWithinGroup(group.rows, state.sortConfig);
-
-        sortedRows.forEach((row, idx) => {
-          const tr = document.createElement('tr');
-          tr.className = 'team-subrow';
-
-          // Team
-          const teamTd = document.createElement('td');
-          teamTd.appendChild(buildTeamCell(row.team, row.logo));
-
-          const role = document.createElement('span');
-          role.className = 'team-role';
-          role.textContent = idx === 0 ? 'Team 1' : 'Team 2';
-          teamTd.appendChild(role);
-          tr.appendChild(teamTd);
-
-          // Model
-          const modelTd = document.createElement('td');
-          modelTd.className = 'numeric';
-          modelTd.textContent = formatValue(row.model_prediction, 'decimal', 'model_prediction');
-          tr.appendChild(modelTd);
-
-          // Market
-          const marketTd = document.createElement('td');
-          marketTd.className = 'numeric';
-          marketTd.textContent = formatValue(row.market_line, 'decimal', 'market_line');
-          tr.appendChild(marketTd);
-
-          // Lookahead
-          const lookaheadTd = document.createElement('td');
-          lookaheadTd.className = 'numeric';
-          lookaheadTd.textContent = formatValue(row.lookahead_line, 'decimal', 'lookahead_line');
-          tr.appendChild(lookaheadTd);
-
-          // Edge
-          const edgeTd = document.createElement('td');
-          edgeTd.className = 'numeric';
-          edgeTd.textContent = formatValue(row.edge, 'spread_edge', 'edge');
-          if (typeof row.edge === 'number') {
-            edgeTd.style.backgroundColor = getEdgeGradientColor(row.edge, EDGE_THRESHOLD_PERCENT);
-          }
-          tr.appendChild(edgeTd);
-
-          // Best Line
-          const bestLineTd = document.createElement('td');
-          bestLineTd.className = 'numeric';
-          bestLineTd.textContent = formatValue(row.best_line, 'decimal', 'best_line');
-          tr.appendChild(bestLineTd);
-
-          // Best Price
-          const bestPriceTd = document.createElement('td');
-          bestPriceTd.className = 'numeric';
-          bestPriceTd.textContent = formatValue(row.best_price, 'decimal', 'best_price');
-          tr.appendChild(bestPriceTd);
-
-          body.appendChild(tr);
-        });
-      });
-    }
-
-    function renderDefaultTable(tabId) {
+    function renderTable(tabId) {
       const state = tabState[tabId];
       const head = document.getElementById(`${tabId}-tableHead`);
       const body = document.getElementById(`${tabId}-tableBody`);
@@ -954,7 +655,7 @@
       });
 
       let processedData = state.rawData;
-
+      
       if (tabId === 'totals') {
         if (state.selectedGames.size > 0) {
           processedData = state.rawData.filter(row => state.selectedGames.has((row['game'] || '').toString().trim()));
@@ -993,7 +694,55 @@
           const td = document.createElement('td');
           const val = row[col.csv];
           const formatted = formatValue(val, col.type, col.csv);
-          td.textContent = formatted;
+
+          if (col.csv === 'team' && tabId === 'spreads') {
+            const teamKey = (val || '').toString().trim();
+            const info = teamLookup[teamKey] || {};
+            const displayName = info.displayName || teamKey;
+            const url = info.injuryUrl || null;
+            const logoUrl = info.logoUrl || row['logo'] || null;
+
+            const wrapper = document.createElement('div');
+            wrapper.className = 'team-cell';
+
+            if (url) {
+              const a = document.createElement('a');
+              a.href = url;
+              a.target = '_blank';
+              a.rel = 'noopener noreferrer';
+              a.className = 'team-link';
+
+              if (logoUrl) {
+                const img = document.createElement('img');
+                img.src = logoUrl;
+                img.alt = `${displayName} logo`;
+                img.className = 'team-logo';
+                a.appendChild(img);
+              }
+
+              const span = document.createElement('span');
+              span.textContent = displayName;
+              a.appendChild(span);
+
+              wrapper.appendChild(a);
+            } else {
+              const line = document.createElement('div');
+              if (logoUrl) {
+                const img = document.createElement('img');
+                img.src = logoUrl;
+                img.alt = `${displayName} logo`;
+                img.className = 'team-logo';
+                line.appendChild(img);
+                line.appendChild(document.createTextNode(' '));
+              }
+              line.appendChild(document.createTextNode(displayName));
+              wrapper.appendChild(line);
+            }
+
+            td.appendChild(wrapper);
+          } else {
+            td.textContent = formatted;
+          }
 
           if (col.type !== 'text') {
             td.classList.add('numeric');
@@ -1008,14 +757,6 @@
 
         body.appendChild(tr);
       });
-    }
-
-    function renderTable(tabId) {
-      if (tabId === 'spreads') {
-        renderSpreadsTable();
-        return;
-      }
-      renderDefaultTable(tabId);
     }
 
     function hydrateTeams() {
@@ -1033,9 +774,7 @@
       });
 
       const existing = new Set(state.allTeams);
-      state.selectedTeams.forEach(t => {
-        if (!existing.has(t)) state.selectedTeams.delete(t);
-      });
+      state.selectedTeams.forEach(t => { if (!existing.has(t)) state.selectedTeams.delete(t); });
     }
 
     function hydrateGames() {
@@ -1049,9 +788,7 @@
       state.allGames = Array.from(set).sort((a, b) => a.localeCompare(b));
 
       const existing = new Set(state.allGames);
-      state.selectedGames.forEach(g => {
-        if (!existing.has(g)) state.selectedGames.delete(g);
-      });
+      state.selectedGames.forEach(g => { if (!existing.has(g)) state.selectedGames.delete(g); });
     }
 
     function updateTableFromCSV() {
