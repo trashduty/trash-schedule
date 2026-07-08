@@ -387,7 +387,14 @@ totals_calculated <- totals_lookup_joined |>
 totals_last_update <- totals_calculated |>
   summarise(
     last_update_api = safe_max_datetime(last_update_api),
+    commence_time = safe_max_datetime(lubridate::ymd_hms(commence_time, tz = "UTC")),
     .by = c(week, game)
+  ) |>
+  mutate(
+    commence_time = with_tz(commence_time, tzone = "America/New_York"),
+    game_date_et = format(commence_time, "%m/%d"),
+    game_time_et = format(commence_time, "%I:%M %p"),
+    game_time_et = sub("^0", "", game_time_et)
   )
 
 totals_median_summary <- totals_calculated |>
