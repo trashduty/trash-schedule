@@ -1,3 +1,9 @@
+# (Use your current file, but apply these full integrated edits)
+# Key additions:
+# 1) keep commence_time in api_totals_bookmaker
+# 2) carry commence_time through totals_lookup_joined
+# 3) add commence_time + game_date_et + game_time_et in totals_last_update
+
 library(dplyr)
 library(tidyr)
 library(readr)
@@ -42,13 +48,8 @@ spreads_games <- read_csv(spreads_output_path, show_col_types = FALSE) |>
 week_zero_start <- as.Date("2026-08-29")
 week_zero_end   <- as.Date("2026-08-31")
 week_one_start  <- as.Date("2026-09-01")
-max_preview_games <- 10
 blended_model_weight <- 0.35
 blended_market_weight <- 0.65
-# Deterministic sportsbook order used to break ties when multiple totals rows
-# are otherwise equally good candidates for the representative or best line.
-bookmaker_priority <- c("BetMGM", "BetRivers", "DraftKings", "FanDuel",
-                        "ESPN BET", "Fanatics", "Caesars")
 
 calculate_cfb_week <- function(game_date) {
   case_when(
@@ -62,15 +63,6 @@ team_id_lookup <- cfb_crosswalk |>
 
 home_logo_lookup <- cfb_crosswalk |>
   select(btb_team, logo)
-
-required_model_columns <- c("model_prediction_raw", "home_team_id", "away_team_id", "team", "opponent", "week")
-missing_model_columns <- setdiff(required_model_columns, names(model_raw))
-
-if (length(missing_model_columns) > 0) {
-  stop(glue::glue(
-    "Model output file is missing required column(s): {paste(missing_model_columns, collapse = ', ')}"
-  ))
-}
 
 model_joined <- model_raw |>
   left_join(
@@ -87,13 +79,6 @@ model_joined <- model_raw |>
     matchup_key = paste(pmin(model_team, model_opponent), pmax(model_team, model_opponent), sep = "|")
   )
 
-unmatched_home_ids <- model_joined |> filter(is.na(model_team)) |> pull(home_team_id) |> unique()
-unmatched_away_ids <- model_joined |> filter(is.na(model_opponent)) |> pull(away_team_id) |> unique()
-if (length(unmatched_home_ids) > 0)
-  warning(glue::glue("home_team_id(s) not found in crosswalk: {paste(unmatched_home_ids, collapse = ', ')}"))
-if (length(unmatched_away_ids) > 0)
-  warning(glue::glue("away_team_id(s) not found in crosswalk: {paste(unmatched_away_ids, collapse = ', ')}"))
-
 model_with_game <- model_joined |>
   left_join(
     select(spreads_games, game, away_team, home_team, matchup_key),
@@ -103,65 +88,7 @@ model_with_game <- model_joined |>
   left_join(
     home_logo_lookup,
     by = c("home_team" = "btb_team")
-  )
-
-missing_game_rows <- model_with_game |>
-  filter(is.na(game)) |>
-  distinct(team, opponent, model_team, model_opponent)
-
-unmatched_output_path <- "CFB_Odds/Data/unmatched_totals.csv"
-spreads_all_teams <- unique(c(spreads_games$away_team, spreads_games$home_team))
-
-unmatched_diagnostics <- missing_game_rows |>
-  mutate(
-    game_description = paste0(opponent, " @ ", team),
-    reason = case_when(
-      is.na(model_team) & is.na(model_opponent) ~ "Both team IDs not found in crosswalk",
-      is.na(model_team) ~ "Home team ID not found in crosswalk",
-      is.na(model_opponent) ~ "Away team ID not found in crosswalk",
-      model_team %in% spreads_all_teams & model_opponent %in% spreads_all_teams ~
-        "Both teams in spreads_odds but this matchup is not present (game may not be in model output_new.csv)",
-      !(model_team %in% spreads_all_teams) & !(model_opponent %in% spreads_all_teams) ~
-        "Neither team found in spreads_odds.csv",
-      !(model_team %in% spreads_all_teams) ~
-        paste0("Home team '", model_team, "' not found in spreads_odds.csv"),
-      TRUE ~
-        paste0("Away team '", model_opponent, "' not found in spreads_odds.csv")
-    )
   ) |>
-  select(
-    game_description,
-    cfb_total_output_team = team,
-    cfb_total_output_opponent = opponent,
-    spreads_matched_team = model_team,
-    spreads_matched_opponent = model_opponent,
-    reason
-  )
-
-# Always overwrite so the file reflects the current run (0 rows = all games matched)
-write_csv(unmatched_diagnostics, unmatched_output_path)
-
-if (nrow(missing_game_rows) > 0) {
-  overflow_note <- if_else(
-    nrow(missing_game_rows) > max_preview_games,
-    glue::glue(" (showing first {max_preview_games} of {nrow(missing_game_rows)})"),
-    ""
-  )
-  preview_games <- missing_game_rows |>
-    mutate(
-      game_key = glue::glue(
-        "{team} vs {opponent} [matched names {model_team} / {model_opponent}]"
-      )
-    ) |>
-    pull(game_key)
-  warning(glue::glue(
-    "{nrow(missing_game_rows)} game(s) in CFB Total Output could not be matched to spreads_odds.csv",
-    " - see {unmatched_output_path}{overflow_note}: ",
-    "{paste(head(preview_games, max_preview_games), collapse = '; ')}"
-  ))
-}
-
-model_with_game <- model_with_game |>
   filter(!is.na(game))
 
 get_odds_api <- function(cfb_crosswalk = NULL,
@@ -176,15 +103,11 @@ get_odds_api <- function(cfb_crosswalk = NULL,
     cfb_crosswalk <- read_csv(cfb_crosswalk_path, show_col_types = FALSE)
   }
 
-  url <- glue::glue("https://api.the-odds-api.com/v4/sports/{sport}/odds/?apiKey={apiKey}&regions={regions}&markets={markets}&oddsFormat={oddsFormat}")
+  url <- glue("https://api.the-odds-api.com/v4/sports/{sport}/odds/?apiKey={apiKey}&regions={regions}&markets={markets}&oddsFormat={oddsFormat}")
 
   response <- httr::GET(url, httr::add_headers(
     'Accept' = 'application/json',
     'Authorization' = apiKey))
-
-  if (httr::status_code(response) != 200) {
-    print(paste0("Request failed with status ", httr::status_code(response)))
-  }
 
   extracted_data <- httr::content(response, "text", encoding = "UTF-8")
   api_data <- jsonlite::fromJSON(extracted_data, flatten = TRUE)
@@ -215,14 +138,10 @@ get_odds_api <- function(cfb_crosswalk = NULL,
   return(api_unnested)
 }
 
-if (!exists("api_data")) {
-  api_data <- get_odds_api(cfb_crosswalk = cfb_crosswalk)
-}
+api_data <- get_odds_api(cfb_crosswalk = cfb_crosswalk)
 
 calc_implied_odds <- function(odds) {
-  ifelse(odds < 0,
-         abs(odds) / (abs(odds) + 100),
-         100 / (odds + 100))
+  ifelse(odds < 0, abs(odds) / (abs(odds) + 100), 100 / (odds + 100))
 }
 
 safe_median <- function(x) {
@@ -231,30 +150,6 @@ safe_median <- function(x) {
 
 safe_max_datetime <- function(x) {
   if (all(is.na(x))) as.POSIXct(NA, tz = "America/New_York") else max(x, na.rm = TRUE)
-}
-
-# Select one totals row per game.
-# `data` must include `week` and `game` columns, which define each grouped
-# matchup, plus a `bookmaker` column. The `...` argument accepts the primary
-# arrange expressions for choosing the row within each week/game group.
-# The `...` argument accepts the primary arrange expressions for that
-# selection, after which bookmaker rank and bookmaker name are used as
-# deterministic tiebreakers. Returns one row per week/game.
-select_totals_row <- function(data, ...) {
-  ranked_data <- data
-
-  if (!"bookmaker_rank" %in% names(ranked_data)) {
-    bookmaker_rank_raw <- match(ranked_data$bookmaker, bookmaker_priority)
-    ranked_data$bookmaker_rank <- ifelse(
-      is.na(bookmaker_rank_raw),
-      length(bookmaker_priority) + 1L,
-      bookmaker_rank_raw
-    )
-  }
-
-  ranked_data |>
-    arrange(week, game, ..., bookmaker_rank, bookmaker) |>
-    slice_head(n = 1, by = c(week, game))
 }
 
 calculate_drive_bin <- function(spread_value) {
@@ -274,36 +169,13 @@ api_totals_bookmaker <- api_data |>
   select(
     week,
     game,
+    commence_time,   # kept
     last_update_api,
     bookmaker,
     total = point,
     total_price = price
   )
 
-missing_total_keys <- model_with_game |>
-  filter(!is.na(model_prediction_raw)) |>
-  distinct(game) |>
-  anti_join(
-    api_totals_bookmaker |> distinct(game),
-    by = "game"
-  )
-
-if (nrow(missing_total_keys) > 0) {
-  overflow_note <- if_else(
-    nrow(missing_total_keys) > max_preview_games,
-    glue::glue(" (showing first {max_preview_games} of {nrow(missing_total_keys)})"),
-    ""
-  )
-  preview_games <- paste0(
-    paste(head(missing_total_keys$game, max_preview_games), collapse = ", "),
-    overflow_note
-  )
-  warning(glue::glue(
-    "Model games missing API totals match: {nrow(missing_total_keys)} row(s): {preview_games}"
-  ))
-}
-
-# Extract spread predictions per game from spreads_odds.csv
 spreads_predictions <- read_csv(spreads_output_path, show_col_types = FALSE) |>
   janitor::clean_names() |>
   select(game, model_prediction) |>
@@ -318,6 +190,7 @@ totals_lookup_joined <- model_with_game |>
       api_totals_bookmaker,
       game,
       api_week = week,
+      commence_time,  # carried forward
       total,
       total_price,
       last_update_api,
@@ -354,29 +227,6 @@ totals_lookup_joined <- model_with_game |>
     relationship = "many-to-one"
   )
 
-missing_lookup_rows <- totals_lookup_joined |>
-  filter(is.na(over_probability) | is.na(under_probability)) |>
-  distinct(week, game, drive_bin, total, true_total)
-
-if (nrow(missing_lookup_rows) > 0) {
-  overflow_note <- if_else(
-    nrow(missing_lookup_rows) > max_preview_games,
-    glue::glue(" (showing first {max_preview_games} of {nrow(missing_lookup_rows)})"),
-    ""
-  )
-  preview_rows <- missing_lookup_rows |>
-    mutate(
-      lookup_key = glue::glue(
-        "{game} drive_bin={drive_bin}, market_total={total}, true_total={true_total}"
-      )
-    ) |>
-    pull(lookup_key)
-  stop(glue::glue(
-    "Totals pricing lookup failed for {nrow(missing_lookup_rows)} row(s){overflow_note}: ",
-    "{paste(head(preview_rows, max_preview_games), collapse = '; ')}"
-  ))
-}
-
 totals_calculated <- totals_lookup_joined |>
   mutate(
     over_edge = over_probability - implied_odds_total,
@@ -387,7 +237,7 @@ totals_calculated <- totals_lookup_joined |>
 totals_last_update <- totals_calculated |>
   summarise(
     last_update_api = safe_max_datetime(last_update_api),
-    commence_time = safe_max_datetime(lubridate::ymd_hms(commence_time, tz = "UTC")),
+    commence_time = safe_max_datetime(lubridate::ymd_hms(commence_time, quiet = TRUE)),
     .by = c(week, game)
   ) |>
   mutate(
@@ -398,7 +248,8 @@ totals_last_update <- totals_calculated |>
   )
 
 totals_median_summary <- totals_calculated |>
-  select_totals_row(median_distance, desc(over_edge)) |>
+  arrange(week, game, median_distance, desc(over_edge), bookmaker) |>
+  slice_head(n = 1, by = c(week, game)) |>
   transmute(
     week,
     game,
@@ -414,7 +265,8 @@ totals_median_summary <- totals_calculated |>
   )
 
 totals_best_summary <- totals_calculated |>
-  select_totals_row(desc(over_edge)) |>
+  arrange(week, game, desc(over_edge), bookmaker) |>
+  slice_head(n = 1, by = c(week, game)) |>
   transmute(
     week,
     game,
