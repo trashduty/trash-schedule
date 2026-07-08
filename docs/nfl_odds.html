@@ -113,6 +113,8 @@
 
     .table-container {
       overflow-x: auto;
+      overflow-y: auto;
+      max-height: 72vh;
       box-shadow: 0 4px 6px rgba(0,0,0,0.1);
       border-radius: 8px;
       background: white;
@@ -178,6 +180,7 @@
       color: white;
       position: sticky;
       top: 0;
+      z-index: 5;
       cursor: pointer;
       user-select: none;
     }
@@ -190,6 +193,33 @@
 
     tr:hover td {
       background-color: rgba(0,0,0,0.04) !important;
+    }
+
+    /* Grouped NFL table styles */
+    .game-group-header td {
+      background: #eef3f8;
+      border-top: 2px solid #d8e2ee;
+      border-bottom: 1px solid #d8e2ee;
+      font-weight: 600;
+      color: #243447;
+    }
+
+    .game-group-title {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+    }
+
+    .game-meta {
+      color: #41566e;
+      font-weight: 500;
+      margin-left: 12px;
+      font-size: 0.82rem;
+    }
+
+    .team-subrow td:first-child {
+      padding-left: 20px;
     }
   </style>
 </head>
@@ -320,14 +350,12 @@
 
     function buildQbLookup(modelRows) {
       const lookup = {};
-
       modelRows.forEach(row => {
         const team = normalizeTeamAbbr(row['Team']);
         const qbName = normalizeName(row['Qbname']);
         if (!team || !qbName) return;
         lookup[team] = qbName;
       });
-
       return lookup;
     }
 
@@ -391,7 +419,6 @@
     function toggleTeamPicker(forceOpen) {
       const picker = document.getElementById('teamPicker');
       const isHidden = picker.hasAttribute('hidden');
-
       const open = (typeof forceOpen === 'boolean') ? forceOpen : isHidden;
       if (open) {
         picker.removeAttribute('hidden');
@@ -404,27 +431,19 @@
     function getEdgeGradientColor(value, thresholdPctPoints) {
       const pct = value * 100;
       const diff = pct - thresholdPctPoints;
-
       if (diff >= 0) {
         const lightness = Math.max(95 - diff * 8, 30);
         return `hsl(120, 70%, ${lightness}%)`;
       }
-
       const lightness = Math.max(95 - Math.abs(diff) * 8, 75);
       return `hsl(0, 80%, ${lightness}%)`;
     }
 
     function formatValue(value, type, csvKey) {
       if (value === null || value === undefined || value === '') return '';
-      if (type === 'probability' || type === 'spread_edge') {
-        return (Number(value) * 100).toFixed(2) + '%';
-      }
-      if (csvKey === 'model_prediction' || csvKey === 'market_line' || csvKey === 'best_line' || csvKey === 'lookahead_line') {
-        return Number(value).toFixed(1);
-      }
-      if (csvKey === 'market_price' || csvKey === 'best_price') {
-        return Number(value).toFixed(0);
-      }
+      if (type === 'probability' || type === 'spread_edge') return (Number(value) * 100).toFixed(2) + '%';
+      if (csvKey === 'model_prediction' || csvKey === 'market_line' || csvKey === 'best_line' || csvKey === 'lookahead_line') return Number(value).toFixed(1);
+      if (csvKey === 'market_price' || csvKey === 'best_price') return Number(value).toFixed(0);
       if (type === 'text') return String(value);
       if (type === 'decimal') return Number(value).toFixed(2);
       return value;
@@ -433,7 +452,6 @@
     function buildPfrGameUrl(row) {
       const game = (row['game'] || '').toString().trim().toUpperCase();
       const gameDate = row['game_date_est'];
-
       if (!game || !gameDate || !game.includes('@')) return null;
 
       const parts = game.split('@');
@@ -449,11 +467,79 @@
       return `https://www.pro-football-reference.com/boxscores/${dateStr}0${pfrAbbr}.htm`;
     }
 
+    function createGroupsFromRows(rows) {
+      const map = new Map();
+
+      rows.forEach((row, idx) => {
+        const game = (row.game || '').toString().trim();
+        const week = (row.week || '').toString().trim();
+        const time = (row.game_time_est || '').toString().trim();
+        const fallback = `${week}|${time}|${idx}`;
+        const key = game || fallback;
+
+        if (!map.has(key)) {
+          map.set(key, { key, game, week, game_time_est: time, rows: [] });
+        }
+        map.get(key).rows.push(row);
+      });
+
+      return Array.from(map.values());
+    }
+
+    function sortGroups(groups, sortCfg) {
+      if (!sortCfg || !sortCfg.key) {
+        return groups.sort((a, b) => {
+          const wa = Number(a.week ?? 9999);
+          const wb = Number(b.week ?? 9999);
+          if (wa !== wb) return wa - wb;
+          return (a.game_time_est || '').localeCompare(b.game_time_est || '') ||
+                 (a.game || '').localeCompare(b.game || '');
+        });
+      }
+
+      const dir = sortCfg.direction === 'desc' ? -1 : 1;
+      const key = sortCfg.key;
+
+      return groups.sort((a, b) => {
+        const aVals = a.rows.map(r => r[key]).filter(v => v !== null && v !== undefined && v !== '');
+        const bVals = b.rows.map(r => r[key]).filter(v => v !== null && v !== undefined && v !== '');
+
+        const aVal = aVals.length ? aVals[0] : null;
+        const bVal = bVals.length ? bVals[0] : null;
+
+        if (aVal === bVal) return 0;
+        if (aVal === null) return 1;
+        if (bVal === null) return -1;
+
+        if (typeof aVal === 'number' && typeof bVal === 'number') {
+          return (aVal < bVal ? -1 : 1) * dir;
+        }
+        return aVal.toString().localeCompare(bVal.toString()) * dir;
+      });
+    }
+
+    function sortRowsWithinGroup(rows, sortCfg) {
+      if (!sortCfg || !sortCfg.key) return rows;
+      const key = sortCfg.key;
+      const dir = sortCfg.direction === 'desc' ? -1 : 1;
+
+      return rows.slice().sort((a, b) => {
+        const aVal = a[key];
+        const bVal = b[key];
+
+        if (aVal === bVal) return 0;
+        if (aVal === null || aVal === undefined || aVal === '') return 1;
+        if (bVal === null || bVal === undefined || bVal === '') return -1;
+
+        if (typeof aVal === 'number' && typeof bVal === 'number') {
+          return (aVal < bVal ? -1 : 1) * dir;
+        }
+        return aVal.toString().localeCompare(bVal.toString()) * dir;
+      });
+    }
+
     function updateTableFromCSV() {
-      Promise.all([
-        parseCsvFromUrl(SPREADS_CSV_URL),
-        parseCsvFromUrl(MODEL_CSV_URL)
-      ])
+      Promise.all([parseCsvFromUrl(SPREADS_CSV_URL), parseCsvFromUrl(MODEL_CSV_URL)])
         .then(([spreadsResults, modelResults]) => {
           if (spreadsResults.meta && spreadsResults.meta.fields) {
             buildColumnMapping(spreadsResults.meta.fields);
@@ -467,8 +553,7 @@
           renderTable();
           updateTeamSummary();
 
-          document.getElementById('status').textContent =
-            'Last updated: ' + new Date().toLocaleTimeString();
+          document.getElementById('status').textContent = 'Last updated: ' + new Date().toLocaleTimeString();
         })
         .catch((err) => {
           document.getElementById('status').textContent = 'Error loading data: ' + err.message;
@@ -483,14 +568,11 @@
       });
 
       allTeams = Array.from(set).sort((a, b) => a.localeCompare(b));
-
       const existing = new Set(allTeams);
       selectedTeams.forEach(t => { if (!existing.has(t)) selectedTeams.delete(t); });
     }
 
-    function onTeamFilterInput() {
-      renderTeamPicker();
-    }
+    function onTeamFilterInput() { renderTeamPicker(); }
 
     function onTeamToggle(team, isChecked) {
       if (isChecked) selectedTeams.add(team);
@@ -519,8 +601,7 @@
     }
 
     function updateTeamCount() {
-      document.getElementById('teamCount').textContent =
-        `Teams: ${allTeams.length} • Selected: ${selectedTeams.size}`;
+      document.getElementById('teamCount').textContent = `Teams: ${allTeams.length} • Selected: ${selectedTeams.size}`;
     }
 
     function updateTeamSummary() {
@@ -564,9 +645,8 @@
     }
 
     function onSort(key) {
-      if (sortConfig.key === key) {
-        sortConfig.direction = sortConfig.direction === 'asc' ? 'desc' : 'asc';
-      } else {
+      if (sortConfig.key === key) sortConfig.direction = sortConfig.direction === 'asc' ? 'desc' : 'asc';
+      else {
         sortConfig.key = key;
         sortConfig.direction = 'asc';
       }
@@ -598,113 +678,126 @@
         processedData = rawData.filter(row => selectedTeams.has((row['team'] || '').toString().trim()));
       }
 
-      if (sortConfig.key) {
-        processedData = processedData.slice().sort((a, b) => {
-          const key = sortConfig.key;
-          const valA = a[key];
-          const valB = b[key];
+      let groups = createGroupsFromRows(processedData);
+      groups = sortGroups(groups, sortConfig);
 
-          if (valA === valB) return 0;
-          if (valA === null || valA === undefined) return 1;
-          if (valB === null || valB === undefined) return -1;
+      groups.forEach(group => {
+        const gameHeaderTr = document.createElement('tr');
+        gameHeaderTr.className = 'game-group-header';
 
-          let comparison;
-          if (typeof valA === 'number' && typeof valB === 'number') {
-            comparison = valA < valB ? -1 : 1;
-          } else {
-            comparison = valA.toString().localeCompare(valB.toString());
-          }
+        const gameTd = document.createElement('td');
+        gameTd.colSpan = activeCols.length;
 
-          return sortConfig.direction === 'asc' ? comparison : -comparison;
-        });
-      }
+        const title = document.createElement('span');
+        title.className = 'game-group-title';
+        title.textContent = group.game || 'Matchup';
 
-      processedData.forEach(row => {
-        const tr = document.createElement('tr');
+        const meta = document.createElement('span');
+        meta.className = 'game-meta';
+        const weekPart = group.week ? `Week ${group.week}` : '';
+        const timePart = group.game_time_est ? group.game_time_est : '';
+        meta.textContent = [weekPart, timePart].filter(Boolean).join(' • ');
 
-        activeCols.forEach(col => {
-          const td = document.createElement('td');
-          const val = row[col.csv];
-          const formatted = formatValue(val, col.type, col.csv);
+        gameTd.appendChild(title);
+        if (meta.textContent) gameTd.appendChild(meta);
+        gameHeaderTr.appendChild(gameTd);
+        body.appendChild(gameHeaderTr);
 
-          if (col.csv === 'team') {
-            const teamKey = (val || '').toString().trim().toUpperCase();
-            const url = TEAM_INJURY_URLS[teamKey];
-            const logoUrl = row['team_logo_espn'];
-            const qbName = qbLookup[teamKey];
-            const wrapper = document.createElement('div');
-            wrapper.className = 'team-cell';
+        const sortedRows = sortRowsWithinGroup(group.rows, sortConfig);
 
-            if (url) {
-              const a = document.createElement('a');
-              a.href = url;
-              a.target = '_blank';
-              a.rel = 'noopener noreferrer';
-              a.className = 'team-link';
+        sortedRows.forEach((row, rowIdx) => {
+          const tr = document.createElement('tr');
+          tr.className = 'team-subrow';
 
-              if (logoUrl) {
-                const img = document.createElement('img');
-                img.src = logoUrl;
-                img.alt = `${formatted} logo`;
-                img.className = 'team-logo';
-                a.appendChild(img);
+          activeCols.forEach(col => {
+            const td = document.createElement('td');
+            const val = row[col.csv];
+            const formatted = formatValue(val, col.type, col.csv);
+
+            const hideGame = (col.csv === 'game');
+            const hideGameTime = (col.csv === 'game_time_est');
+            const hideWeekOnSecondRow = (col.csv === 'week' && rowIdx > 0);
+
+            if (col.csv === 'team') {
+              const teamKey = (val || '').toString().trim().toUpperCase();
+              const url = TEAM_INJURY_URLS[teamKey];
+              const logoUrl = row['team_logo_espn'];
+              const qbName = qbLookup[teamKey];
+              const wrapper = document.createElement('div');
+              wrapper.className = 'team-cell';
+
+              if (url) {
+                const a = document.createElement('a');
+                a.href = url;
+                a.target = '_blank';
+                a.rel = 'noopener noreferrer';
+                a.className = 'team-link';
+
+                if (logoUrl) {
+                  const img = document.createElement('img');
+                  img.src = logoUrl;
+                  img.alt = `${formatted} logo`;
+                  img.className = 'team-logo';
+                  a.appendChild(img);
+                }
+
+                const span = document.createElement('span');
+                span.textContent = formatted;
+                a.appendChild(span);
+                wrapper.appendChild(a);
+              } else {
+                const line = document.createElement('div');
+                if (logoUrl) {
+                  const img = document.createElement('img');
+                  img.src = logoUrl;
+                  img.alt = `${formatted} logo`;
+                  img.className = 'team-logo';
+                  line.appendChild(img);
+                  line.appendChild(document.createTextNode(' '));
+                }
+                line.appendChild(document.createTextNode(formatted));
+                wrapper.appendChild(line);
               }
 
-              const span = document.createElement('span');
-              span.textContent = formatted;
-              a.appendChild(span);
-
-              wrapper.appendChild(a);
-            } else {
-              const line = document.createElement('div');
-              if (logoUrl) {
-                const img = document.createElement('img');
-                img.src = logoUrl;
-                img.alt = `${formatted} logo`;
-                img.className = 'team-logo';
-                line.appendChild(img);
-                line.appendChild(document.createTextNode(' '));
+              if (qbName) {
+                const note = document.createElement('div');
+                note.className = 'qb-note';
+                note.textContent = `*Assumes ${qbName} is starting`;
+                wrapper.appendChild(note);
               }
-              line.appendChild(document.createTextNode(formatted));
-              wrapper.appendChild(line);
-            }
 
-            if (qbName) {
-              const note = document.createElement('div');
-              note.className = 'qb-note';
-              note.textContent = `*Assumes ${qbName} is starting`;
-              wrapper.appendChild(note);
-            }
-
-            td.appendChild(wrapper);
-          } else if (col.csv === 'game') {
-            const url = buildPfrGameUrl(row);
-            if (url) {
-              const a = document.createElement('a');
-              a.href = url;
-              a.target = '_blank';
-              a.rel = 'noopener noreferrer';
-              a.textContent = formatted;
-              td.appendChild(a);
+              td.appendChild(wrapper);
+            } else if (hideGame || hideGameTime || hideWeekOnSecondRow) {
+              td.textContent = '';
+            } else if (col.csv === 'game') {
+              const url = buildPfrGameUrl(row);
+              if (url) {
+                const a = document.createElement('a');
+                a.href = url;
+                a.target = '_blank';
+                a.rel = 'noopener noreferrer';
+                a.textContent = formatted;
+                td.appendChild(a);
+              } else {
+                td.textContent = formatted;
+              }
             } else {
               td.textContent = formatted;
             }
-          } else {
-            td.textContent = formatted;
-          }
 
-          if (col.type !== 'text') {
-            td.classList.add('numeric');
-          }
+            if (col.type !== 'text') td.classList.add('numeric');
 
-          if (typeof val === 'number' && col.type === 'spread_edge') {
-            td.style.backgroundColor = getEdgeGradientColor(val, EDGE_THRESHOLD_PERCENT);
-          }
+            if (!(hideGame || hideGameTime || hideWeekOnSecondRow) &&
+                typeof val === 'number' &&
+                col.type === 'spread_edge') {
+              td.style.backgroundColor = getEdgeGradientColor(val, EDGE_THRESHOLD_PERCENT);
+            }
 
-          tr.appendChild(td);
+            tr.appendChild(td);
+          });
+
+          body.appendChild(tr);
         });
-
-        body.appendChild(tr);
       });
     }
 
