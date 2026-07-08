@@ -98,7 +98,9 @@
       margin-top: 10px;
     }
 
-    .team-picker[hidden] { display: none; }
+    .team-picker[hidden] {
+      display: none;
+    }
 
     .team-picker-header {
       display: flex;
@@ -141,7 +143,9 @@
       border-bottom: 1px dashed rgba(0,0,0,0.06);
     }
 
-    .team-item:last-child { border-bottom: none; }
+    .team-item:last-child {
+      border-bottom: none;
+    }
 
     .team-count {
       font-size: 0.85rem;
@@ -890,26 +894,33 @@
 
         const sortedRows = sortRowsWithinGroup(group.rows, state.sortConfig);
 
-        sortedRows.forEach(row => {
+        sortedRows.forEach((row, rowIdx) => {
           const tr = document.createElement('tr');
           tr.className = 'team-subrow';
 
           activeCols.forEach(col => {
             const td = document.createElement('td');
             const val = row[col.csv];
-            const hideInTeamRows = (col.csv === 'week' || col.csv === 'game' || col.csv === 'game_time_est');
+
+            const hideGame = (col.csv === 'game');
+            const hideGameTime = (col.csv === 'game_time_est');
+            const hideWeekOnSecondRow = (col.csv === 'week' && rowIdx > 0);
 
             if (col.csv === 'team') {
               td.appendChild(buildTeamCell(row.team, row.logo));
+            } else if (hideGame || hideGameTime || hideWeekOnSecondRow) {
+              td.textContent = '';
             } else {
-              td.textContent = hideInTeamRows ? '' : formatValue(val, col.type, col.csv);
+              td.textContent = formatValue(val, col.type, col.csv);
             }
 
             if (col.type !== 'text') {
               td.classList.add('numeric');
             }
 
-            if (!hideInTeamRows && typeof val === 'number' && col.type === 'spread_edge') {
+            if (!(hideGame || hideGameTime || hideWeekOnSecondRow) &&
+                typeof val === 'number' &&
+                col.type === 'spread_edge') {
               td.style.backgroundColor = getEdgeGradientColor(val, EDGE_THRESHOLD_PERCENT);
             }
 
