@@ -25,6 +25,42 @@
       font-size: 1.1rem;
     }
 
+    .subtabs {
+      display: flex;
+      gap: 0;
+      margin-bottom: 16px;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .subtab {
+      padding: 8px 12px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 0.9rem;
+      color: #666;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      transition: color 0.2s;
+    }
+
+    .subtab:hover {
+      color: #333;
+    }
+
+    .subtab.active {
+      color: #2c3e50;
+      border-bottom-color: #2c3e50;
+    }
+
+    .subtab-content {
+      display: none;
+    }
+
+    .subtab-content.active {
+      display: block;
+    }
+
     .controls {
       margin-bottom: 14px;
       display: flex;
@@ -72,7 +108,7 @@
       flex-wrap: wrap;
     }
 
-    #teamFilter {
+    .teamFilter {
       padding: 8px 12px;
       border: 1px solid #ccc;
       border-radius: 6px;
@@ -193,50 +229,92 @@
     <a href="https://www.covers.com/sport/ncaaf/weather" target="_blank" rel="noopener noreferrer">Weather Reports</a>
   </div>
 
-  <div class="controls">
-    <div>
-      <button type="button" id="toggleTeamPickerBtn" onclick="toggleTeamPicker()">
-        Select teams…
-      </button>
-    </div>
-    <div class="team-summary" id="teamSummary">All teams</div>
-  </div>
+  <div class="subtabs" id="subtabs"></div>
 
-  <div class="team-picker" id="teamPicker" hidden>
-    <div class="team-picker-header">
-      <input id="teamFilter" type="text" placeholder="Type to find teams..." oninput="onTeamFilterInput()" />
-
-      <div class="team-picker-actions">
-        <button type="button" onclick="selectVisibleTeams()">Select visible</button>
-        <button type="button" onclick="clearTeamSelection()">Clear</button>
-        <button type="button" onclick="toggleTeamPicker(false)">Close</button>
+  <!-- Spreads Tab -->
+  <div class="subtab-content" id="spreads-content">
+    <div class="controls">
+      <div>
+        <button type="button" id="spreads-toggleTeamPickerBtn" onclick="toggleTeamPicker('spreads')">
+          Select teams…
+        </button>
       </div>
+      <div class="team-summary" id="spreads-teamSummary">All teams</div>
     </div>
 
-    <div class="team-list" id="teamList"></div>
-    <div class="team-count" id="teamCount">Teams: 0 • Selected: 0</div>
+    <div class="team-picker" id="spreads-teamPicker" hidden>
+      <div class="team-picker-header">
+        <input class="teamFilter" id="spreads-teamFilter" type="text" placeholder="Type to find teams..." oninput="onTeamFilterInput('spreads')" />
+
+        <div class="team-picker-actions">
+          <button type="button" onclick="selectVisibleTeams('spreads')">Select visible</button>
+          <button type="button" onclick="clearTeamSelection('spreads')">Clear</button>
+          <button type="button" onclick="toggleTeamPicker('spreads', false)">Close</button>
+        </div>
+      </div>
+
+      <div class="team-list" id="spreads-teamList"></div>
+      <div class="team-count" id="spreads-teamCount">Teams: 0 • Selected: 0</div>
+    </div>
+
+    <div class="table-container">
+      <table id="spreads-oddsTable">
+        <thead><tr id="spreads-tableHead"></tr></thead>
+        <tbody id="spreads-tableBody"></tbody>
+      </table>
+    </div>
   </div>
 
-  <div class="table-container">
-    <table id="oddsTable">
-      <thead><tr id="tableHead"></tr></thead>
-      <tbody id="tableBody"></tbody>
-    </table>
+  <!-- Totals Tab -->
+  <div class="subtab-content" id="totals-content">
+    <div class="controls">
+      <div>
+        <button type="button" id="totals-toggleTeamPickerBtn" onclick="toggleTeamPicker('totals')">
+          Select games…
+        </button>
+      </div>
+      <div class="team-summary" id="totals-teamSummary">All games</div>
+    </div>
+
+    <div class="team-picker" id="totals-teamPicker" hidden>
+      <div class="team-picker-header">
+        <input class="teamFilter" id="totals-teamFilter" type="text" placeholder="Type to find games..." oninput="onTeamFilterInput('totals')" />
+
+        <div class="team-picker-actions">
+          <button type="button" onclick="selectVisibleTeams('totals')">Select visible</button>
+          <button type="button" onclick="clearTeamSelection('totals')">Clear</button>
+          <button type="button" onclick="toggleTeamPicker('totals', false)">Close</button>
+        </div>
+      </div>
+
+      <div class="team-list" id="totals-teamList"></div>
+      <div class="team-count" id="totals-teamCount">Games: 0 • Selected: 0</div>
+    </div>
+
+    <div class="table-container">
+      <table id="totals-oddsTable">
+        <thead><tr id="totals-tableHead"></tr></thead>
+        <tbody id="totals-tableBody"></tbody>
+      </table>
+    </div>
   </div>
 
   <script>
-    const SPREADS_CSV_URL = 'https://raw.githubusercontent.com/trashduty/trash-schedule/main/CFB_Odds/Data/spreads_odds.csv';
-    const CROSSWALK_CSV_URL = 'https://raw.githubusercontent.com/trashduty/trash-schedule/main/CFB_Odds/Data/CFB%20Teams%20Full%20Crosswalk.csv';
+    const CSV_URLS = {
+      spreads: 'https://raw.githubusercontent.com/trashduty/trash-schedule/main/CFB_Odds/Data/spreads_odds.csv',
+      totals: 'https://raw.githubusercontent.com/trashduty/trash-schedule/main/CFB_Odds/Data/totals_odds.csv',
+      crosswalk: 'https://raw.githubusercontent.com/trashduty/trash-schedule/main/CFB_Odds/Data/CFB%20Teams%20Full%20Crosswalk.csv'
+    };
 
     const REFRESH_INTERVAL = 60000;
     const EXCLUDED_COLUMNS = new Set(['logo', 'last_update_api', 'game_date_est']);
     const EDGE_THRESHOLD_PERCENT = 3;
 
-    let rawData = [];
-    let allTeams = [];
-    let selectedTeams = new Set();
-    let sortConfig = { key: null, direction: 'asc' };
-    let columnMapping = [];
+    const tabState = {
+      spreads: { rawData: [], allTeams: [], selectedTeams: new Set(), sortConfig: { key: null, direction: 'asc' }, columnMapping: [] },
+      totals: { rawData: [], allGames: [], selectedGames: new Set(), sortConfig: { key: null, direction: 'asc' }, columnMapping: [] }
+    };
+
     let teamLookup = {};
 
     function parseCsvFromUrl(url) {
@@ -329,17 +407,45 @@
         mapped.splice(updatedModelPredictionIdx, 0, marketLineCol);
       }
 
-      columnMapping = mapped;
+      return mapped;
     }
 
-    function toggleTeamPicker(forceOpen) {
-      const picker = document.getElementById('teamPicker');
-      const isHidden = picker.hasAttribute('hidden');
+    function setupSubtabs() {
+      const container = document.getElementById('subtabs');
+      container.innerHTML = '';
 
+      const subtabs = [
+        { id: 'spreads', label: 'Spreads' },
+        { id: 'totals', label: 'Totals' }
+      ];
+
+      subtabs.forEach(subtab => {
+        const button = document.createElement('button');
+        button.className = 'subtab' + (subtab.id === 'spreads' ? ' active' : '');
+        button.textContent = subtab.label;
+        button.onclick = () => switchSubtab(subtab.id);
+        container.appendChild(button);
+      });
+
+      document.getElementById('spreads-content').classList.add('active');
+    }
+
+    function switchSubtab(tabId) {
+      document.querySelectorAll('.subtab-content').forEach(el => el.classList.remove('active'));
+      document.getElementById(`${tabId}-content`).classList.add('active');
+
+      document.querySelectorAll('.subtab').forEach(el => el.classList.remove('active'));
+      event.target.classList.add('active');
+    }
+
+    function toggleTeamPicker(tabId, forceOpen) {
+      const picker = document.getElementById(`${tabId}-teamPicker`);
+      if (!picker) return;
+      const isHidden = picker.hasAttribute('hidden');
       const open = (typeof forceOpen === 'boolean') ? forceOpen : isHidden;
       if (open) {
         picker.removeAttribute('hidden');
-        setTimeout(() => document.getElementById('teamFilter')?.focus(), 0);
+        setTimeout(() => document.getElementById(`${tabId}-teamFilter`)?.focus(), 0);
       } else {
         picker.setAttribute('hidden', '');
       }
@@ -374,169 +480,195 @@
       return value;
     }
 
-    function updateTableFromCSV() {
-      Promise.all([
-        parseCsvFromUrl(SPREADS_CSV_URL),
-        parseCsvFromUrl(CROSSWALK_CSV_URL)
-      ])
-        .then(([spreadsResults, crosswalkResults]) => {
-          if (spreadsResults.meta && spreadsResults.meta.fields) {
-            buildColumnMapping(spreadsResults.meta.fields);
-          }
+    function onTeamFilterInput(tabId) {
+      renderTeamPicker(tabId);
+    }
 
-          teamLookup = buildTeamLookup(crosswalkResults.data || []);
-          rawData = spreadsResults.data || [];
+    function onTeamToggle(tabId, team, isChecked) {
+      const state = tabState[tabId];
+      if (isChecked) state.selectedTeams.add(team);
+      else state.selectedTeams.delete(team);
 
-          hydrateTeams();
-          renderTeamPicker();
-          renderTable();
-          updateTeamSummary();
+      updateTeamCount(tabId);
+      updateTeamSummary(tabId);
+      renderTable(tabId);
+    }
 
-          document.getElementById('status').textContent =
-            'Last updated: ' + new Date().toLocaleTimeString();
-        })
-        .catch((err) => {
-          document.getElementById('status').textContent = 'Error loading data: ' + err.message;
+    function onGameToggle(tabId, game, isChecked) {
+      const state = tabState[tabId];
+      if (isChecked) state.selectedGames.add(game);
+      else state.selectedGames.delete(game);
+
+      updateTeamCount(tabId);
+      updateTeamSummary(tabId);
+      renderTable(tabId);
+    }
+
+    function clearTeamSelection(tabId) {
+      const state = tabState[tabId];
+      state.selectedTeams.clear();
+      state.selectedGames.clear();
+      const filterEl = document.getElementById(`${tabId}-teamFilter`);
+      if (filterEl) filterEl.value = '';
+      renderTeamPicker(tabId);
+      updateTeamSummary(tabId);
+      renderTable(tabId);
+    }
+
+    function selectVisibleTeams(tabId) {
+      const state = tabState[tabId];
+      const filterText = document.getElementById(`${tabId}-teamFilter`).value.toLowerCase().trim();
+      
+      if (tabId === 'totals') {
+        const visible = state.allGames.filter(g => g.toLowerCase().includes(filterText));
+        visible.forEach(g => state.selectedGames.add(g));
+      } else {
+        const visible = state.allTeams.filter(t => {
+          const displayName = (teamLookup[t]?.displayName || t).toLowerCase();
+          return displayName.includes(filterText) || t.toLowerCase().includes(filterText);
         });
+        visible.forEach(t => state.selectedTeams.add(t));
+      }
+      
+      renderTeamPicker(tabId);
+      updateTeamSummary(tabId);
+      renderTable(tabId);
     }
 
-    function hydrateTeams() {
-      const set = new Set();
-      rawData.forEach(row => {
-        const t = (row['team'] || '').toString().trim();
-        if (t) set.add(t);
-      });
-
-      allTeams = Array.from(set).sort((a, b) => {
-        const nameA = (teamLookup[a]?.displayName || a).toLowerCase();
-        const nameB = (teamLookup[b]?.displayName || b).toLowerCase();
-        return nameA.localeCompare(nameB);
-      });
-
-      const existing = new Set(allTeams);
-      selectedTeams.forEach(t => { if (!existing.has(t)) selectedTeams.delete(t); });
+    function updateTeamCount(tabId) {
+      const state = tabState[tabId];
+      const countEl = document.getElementById(`${tabId}-teamCount`);
+      if (!countEl) return;
+      if (tabId === 'totals') {
+        countEl.textContent = `Games: ${state.allGames.length} • Selected: ${state.selectedGames.size}`;
+      } else {
+        countEl.textContent = `Teams: ${state.allTeams.length} • Selected: ${state.selectedTeams.size}`;
+      }
     }
 
-    function onTeamFilterInput() {
-      renderTeamPicker();
-    }
-
-    function onTeamToggle(team, isChecked) {
-      if (isChecked) selectedTeams.add(team);
-      else selectedTeams.delete(team);
-
-      updateTeamCount();
-      updateTeamSummary();
-      renderTable();
-    }
-
-    function clearTeamSelection() {
-      selectedTeams.clear();
-      document.getElementById('teamFilter').value = '';
-      renderTeamPicker();
-      updateTeamSummary();
-      renderTable();
-    }
-
-    function selectVisibleTeams() {
-      const filterText = document.getElementById('teamFilter').value.toLowerCase().trim();
-      const visible = allTeams.filter(t => {
-        const displayName = (teamLookup[t]?.displayName || t).toLowerCase();
-        return displayName.includes(filterText) || t.toLowerCase().includes(filterText);
-      });
-      visible.forEach(t => selectedTeams.add(t));
-      renderTeamPicker();
-      updateTeamSummary();
-      renderTable();
-    }
-
-    function updateTeamCount() {
-      document.getElementById('teamCount').textContent =
-        `Teams: ${allTeams.length} • Selected: ${selectedTeams.size}`;
-    }
-
-    function updateTeamSummary() {
-      const el = document.getElementById('teamSummary');
-      if (selectedTeams.size === 0) {
-        el.textContent = 'All teams';
+    function updateTeamSummary(tabId) {
+      const state = tabState[tabId];
+      const el = document.getElementById(`${tabId}-teamSummary`);
+      if (!el) return;
+      const isSelected = tabId === 'totals' ? state.selectedGames.size : state.selectedTeams.size;
+      if (isSelected === 0) {
+        el.textContent = tabId === 'totals' ? 'All games' : 'All teams';
         return;
       }
-      el.textContent = `${selectedTeams.size} team${selectedTeams.size === 1 ? '' : 's'} selected`;
+      el.textContent = `${isSelected} ${tabId === 'totals' ? 'game' : 'team'}${isSelected === 1 ? '' : 's'} selected`;
     }
 
-    function renderTeamPicker() {
-      const container = document.getElementById('teamList');
-      const filterText = document.getElementById('teamFilter').value.toLowerCase().trim();
+    function renderTeamPicker(tabId) {
+      const state = tabState[tabId];
+      const container = document.getElementById(`${tabId}-teamList`);
+      if (!container) return;
+      const filterText = document.getElementById(`${tabId}-teamFilter`).value.toLowerCase().trim();
 
       container.innerHTML = '';
-      const filteredTeams = allTeams.filter(t => {
-        const displayName = (teamLookup[t]?.displayName || t).toLowerCase();
-        return displayName.includes(filterText) || t.toLowerCase().includes(filterText);
-      });
+      
+      if (tabId === 'totals') {
+        const filtered = state.allGames.filter(g => g.toLowerCase().includes(filterText));
+        filtered.forEach(game => {
+          const id = `${tabId}_game_${game.replace(/[^a-z0-9]/gi, '_')}`;
 
-      filteredTeams.forEach(team => {
-        const displayName = teamLookup[team]?.displayName || team;
-        const id = 'team_' + team.replace(/[^a-z0-9]/gi, '_');
+          const row = document.createElement('div');
+          row.className = 'team-item';
 
-        const row = document.createElement('div');
-        row.className = 'team-item';
+          const cb = document.createElement('input');
+          cb.type = 'checkbox';
+          cb.id = id;
+          cb.checked = state.selectedGames.has(game);
+          cb.onchange = () => onGameToggle(tabId, game, cb.checked);
 
-        const cb = document.createElement('input');
-        cb.type = 'checkbox';
-        cb.id = id;
-        cb.checked = selectedTeams.has(team);
-        cb.onchange = () => onTeamToggle(team, cb.checked);
+          const label = document.createElement('label');
+          label.htmlFor = id;
+          label.textContent = game;
 
-        const label = document.createElement('label');
-        label.htmlFor = id;
-        label.textContent = displayName;
-
-        row.appendChild(cb);
-        row.appendChild(label);
-        container.appendChild(row);
-      });
-
-      updateTeamCount();
-    }
-
-    function onSort(key) {
-      if (sortConfig.key === key) {
-        sortConfig.direction = sortConfig.direction === 'asc' ? 'desc' : 'asc';
+          row.appendChild(cb);
+          row.appendChild(label);
+          container.appendChild(row);
+        });
       } else {
-        sortConfig.key = key;
-        sortConfig.direction = 'asc';
+        const filtered = state.allTeams.filter(t => {
+          const displayName = (teamLookup[t]?.displayName || t).toLowerCase();
+          return displayName.includes(filterText) || t.toLowerCase().includes(filterText);
+        });
+
+        filtered.forEach(team => {
+          const displayName = teamLookup[team]?.displayName || team;
+          const id = `${tabId}_team_${team.replace(/[^a-z0-9]/gi, '_')}`;
+
+          const row = document.createElement('div');
+          row.className = 'team-item';
+
+          const cb = document.createElement('input');
+          cb.type = 'checkbox';
+          cb.id = id;
+          cb.checked = state.selectedTeams.has(team);
+          cb.onchange = () => onTeamToggle(tabId, team, cb.checked);
+
+          const label = document.createElement('label');
+          label.htmlFor = id;
+          label.textContent = displayName;
+
+          row.appendChild(cb);
+          row.appendChild(label);
+          container.appendChild(row);
+        });
       }
-      renderTable();
+
+      updateTeamCount(tabId);
     }
 
-    function renderTable() {
-      const head = document.getElementById('tableHead');
-      const body = document.getElementById('tableBody');
+    function onSort(tabId, key) {
+      const state = tabState[tabId];
+      if (state.sortConfig.key === key) {
+        state.sortConfig.direction = state.sortConfig.direction === 'asc' ? 'desc' : 'asc';
+      } else {
+        state.sortConfig.key = key;
+        state.sortConfig.direction = 'asc';
+      }
+      renderTable(tabId);
+    }
+
+    function renderTable(tabId) {
+      const state = tabState[tabId];
+      const head = document.getElementById(`${tabId}-tableHead`);
+      const body = document.getElementById(`${tabId}-tableBody`);
+
+      if (!head || !body) return;
 
       head.innerHTML = '';
       body.innerHTML = '';
 
-      if (!rawData || rawData.length === 0) return;
+      if (!state.rawData || state.rawData.length === 0) return;
 
-      const activeCols = columnMapping.filter(col =>
-        Object.prototype.hasOwnProperty.call(rawData[0], col.csv)
+      const activeCols = state.columnMapping.filter(col =>
+        Object.prototype.hasOwnProperty.call(state.rawData[0], col.csv)
       );
 
       activeCols.forEach(col => {
         const th = document.createElement('th');
         th.textContent = col.display;
-        th.onclick = () => onSort(col.csv);
+        th.onclick = () => onSort(tabId, col.csv);
         head.appendChild(th);
       });
 
-      let processedData = rawData;
-      if (selectedTeams.size > 0) {
-        processedData = rawData.filter(row => selectedTeams.has((row['team'] || '').toString().trim()));
+      let processedData = state.rawData;
+      
+      if (tabId === 'totals') {
+        if (state.selectedGames.size > 0) {
+          processedData = state.rawData.filter(row => state.selectedGames.has((row['game'] || '').toString().trim()));
+        }
+      } else {
+        if (state.selectedTeams.size > 0) {
+          processedData = state.rawData.filter(row => state.selectedTeams.has((row['team'] || '').toString().trim()));
+        }
       }
 
-      if (sortConfig.key) {
+      if (state.sortConfig.key) {
         processedData = processedData.slice().sort((a, b) => {
-          const key = sortConfig.key;
+          const key = state.sortConfig.key;
           const valA = a[key];
           const valB = b[key];
 
@@ -551,7 +683,7 @@
             comparison = valA.toString().localeCompare(valB.toString());
           }
 
-          return sortConfig.direction === 'asc' ? comparison : -comparison;
+          return state.sortConfig.direction === 'asc' ? comparison : -comparison;
         });
       }
 
@@ -563,7 +695,7 @@
           const val = row[col.csv];
           const formatted = formatValue(val, col.type, col.csv);
 
-          if (col.csv === 'team') {
+          if (col.csv === 'team' && tabId === 'spreads') {
             const teamKey = (val || '').toString().trim();
             const info = teamLookup[teamKey] || {};
             const displayName = info.displayName || teamKey;
@@ -627,6 +759,70 @@
       });
     }
 
+    function hydrateTeams() {
+      const state = tabState.spreads;
+      const set = new Set();
+      state.rawData.forEach(row => {
+        const t = (row['team'] || '').toString().trim();
+        if (t) set.add(t);
+      });
+
+      state.allTeams = Array.from(set).sort((a, b) => {
+        const nameA = (teamLookup[a]?.displayName || a).toLowerCase();
+        const nameB = (teamLookup[b]?.displayName || b).toLowerCase();
+        return nameA.localeCompare(nameB);
+      });
+
+      const existing = new Set(state.allTeams);
+      state.selectedTeams.forEach(t => { if (!existing.has(t)) state.selectedTeams.delete(t); });
+    }
+
+    function hydrateGames() {
+      const state = tabState.totals;
+      const set = new Set();
+      state.rawData.forEach(row => {
+        const g = (row['game'] || '').toString().trim();
+        if (g) set.add(g);
+      });
+
+      state.allGames = Array.from(set).sort((a, b) => a.localeCompare(b));
+
+      const existing = new Set(state.allGames);
+      state.selectedGames.forEach(g => { if (!existing.has(g)) state.selectedGames.delete(g); });
+    }
+
+    function updateTableFromCSV() {
+      Promise.all([
+        parseCsvFromUrl(CSV_URLS.spreads),
+        parseCsvFromUrl(CSV_URLS.totals),
+        parseCsvFromUrl(CSV_URLS.crosswalk)
+      ])
+        .then(([spreadsResults, totalsResults, crosswalkResults]) => {
+          teamLookup = buildTeamLookup(crosswalkResults.data || []);
+
+          // Spreads
+          tabState.spreads.rawData = spreadsResults.data || [];
+          tabState.spreads.columnMapping = buildColumnMapping(spreadsResults.meta?.fields || []);
+          hydrateTeams();
+          renderTeamPicker('spreads');
+          renderTable('spreads');
+
+          // Totals
+          tabState.totals.rawData = totalsResults.data || [];
+          tabState.totals.columnMapping = buildColumnMapping(totalsResults.meta?.fields || []);
+          hydrateGames();
+          renderTeamPicker('totals');
+          renderTable('totals');
+
+          document.getElementById('status').textContent =
+            'Last updated: ' + new Date().toLocaleTimeString();
+        })
+        .catch((err) => {
+          document.getElementById('status').textContent = 'Error loading data: ' + err.message;
+        });
+    }
+
+    setupSubtabs();
     updateTableFromCSV();
     setInterval(updateTableFromCSV, REFRESH_INTERVAL);
   </script>
