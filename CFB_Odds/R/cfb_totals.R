@@ -45,6 +45,10 @@ week_one_start  <- as.Date("2026-09-01")
 max_preview_games <- 10
 blended_model_weight <- 0.35
 blended_market_weight <- 0.65
+# Deterministic sportsbook order used to break ties when multiple totals rows
+# are otherwise equally good candidates for the representative or best line.
+bookmaker_priority <- c("BetMGM", "BetRivers", "DraftKings", "FanDuel",
+                        "ESPN BET", "Fanatics", "Caesars")
 
 calculate_cfb_week <- function(game_date) {
   case_when(
@@ -59,7 +63,7 @@ team_id_lookup <- cfb_crosswalk |>
 home_logo_lookup <- cfb_crosswalk |>
   select(btb_team, logo)
 
-required_model_columns <- c("model_prediction", "home_team_id", "away_team_id", "team", "opponent", "week", "over_under")
+required_model_columns <- c("model_prediction", "home_team_id", "away_team_id", "team", "opponent", "week")
 missing_model_columns <- setdiff(required_model_columns, names(model_raw))
 
 if (length(missing_model_columns) > 0) {
@@ -80,7 +84,6 @@ model_joined <- model_raw |>
   mutate(
     week = as.numeric(week),
     model_prediction = as.numeric(model_prediction),
-    over_under = as.numeric(over_under),
     matchup_key = paste(pmin(model_team, model_opponent), pmax(model_team, model_opponent), sep = "|")
   )
 
@@ -230,6 +233,30 @@ safe_max_datetime <- function(x) {
   if (all(is.na(x))) as.POSIXct(NA, tz = "America/New_York") else max(x, na.rm = TRUE)
 }
 
+# Select one totals row per game.
+# `data` must include `week` and `game` columns, which define each grouped
+# matchup, plus a `bookmaker` column. The `...` argument accepts the primary
+# arrange expressions for choosing the row within each week/game group.
+# The `...` argument accepts the primary arrange expressions for that
+# selection, after which bookmaker rank and bookmaker name are used as
+# deterministic tiebreakers. Returns one row per week/game.
+select_totals_row <- function(data, ...) {
+  ranked_data <- data
+
+  if (!"bookmaker_rank" %in% names(ranked_data)) {
+    bookmaker_rank_raw <- match(ranked_data$bookmaker, bookmaker_priority)
+    ranked_data$bookmaker_rank <- ifelse(
+      is.na(bookmaker_rank_raw),
+      length(bookmaker_priority) + 1L,
+      bookmaker_rank_raw
+    )
+  }
+
+  ranked_data |>
+    arrange(week, game, ..., bookmaker_rank, bookmaker) |>
+    slice_head(n = 1, by = c(week, game))
+}
+
 calculate_drive_bin <- function(total_value) {
   case_when(
     !is.na(total_value) & total_value >= 0 & total_value <= 7 ~ 1,
@@ -240,7 +267,7 @@ calculate_drive_bin <- function(total_value) {
   )
 }
 
-api_totals <- api_data |>
+api_totals_bookmaker <- api_data |>
   filter(market == "totals", name == "Over") |>
   filter(!is.na(home_team), !is.na(away_team)) |>
   mutate(game = paste0(away_team, "@", home_team)) |>
@@ -249,15 +276,15 @@ api_totals <- api_data |>
     game,
     last_update_api,
     bookmaker,
-    over_under = point,
-    market_price = price
+    total = point,
+    total_price = price
   )
 
 missing_total_keys <- model_with_game |>
   filter(!is.na(model_prediction)) |>
   distinct(game) |>
   anti_join(
-    api_totals |> distinct(game),
+    api_totals_bookmaker |> distinct(game),
     by = "game"
   )
 
@@ -280,44 +307,44 @@ totals_lookup_joined <- model_with_game |>
   filter(!is.na(model_prediction), !is.na(game)) |>
   left_join(
     select(
-      api_totals,
+      api_totals_bookmaker,
       game,
       api_week = week,
-      over_under,
-      market_price,
+      total,
+      total_price,
       last_update_api,
       bookmaker
     ),
     by = "game",
     relationship = "many-to-many"
   ) |>
-  filter(!is.na(over_under), !is.na(market_price), !is.na(last_update_api)) |>
+  filter(!is.na(total), !is.na(total_price), !is.na(last_update_api)) |>
   mutate(week = api_week) |>
   mutate(
-    median_total_raw = safe_median(over_under),
+    median_total_raw = safe_median(total),
     .by = game,
-    .after = over_under
+    .after = total
   ) |>
   mutate(median_total = round(median_total_raw * 2) / 2) |>
   mutate(
     true_total = ((model_prediction * blended_model_weight) + (median_total * blended_market_weight)),
-    .after = over_under
+    .after = total
   ) |>
   mutate(
     true_total = round(true_total * 2) / 2,
-    over_under = round(over_under * 2) / 2,
+    total = round(total * 2) / 2,
     drive_bin = calculate_drive_bin(true_total),
-    implied_odds_total = calc_implied_odds(market_price)
+    implied_odds_total = calc_implied_odds(total_price)
   ) |>
   left_join(
     lookup,
-    by = c("drive_bin", "over_under" = "market_total", "true_total"),
+    by = c("drive_bin", "total" = "market_total", "true_total"),
     relationship = "many-to-one"
   )
 
 missing_lookup_rows <- totals_lookup_joined |>
   filter(is.na(over_probability) | is.na(push_probability)) |>
-  distinct(week, game, drive_bin, over_under, true_total)
+  distinct(week, game, drive_bin, total, true_total)
 
 if (nrow(missing_lookup_rows) > 0) {
   overflow_note <- if_else(
@@ -328,7 +355,7 @@ if (nrow(missing_lookup_rows) > 0) {
   preview_rows <- missing_lookup_rows |>
     mutate(
       lookup_key = glue::glue(
-        "{game} drive_bin={drive_bin}, market_total={over_under}, true_total={true_total}"
+        "{game} drive_bin={drive_bin}, market_total={total}, true_total={true_total}"
       )
     ) |>
     pull(lookup_key)
@@ -340,29 +367,43 @@ if (nrow(missing_lookup_rows) > 0) {
 
 totals_calculated <- totals_lookup_joined |>
   mutate(edge = over_probability - implied_odds_total) |>
-  group_by(week, game) |>
   mutate(
-    median_edge_row = row_number(-edge) == ceiling(n() / 2),
-    highest_edge_row = row_number(-edge) == 1
-  ) |>
-  ungroup()
+    median_distance = abs(total - median_total)
+  )
 
-totals_summary <- totals_calculated |>
+totals_last_update <- totals_calculated |>
   summarise(
-    logo = logo[median_edge_row],
     last_update_api = safe_max_datetime(last_update_api),
-    model_prediction = true_total[median_edge_row],
-    market_line = over_under[median_edge_row],
-    market_price = market_price[median_edge_row],
-    median_over_probability = over_probability[median_edge_row],
-    edge = edge[median_edge_row],
-    best_book = bookmaker[highest_edge_row],
-    best_line = over_under[highest_edge_row],
-    best_price = market_price[highest_edge_row],
-    best_over_probability = over_probability[highest_edge_row],
-    best_edge = edge[highest_edge_row],
     .by = c(week, game)
-  ) |>
-  rename(over_probability = median_over_probability)
+  )
+
+totals_median_summary <- totals_calculated |>
+  select_totals_row(median_distance, desc(edge)) |>
+  transmute(
+    week,
+    game,
+    logo,
+    model_prediction = true_total,
+    market_line = total,
+    market_price = total_price,
+    over_probability,
+    edge
+  )
+
+totals_best_summary <- totals_calculated |>
+  select_totals_row(desc(edge)) |>
+  transmute(
+    week,
+    game,
+    best_book = bookmaker,
+    best_line = total,
+    best_price = total_price,
+    best_over_probability = over_probability,
+    best_edge = edge
+  )
+
+totals_summary <- totals_last_update |>
+  left_join(totals_median_summary, by = c("week", "game")) |>
+  left_join(totals_best_summary, by = c("week", "game"))
 
 write_csv(totals_summary, "CFB_Odds/Data/totals_odds.csv")
