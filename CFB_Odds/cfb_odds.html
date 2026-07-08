@@ -892,7 +892,7 @@
             const val = row[col.csv];
 
             const hideGame = (col.csv === 'game');
-            const hideGameTime = (col.csv === 'game_time_est');
+            const hideGameTime = (col.csv === 'game_time_est' || col.csv === 'commence_time'); // add commence_time
             const hideWeekOnSecondRow = (col.csv === 'week' && rowIdx > 0);
 
             if (col.csv === 'team') {
