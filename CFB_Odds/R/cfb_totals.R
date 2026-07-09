@@ -178,7 +178,7 @@ api_totals_bookmaker <- api_data |>
 
 spreads_predictions <- read_csv(spreads_output_path, show_col_types = FALSE) |>
   janitor::clean_names() |>
-  select(game, model_prediction) |>
+  select(game, model_prediction, market_line) |>
   distinct()
 
 totals_lookup_joined <- model_with_game |>
@@ -218,7 +218,7 @@ totals_lookup_joined <- model_with_game |>
   mutate(
     true_total = round(true_total * 2) / 2,
     total = round(total * 2) / 2,
-    drive_bin = calculate_drive_bin(model_prediction),
+    drive_bin = calculate_drive_bin(market_line),
     implied_odds_total = calc_implied_odds(total_price)
   ) |>
   left_join(
