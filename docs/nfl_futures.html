@@ -611,13 +611,15 @@
             });
         });
 
-        function convertToAmericanOdds(percentage) {
-            const prob = percentage;
-            if (prob >= 0.5) {
-                const odds = Math.round(100 / prob - 100);
+        function convertToAmericanOdds(probability) {
+            // Probability is a decimal (0.07 for 7%, 0.60 for 60%, etc.)
+            if (probability <= 0.5) {
+                // Positive odds for 50% or lower
+                const odds = Math.round(100 / probability - 100);
                 return '+' + odds;
             } else {
-                const odds = Math.round(prob / (1 - prob) * -100);
+                // Negative odds for above 50%
+                const odds = Math.round(probability / (1 - probability) * -100);
                 return odds.toString();
             }
         }
