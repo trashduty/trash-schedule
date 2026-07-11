@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NFL 2026 Season Win Totals</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #071016;
+            --panel: #0d1a22;
+            --panel-2: #101f29;
+            --line: #233641;
+            --text: #f3f7f8;
+            --muted: #9eb0ba;
+            --green: #5ce1a7;
+            --green-dark: #1aa16f;
+            --red: #ff7474;
+            --gold: #f5c66a;
+            --blue: #71b7ff;
+            --shadow: 0 18px 55px rgba(0,0,0,.28);
+        }
+
+        html, body {
+            height: 100%;
+        }
+
+        body {
+            background:
+                radial-gradient(circle at 12% -10%, rgba(92,225,167,.11), transparent 30%),
+                radial-gradient(circle at 95% 5%, rgba(113,183,255,.08), transparent 26%),
+                var(--bg);
+            color: var(--text);
+            font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            font-size: 16px;
+            line-height: 1.5;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        header {
+            margin-bottom: 32px;
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            color: var(--green);
+            font-size: 0.78rem;
+            font-weight: 800;
+            letter-spacing: 0.13em;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+        }
+
+        .eyebrow:before {
+            content: "";
+            width: 30px;
+            height: 2px;
+            background: var(--green);
+        }
+
+        h1 {
+            font-size: clamp(2.2rem, 5vw, 3rem);
+            font-weight: 800;
+            line-height: 1.02;
+            margin-bottom: 8px;
+            letter-spacing: -0.055em;
+            color: var(--text);
+        }
+
+        .subtitle {
+            color: var(--muted);
+            font-size: clamp(1rem, 1.8vw, 1.1rem);
+            max-width: 700px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .search-box,
+        .filter-select {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            color: var(--text);
+            border-radius: 9px;
+            padding: 12px 16px;
+            font-family: inherit;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .search-box::placeholder,
+        .filter-select {
+            color: var(--muted);
+        }
+
+        .search-box:focus,
+        .filter-select:focus {
+            border-color: var(--green);
+        }
+
+        .search-box {
+            min-width: 280px;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .filter-select {
+            min-width: 180px;
+        }
+
+        .info-section {
+            margin-bottom: 24px;
+            padding: 16px;
+            background: rgba(16,31,41,0.6);
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
+        .table-wrapper {
+            background: linear-gradient(180deg, rgba(16,31,41,.96), rgba(11,24,32,.96));
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1200px;
+        }
+
+        thead {
+            background: rgba(0,0,0,0.3);
+        }
+
+        th {
+            padding: 16px 12px;
+            text-align: left;
+            font-size: 0.73rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.075em;
+            color: #91a5af;
+            border-bottom: 1px solid var(--line);
+            cursor: pointer;
+            user-select: none;
+            white-space: nowrap;
+            background: rgba(0,0,0,0.2);
+            transition: background 0.2s;
+            position: relative;
+        }
+
+        th:hover {
+            background: rgba(92,225,167,0.1);
+        }
+
+        th.sortable:after {
+            content: " ⇅";
+            opacity: 0.5;
+            font-size: 0.9em;
+            margin-left: 4px;
+        }
+
+        th.sort-asc:after {
+            content: " ↑";
+            opacity: 1;
+            color: var(--green);
+        }
+
+        th.sort-desc:after {
+            content: " ↓";
+            opacity: 1;
+            color: var(--green);
+        }
+
+        td {
+            padding: 14px 12px;
+            border-bottom: 1px solid var(--line);
+            font-size: 0.9rem;
+            color: var(--text);
+        }
+
+        tbody tr {
+            transition: background-color 0.2s;
+        }
+
+        tbody tr:hover {
+            background-color: rgba(92,225,167,0.05);
+        }
+
+        .team-cell {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 600;
+            min-width: 220px;
+        }
+
+        .team-logo {
+            width: 32px;
+            height: 32px;
+            border-radius: 4px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            flex-shrink: 0;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .team-name {
+            flex: 1;
+        }
+
+        .division-badge {
+            display: inline-block;
+            background: rgba(113,183,255,0.15);
+            color: var(--blue);
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            border: 1px solid rgba(113,183,255,0.3);
+            white-space: nowrap;
+        }
+
+        .percentage {
+            font-variant-numeric: tabular-nums;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .price {
+            font-variant-numeric: tabular-nums;
+            font-weight: 600;
+            color: var(--blue);
+            text-align: center;
+        }
+
+        .positive {
+            color: var(--green);
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .negative {
+            color: var(--red);
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .edge-value {
+            font-variant-numeric: tabular-nums;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .win-total {
+            font-variant-numeric: tabular-nums;
+            font-weight: 600;
+            color: var(--gold);
+            text-align: center;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 48px 24px;
+            color: var(--muted);
+            font-size: 1rem;
+        }
+
+        .result-count {
+            padding: 12px 24px;
+            color: var(--muted);
+            font-size: 0.85rem;
+            border-top: 1px solid var(--line);
+            text-align: right;
+        }
+
+        @media (max-width: 768px) {
+            .controls {
+                flex-direction: column;
+            }
+
+            .search-box,
+            .filter-select {
+                width: 100%;
+            }
+
+            th, td {
+                padding: 10px 8px;
+                font-size: 0.8rem;
+            }
+
+            .team-cell {
+                gap: 8px;
+                min-width: 150px;
+            }
+
+            .team-logo {
+                width: 28px;
+                height: 28px;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .percentage,
+            .price,
+            .positive,
+            .negative,
+            .edge-value,
+            .win-total {
+                font-size: 0.85rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="eyebrow">NFL Futures Analysis</div>
+            <h1>2026 Season Win Total Odds</h1>
+            <p class="subtitle">Interactive table with sortable columns, team search, and division filters. All probabilities and true odds calculated from market prices.</p>
+        </header>
+
+        <div class="controls">
+            <input type="text" class="search-box" id="searchInput" placeholder="Search team name...">
+            <select class="filter-select" id="divisionFilter">
+                <option value="">All Divisions</option>
+                <option value="AFC East">AFC East</option>
+                <option value="AFC West">AFC West</option>
+                <option value="AFC North">AFC North</option>
+                <option value="AFC South">AFC South</option>
+                <option value="NFC East">NFC East</option>
+                <option value="NFC West">NFC West</option>
+                <option value="NFC North">NFC North</option>
+                <option value="NFC South">NFC South</option>
+            </select>
+        </div>
+
+        <div class="info-section">
+            ℹ️ Click column headers to sort (ascending/descending). Use search to find teams by name. Percentages are derived from implied odds. All data from top market prices as of last update.
+        </div>
+
+        <div class="table-wrapper">
+            <table id="dataTable">
+                <thead>
+                    <tr>
+                        <th class="sortable">Team</th>
+                        <th class="sortable">Division</th>
+                        <th class="sortable">Win Total</th>
+                        <th class="sortable">Make Playoffs</th>
+                        <th class="sortable">Win Division</th>
+                        <th class="sortable">Win Conference</th>
+                        <th class="sortable">Super Bowl</th>
+                        <th class="sortable">OVER Win Total (Best Price)</th>
+                        <th class="sortable">UNDER Win Total (Best Price)</th>
+                        <th class="sortable">BTB OVER True Odds</th>
+                        <th class="sortable">BTB UNDER True Odds</th>
+                        <th class="sortable">Edge OVER</th>
+                        <th class="sortable">Edge UNDER</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                </tbody>
+            </table>
+            <div id="noResults" class="no-results" style="display: none;">
+                No teams found matching your filters.
+            </div>
+            <div id="resultCount" class="result-count"></div>
+        </div>
+    </div>
+
+    <script>
+        // NFL team logos and data
+        const teamLogos = {
+            "Arizona Cardinals": "🔴",
+            "Atlanta Falcons": "⚫",
+            "Baltimore Ravens": "🟣",
+            "Buffalo Bills": "🔵",
+            "Carolina Panthers": "⚫",
+            "Chicago Bears": "🟠",
+            "Cincinnati Bengals": "🟠",
+            "Cleveland Browns": "🟤",
+            "Dallas Cowboys": "🩵",
+            "Denver Broncos": "🟠",
+            "Detroit Lions": "🔵",
+            "Green Bay Packers": "💛",
+            "Houston Texans": "🔴",
+            "Indianapolis Colts": "🔵",
+            "Jacksonville Jaguars": "🖤",
+            "Kansas City Chiefs": "🔴",
+            "Las Vegas Raiders": "🖤",
+            "Los Angeles Chargers": "⚡",
+            "Los Angeles Rams": "🔵",
+            "Miami Dolphins": "🐬",
+            "Minnesota Vikings": "🟣",
+            "New England Patriots": "🔵",
+            "New Orleans Saints": "🖤",
+            "New York Giants": "🔵",
+            "New York Jets": "🟢",
+            "Philadelphia Eagles": "🦅",
+            "Pittsburgh Steelers": "🖤",
+            "San Francisco 49ers": "🔴",
+            "Seattle Seahawks": "🔵",
+            "Tampa Bay Buccaneers": "🔴",
+            "Tennessee Titans": "🔵",
+            "Washington Commanders": "🔴"
+        };
+
+        const teamsData = [
+            { team: "Arizona Cardinals", division: "NFC West", winTotal: 4.5, makePlayoffs: 7, winDivision: 1, winConference: 0, superBowl: 0, overPrice: "150", underPrice: "-140", overTrueOdds: "-198", underTrueOdds: "198", edgeOver: "26.44%", edgeUnder: "-24.78%" },
+            { team: "Atlanta Falcons", division: "NFC South", winTotal: 7.5, makePlayoffs: 26, winDivision: 20, winConference: 1, superBowl: 0, overPrice: "105", underPrice: "-120", overTrueOdds: "132", underTrueOdds: "-132", edgeOver: "-5.68%", edgeUnder: "2.35%" },
+            { team: "Baltimore Ravens", division: "AFC North", winTotal: 11.5, makePlayoffs: 66, winDivision: 46, winConference: 10, superBowl: 5, overPrice: "126", underPrice: "-140", overTrueOdds: "258", underTrueOdds: "-258", edgeOver: "-16.31%", edgeUnder: "13.73%" },
+            { team: "Buffalo Bills", division: "AFC East", winTotal: 10.5, makePlayoffs: 92, winDivision: 74, winConference: 25, superBowl: 13, overPrice: "-125", underPrice: "118", overTrueOdds: "-449", underTrueOdds: "449", edgeOver: "26.23%", edgeUnder: "-27.66%" },
+            { team: "Carolina Panthers", division: "NFC South", winTotal: 7.5, makePlayoffs: 17, winDivision: 14, winConference: 1, superBowl: 0, overPrice: "115", underPrice: "-130", overTrueOdds: "269", underTrueOdds: "-269", edgeOver: "-19.41%", edgeUnder: "16.38%" },
+            { team: "Chicago Bears", division: "NFC North", winTotal: 9.5, makePlayoffs: 35, winDivision: 15, winConference: 3, superBowl: 2, overPrice: "110", underPrice: "-120", overTrueOdds: "208", underTrueOdds: "-208", edgeOver: "-15.15%", edgeUnder: "11.01%" },
+            { team: "Cincinnati Bengals", division: "AFC North", winTotal: 10.5, makePlayoffs: 57, winDivision: 35, winConference: 5, superBowl: 2, overPrice: "115", underPrice: "-125", overTrueOdds: "182", underTrueOdds: "-182", edgeOver: "-11.05%", edgeUnder: "8.98%" },
+            { team: "Cleveland Browns", division: "AFC North", winTotal: 5.5, makePlayoffs: 7, winDivision: 3, winConference: 0, superBowl: 0, overPrice: "-110", underPrice: "115", overTrueOdds: "111", underTrueOdds: "-111", edgeOver: "-4.99%", edgeUnder: "6.10%" },
+            { team: "Dallas Cowboys", division: "NFC East", winTotal: 9.5, makePlayoffs: 51, winDivision: 30, winConference: 6, superBowl: 3, overPrice: "110", underPrice: "-130", overTrueOdds: "113", underTrueOdds: "-113", edgeOver: "-0.67%", edgeUnder: "-3.47%" },
+            { team: "Denver Broncos", division: "AFC West", winTotal: 9.5, makePlayoffs: 64, winDivision: 34, winConference: 9, superBowl: 5, overPrice: "-125", underPrice: "105", overTrueOdds: "-149", underTrueOdds: "149", edgeOver: "4.28%", edgeUnder: "-8.62%" },
+            { team: "Detroit Lions", division: "NFC North", winTotal: 10.5, makePlayoffs: 44, winDivision: 20, winConference: 6, superBowl: 3, overPrice: "-110", underPrice: "120", overTrueOdds: "278", underTrueOdds: "-278", edgeOver: "-25.93%", edgeUnder: "28.09%" },
+            { team: "Green Bay Packers", division: "NFC North", winTotal: 9.5, makePlayoffs: 70, winDivision: 49, winConference: 12, superBowl: 6, overPrice: "-140", underPrice: "115", overTrueOdds: "-208", underTrueOdds: "208", edgeOver: "9.20%", edgeUnder: "-14.04%" },
+            { team: "Houston Texans", division: "AFC South", winTotal: 9.5, makePlayoffs: 60, winDivision: 37, winConference: 11, superBowl: 6, overPrice: "-125", underPrice: "110", overTrueOdds: "-117", underTrueOdds: "117", edgeOver: "-1.64%", edgeUnder: "-1.54%" },
+            { team: "Indianapolis Colts", division: "AFC South", winTotal: 7.5, makePlayoffs: 47, winDivision: 22, winConference: 5, superBowl: 2, overPrice: "-125", underPrice: "115", overTrueOdds: "-235", underTrueOdds: "235", edgeOver: "14.59%", edgeUnder: "-16.66%" },
+            { team: "Jacksonville Jaguars", division: "AFC South", winTotal: 9.5, makePlayoffs: 64, winDivision: 39, winConference: 9, superBowl: 4, overPrice: "110", underPrice: "-130", overTrueOdds: "-141", underTrueOdds: "141", edgeOver: "10.89%", edgeUnder: "-15.03%" },
+            { team: "Kansas City Chiefs", division: "AFC West", winTotal: 10.5, makePlayoffs: 48, winDivision: 20, winConference: 6, superBowl: 3, overPrice: "120", underPrice: "-140", overTrueOdds: "238", underTrueOdds: "-238", edgeOver: "-15.87%", edgeUnder: "12.08%" },
+            { team: "Las Vegas Raiders", division: "AFC West", winTotal: 5.5, makePlayoffs: 15, winDivision: 4, winConference: 0, superBowl: 0, overPrice: "-135", underPrice: "135", overTrueOdds: "-221", underTrueOdds: "221", edgeOver: "11.40%", edgeUnder: "-11.40%" },
+            { team: "Los Angeles Chargers", division: "AFC West", winTotal: 9.5, makePlayoffs: 70, winDivision: 42, winConference: 9, superBowl: 4, overPrice: "-135", underPrice: "115", overTrueOdds: "-192", underTrueOdds: "192", edgeOver: "8.31%", edgeUnder: "-12.27%" },
+            { team: "Los Angeles Rams", division: "NFC West", winTotal: 11.5, makePlayoffs: 88, winDivision: 52, winConference: 27, superBowl: 16, overPrice: "-120", underPrice: "105", overTrueOdds: "-155", underTrueOdds: "155", edgeOver: "6.24%", edgeUnder: "-9.56%" },
+            { team: "Miami Dolphins", division: "AFC East", winTotal: 4.5, makePlayoffs: 4, winDivision: 1, winConference: 0, superBowl: 0, overPrice: "110", underPrice: "-130", overTrueOdds: "-107", underTrueOdds: "107", edgeOver: "4.07%", edgeUnder: "-8.21%" },
+            { team: "Minnesota Vikings", division: "NFC North", winTotal: 8.5, makePlayoffs: 35, winDivision: 17, winConference: 3, superBowl: 1, overPrice: "100", underPrice: "110", overTrueOdds: "117", underTrueOdds: "-117", edgeOver: "-3.92%", edgeUnder: "6.30%" },
+            { team: "New England Patriots", division: "AFC East", winTotal: 10.5, makePlayoffs: 64, winDivision: 25, winConference: 7, superBowl: 3, overPrice: "115", underPrice: "-140", overTrueOdds: "119", underTrueOdds: "-119", edgeOver: "-0.85%", edgeUnder: "-4.00%" },
+            { team: "New Orleans Saints", division: "NFC South", winTotal: 7.5, makePlayoffs: 14, winDivision: 12, winConference: 1, superBowl: 0, overPrice: "-120", underPrice: "105", overTrueOdds: "282", underTrueOdds: "-282", edgeOver: "-28.37%", edgeUnder: "25.04%" },
+            { team: "New York Giants", division: "NFC East", winTotal: 7.5, makePlayoffs: 8, winDivision: 4, winConference: 0, superBowl: 0, overPrice: "-120", underPrice: "100", overTrueOdds: "352", underTrueOdds: "-352", edgeOver: "-32.42%", edgeUnder: "27.88%" },
+            { team: "New York Jets", division: "AFC East", winTotal: 5.5, makePlayoffs: 3, winDivision: 1, winConference: 0, superBowl: 0, overPrice: "-120", underPrice: "100", overTrueOdds: "183", underTrueOdds: "-183", edgeOver: "-19.21%", edgeUnder: "14.66%" },
+            { team: "Philadelphia Eagles", division: "NFC East", winTotal: 10.5, makePlayoffs: 66, winDivision: 47, winConference: 10, superBowl: 5, overPrice: "125", underPrice: "-140", overTrueOdds: "136", underTrueOdds: "-136", edgeOver: "-2.07%", edgeUnder: "-0.71%" },
+            { team: "Pittsburgh Steelers", division: "AFC North", winTotal: 8.5, makePlayoffs: 32, winDivision: 16, winConference: 3, superBowl: 1, overPrice: "118", underPrice: "-120", overTrueOdds: "146", underTrueOdds: "-146", edgeOver: "-5.22%", edgeUnder: "4.80%" },
+            { team: "San Francisco 49ers", division: "NFC West", winTotal: 10.5, makePlayoffs: 75, winDivision: 28, winConference: 10, superBowl: 5, overPrice: "105", underPrice: "-125", overTrueOdds: "-134", underTrueOdds: "134", edgeOver: "8.48%", edgeUnder: "-12.82%" },
+            { team: "Seattle Seahawks", division: "NFC West", winTotal: 10.5, makePlayoffs: 71, winDivision: 19, winConference: 12, superBowl: 7, overPrice: "-115", underPrice: "-105", overTrueOdds: "-110", underTrueOdds: "110", edgeOver: "-1.11%", edgeUnder: "-3.60%" },
+            { team: "Tampa Bay Buccaneers", division: "NFC South", winTotal: 8.5, makePlayoffs: 59, winDivision: 54, winConference: 4, superBowl: 2, overPrice: "105", underPrice: "-125", overTrueOdds: "-131", underTrueOdds: "131", edgeOver: "7.93%", edgeUnder: "-12.27%" },
+            { team: "Tennessee Titans", division: "AFC South", winTotal: 6.5, makePlayoffs: 7, winDivision: 2, winConference: 0, superBowl: 0, overPrice: "100", underPrice: "-115", overTrueOdds: "251", underTrueOdds: "-251", edgeOver: "-21.51%", edgeUnder: "18.02%" },
+            { team: "Washington Commanders", division: "NFC East", winTotal: 7.5, makePlayoffs: 36, winDivision: 20, winConference: 3, superBowl: 1, overPrice: "-120", underPrice: "105", overTrueOdds: "-159", underTrueOdds: "159", edgeOver: "6.84%", edgeUnder: "-10.17%" }
+        ];
+
+        let currentData = [...teamsData];
+        let sortConfig = { key: null, direction: 'asc' };
+
+        const tableBody = document.getElementById('tableBody');
+        const searchInput = document.getElementById('searchInput');
+        const divisionFilter = document.getElementById('divisionFilter');
+        const noResults = document.getElementById('noResults');
+        const resultCount = document.getElementById('resultCount');
+        const table = document.getElementById('dataTable');
+
+        function formatPercentage(value) {
+            return (value / 100).toFixed(1) + '%';
+        }
+
+        function createTeamCell(team) {
+            const logo = teamLogos[team] || '🏈';
+            return `
+                <div class="team-cell">
+                    <div class="team-logo">${logo}</div>
+                    <span class="team-name">${team}</span>
+                </div>
+            `;
+        }
+
+        function renderTable(data) {
+            tableBody.innerHTML = '';
+
+            if (data.length === 0) {
+                noResults.style.display = 'block';
+                resultCount.innerHTML = '';
+                return;
+            }
+
+            noResults.style.display = 'none';
+            resultCount.innerHTML = `Showing ${data.length} of ${teamsData.length} teams`;
+
+            data.forEach(row => {
+                const tr = document.createElement('tr');
+                const isPositiveEdgeOver = !row.edgeOver.startsWith('-');
+                const isPositiveEdgeUnder = !row.edgeUnder.startsWith('-');
+
+                tr.innerHTML = `
+                    <td>${createTeamCell(row.team)}</td>
+                    <td><span class="division-badge">${row.division}</span></td>
+                    <td class="win-total">${row.winTotal}</td>
+                    <td class="percentage">${formatPercentage(row.makePlayoffs)}</td>
+                    <td class="percentage">${formatPercentage(row.winDivision)}</td>
+                    <td class="percentage">${formatPercentage(row.winConference)}</td>
+                    <td class="percentage">${formatPercentage(row.superBowl)}</td>
+                    <td class="price">${row.overPrice}</td>
+                    <td class="price">${row.underPrice}</td>
+                    <td class="price">${row.overTrueOdds}</td>
+                    <td class="price">${row.underTrueOdds}</td>
+                    <td class="${isPositiveEdgeOver ? 'positive' : 'negative'} edge-value">${row.edgeOver}</td>
+                    <td class="${isPositiveEdgeUnder ? 'positive' : 'negative'} edge-value">${row.edgeUnder}</td>
+                `;
+                tableBody.appendChild(tr);
+            });
+        }
+
+        function sortData(key) {
+            if (sortConfig.key === key) {
+                sortConfig.direction = sortConfig.direction === 'asc' ? 'desc' : 'asc';
+            } else {
+                sortConfig.key = key;
+                sortConfig.direction = 'asc';
+            }
+
+            const headers = table.querySelectorAll('th');
+            headers.forEach(h => {
+                h.classList.remove('sort-asc', 'sort-desc');
+            });
+
+            const keyMap = {
+                'team': 0, 'division': 1, 'winTotal': 2, 'makePlayoffs': 3,
+                'winDivision': 4, 'winConference': 5, 'superBowl': 6,
+                'overPrice': 7, 'underPrice': 8, 'overTrueOdds': 9,
+                'underTrueOdds': 10, 'edgeOver': 11, 'edgeUnder': 12
+            };
+
+            const sortHeader = Array.from(headers)[keyMap[key]];
+            if (sortHeader) {
+                sortHeader.classList.add(sortConfig.direction === 'asc' ? 'sort-asc' : 'sort-desc');
+            }
+
+            currentData.sort((a, b) => {
+                let aVal = a[key];
+                let bVal = b[key];
+
+                // Handle percentage strings (remove % and convert)
+                if (typeof aVal === 'string' && aVal.includes('%')) {
+                    aVal = parseFloat(aVal);
+                    bVal = parseFloat(bVal);
+                }
+
+                if (typeof aVal === 'string') {
+                    aVal = aVal.toLowerCase();
+                    bVal = bVal.toLowerCase();
+                }
+
+                if (aVal < bVal) return sortConfig.direction === 'asc' ? -1 : 1;
+                if (aVal > bVal) return sortConfig.direction === 'asc' ? 1 : -1;
+                return 0;
+            });
+
+            renderTable(currentData);
+        }
+
+        function filterData() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const selectedDivision = divisionFilter.value;
+
+            currentData = teamsData.filter(row => {
+                const matchesSearch = row.team.toLowerCase().includes(searchTerm);
+                const matchesDivision = !selectedDivision || row.division === selectedDivision;
+                return matchesSearch && matchesDivision;
+            });
+
+            renderTable(currentData);
+        }
+
+        // Event listeners
+        searchInput.addEventListener('input', filterData);
+        divisionFilter.addEventListener('change', filterData);
+
+        table.querySelectorAll('th.sortable').forEach((header, index) => {
+            header.addEventListener('click', () => {
+                const keyMap = [
+                    'team', 'division', 'winTotal', 'makePlayoffs',
+                    'winDivision', 'winConference', 'superBowl',
+                    'overPrice', 'underPrice', 'overTrueOdds',
+                    'underTrueOdds', 'edgeOver', 'edgeUnder'
+                ];
+                sortData(keyMap[index]);
+            });
+        });
+
+        // Initial render
+        renderTable(currentData);
+    </script>
+</body>
+</html>
