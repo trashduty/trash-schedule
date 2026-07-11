@@ -179,7 +179,14 @@
             border-radius: 16px;
             box-shadow: var(--shadow);
             overflow: hidden;
-            overflow-x: auto;
+            height: 600px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .table-scroll {
+            overflow-y: auto;
+            flex: 1;
         }
 
         table {
@@ -190,6 +197,9 @@
 
         thead {
             background: rgba(0,0,0,0.3);
+            position: sticky;
+            top: 0;
+            z-index: 10;
         }
 
         th {
@@ -375,6 +385,7 @@
             font-size: 0.85rem;
             border-top: 1px solid var(--line);
             text-align: right;
+            background: rgba(16,31,41,0.6);
         }
 
         .tooltip {
@@ -466,6 +477,10 @@
                 padding: 10px 16px;
                 font-size: 0.85rem;
             }
+
+            .table-wrapper {
+                height: 400px;
+            }
         }
     </style>
 </head>
@@ -504,26 +519,28 @@
         <!-- Win Totals Tab -->
         <div id="win-totals" class="tab-content active">
             <div class="table-wrapper">
-                <table id="winTotalsTable">
-                    <thead>
-                        <tr>
-                            <th class="sortable">Team</th>
-                            <th class="sortable">Division</th>
-                            <th class="sortable">Market Win Total</th>
-                            <th class="sortable">BTB Projected Wins</th>
-                            <th class="sortable">BTB Over True Odds</th>
-                            <th class="sortable">Best Odds for Over</th>
-                            <th class="sortable">BTB Under True Odds</th>
-                            <th class="sortable">Best Odds for Under</th>
-                            <th class="sortable">Edge Over</th>
-                            <th class="sortable">Edge Under</th>
-                        </tr>
-                    </thead>
-                    <tbody id="winTotalsTableBody">
-                    </tbody>
-                </table>
-                <div id="winTotalsNoResults" class="no-results" style="display: none;">
-                    No teams found matching your filters.
+                <div class="table-scroll">
+                    <table id="winTotalsTable">
+                        <thead>
+                            <tr>
+                                <th class="sortable">Team</th>
+                                <th class="sortable">Division</th>
+                                <th class="sortable">Market Win Total</th>
+                                <th class="sortable">BTB Projected Wins</th>
+                                <th class="sortable">BTB Over True Odds</th>
+                                <th class="sortable">Best Odds for Over</th>
+                                <th class="sortable">BTB Under True Odds</th>
+                                <th class="sortable">Best Odds for Under</th>
+                                <th class="sortable">Edge Over</th>
+                                <th class="sortable">Edge Under</th>
+                            </tr>
+                        </thead>
+                        <tbody id="winTotalsTableBody">
+                        </tbody>
+                    </table>
+                    <div id="winTotalsNoResults" class="no-results" style="display: none;">
+                        No teams found matching your filters.
+                    </div>
                 </div>
                 <div id="winTotalsResultCount" class="result-count"></div>
             </div>
@@ -532,22 +549,24 @@
         <!-- Futures Tab -->
         <div id="futures" class="tab-content">
             <div class="table-wrapper">
-                <table id="futuresTable">
-                    <thead>
-                        <tr>
-                            <th class="sortable">Team</th>
-                            <th class="sortable">Division</th>
-                            <th class="sortable">Make Playoffs</th>
-                            <th class="sortable">Win Division</th>
-                            <th class="sortable">Win Conference</th>
-                            <th class="sortable">Super Bowl</th>
-                        </tr>
-                    </thead>
-                    <tbody id="futuresTableBody">
-                    </tbody>
-                </table>
-                <div id="futuresNoResults" class="no-results" style="display: none;">
-                    No teams found matching your filters.
+                <div class="table-scroll">
+                    <table id="futuresTable">
+                        <thead>
+                            <tr>
+                                <th class="sortable">Team</th>
+                                <th class="sortable">Division</th>
+                                <th class="sortable">Make Playoffs</th>
+                                <th class="sortable">Win Division</th>
+                                <th class="sortable">Win Conference</th>
+                                <th class="sortable">Super Bowl</th>
+                            </tr>
+                        </thead>
+                        <tbody id="futuresTableBody">
+                        </tbody>
+                    </table>
+                    <div id="futuresNoResults" class="no-results" style="display: none;">
+                        No teams found matching your filters.
+                    </div>
                 </div>
                 <div id="futuresResultCount" class="result-count"></div>
             </div>
