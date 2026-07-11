@@ -285,7 +285,7 @@
             text-align: center;
         }
 
-        .price {
+        .odds {
             font-variant-numeric: tabular-nums;
             font-weight: 600;
             color: var(--blue);
@@ -362,7 +362,7 @@
             }
 
             .percentage,
-            .price,
+            .odds,
             .positive,
             .negative,
             .edge-value,
@@ -410,8 +410,8 @@
                         <th class="sortable">Win Division</th>
                         <th class="sortable">Win Conference</th>
                         <th class="sortable">Super Bowl</th>
-                        <th class="sortable">OVER Win Total (Best Price)</th>
-                        <th class="sortable">UNDER Win Total (Best Price)</th>
+                        <th class="sortable">OVER Win Total (Best Odds)</th>
+                        <th class="sortable">UNDER Win Total (Best Odds)</th>
                         <th class="sortable">BTB OVER True Odds</th>
                         <th class="sortable">BTB UNDER True Odds</th>
                         <th class="sortable">Edge OVER</th>
@@ -522,10 +522,10 @@
                     <td class="percentage">${formatPercentage(row.winDivision)}</td>
                     <td class="percentage">${formatPercentage(row.winConference)}</td>
                     <td class="percentage">${formatPercentage(row.superBowl)}</td>
-                    <td class="price">${formatPrice(row.overPrice)}</td>
-                    <td class="price">${formatPrice(row.underPrice)}</td>
-                    <td class="price">${formatPrice(row.overTrueOdds)}</td>
-                    <td class="price">${formatPrice(row.underTrueOdds)}</td>
+                    <td class="odds">${formatPrice(row.overPrice)}</td>
+                    <td class="odds">${formatPrice(row.underPrice)}</td>
+                    <td class="odds">${formatPrice(row.overTrueOdds)}</td>
+                    <td class="odds">${formatPrice(row.underTrueOdds)}</td>
                     <td class="${isPositiveEdgeOver ? 'positive' : 'negative'} edge-value">${formatPrice(row.edgeOver)}%</td>
                     <td class="${isPositiveEdgeUnder ? 'positive' : 'negative'} edge-value">${formatPrice(row.edgeUnder)}%</td>
                 `;
