@@ -186,6 +186,7 @@
 
         .table-scroll {
             overflow-y: auto;
+            overflow-x: auto;
             flex: 1;
         }
 
@@ -557,8 +558,14 @@
                                 <th class="sortable">Division</th>
                                 <th class="sortable">Make Playoffs</th>
                                 <th class="sortable">Win Division</th>
+                                <th class="sortable">Div Odds</th>
+                                <th class="sortable">Div Edge</th>
                                 <th class="sortable">Win Conference</th>
-                                <th class="sortable">Super Bowl</th>
+                                <th class="sortable">Conf Odds</th>
+                                <th class="sortable">Conf Edge</th>
+                                <th class="sortable">Win Super Bowl</th>
+                                <th class="sortable">SB Odds</th>
+                                <th class="sortable">SB Edge</th>
                             </tr>
                         </thead>
                         <tbody id="futuresTableBody">
@@ -575,38 +582,38 @@
 
     <script>
         const teamsData = [
-            { team: "Arizona Cardinals", division: "NFC West", logo: "https://a.espncdn.com/i/teamlogos/nfl/500/ari.png", winTotal: 4.5, btbProjectedWins: 5.7, overTrueOdds: -198, overPrice: 150, underTrueOdds: 198, underPrice: -140, edgeOver: 26.44, edgeUnder: -24.78, makePlayoffs: 0.07, winDivision: 0.0060, winConference: 0.0020, superBowl: 0.0010 },
-            { team: "Atlanta Falcons", division: "NFC South", logo: "https://a.espncdn.com/i/teamlogos/nfl/500/atl.png", winTotal: 7.5, btbProjectedWins: 7.1, overTrueOdds: 132, overPrice: 105, underTrueOdds: -132, underPrice: -120, edgeOver: -5.68, edgeUnder: 2.35, makePlayoffs: 0.2630, winDivision: 0.1960, winConference: 0.0120, superBowl: 0.0020 },
-            { team: "Baltimore Ravens", division: "AFC North", logo: "https://a.espncdn.com/i/teamlogos/nfl/500/bal.png", winTotal: 11.5, btbProjectedWins: 10, overTrueOdds: 258, overPrice: 126, underTrueOdds: -258, underPrice: -140, edgeOver: -16.31, edgeUnder: 13.73, makePlayoffs: 0.6560, winDivision: 0.4620, winConference: 0.1090, superBowl: 0.0560 },
-            { team: "Buffalo Bills", division: "AFC East", logo: "https://a.espncdn.com/i/teamlogos/nfl/500/buf.png", winTotal: 10.5, btbProjectedWins: 12.4, overTrueOdds: -449, overPrice: -125, underTrueOdds: 449, underPrice: 118, edgeOver: 26.23, edgeUnder: -27.66, makePlayoffs: 0.9180, winDivision: 0.7200, winConference: 0.2400, superBowl: 0.1200 },
-            { team: "Carolina Panthers", division: "NFC South", logo: "https://a.espncdn.com/i/teamlogos/nfl/500-dark/car.png", winTotal: 7.5, btbProjectedWins: 6.1, overTrueOdds: 269, overPrice: 115, underTrueOdds: -269, underPrice: -130, edgeOver: -19.41, edgeUnder: 16.38, makePlayoffs: 0.1640, winDivision: 0.1300, winConference: 0.0080, superBowl: 0.0030 },
-            { team: "Chicago Bears", division: "NFC North", logo: "https://a.espncdn.com/i/teamlogos/nfl/500/chi.png", winTotal: 9.5, btbProjectedWins: 8.3, overTrueOdds: 208, overPrice: 110, underTrueOdds: -208, underPrice: -120, edgeOver: -15.15, edgeUnder: 11.01, makePlayoffs: 0.3320, winDivision: 0.1480, winConference: 0.0370, superBowl: 0.0180 },
-            { team: "Cincinnati Bengals", division: "AFC North", logo: "https://a.espncdn.com/i/teamlogos/nfl/500/cin.png", winTotal: 10.5, btbProjectedWins: 9.6, overTrueOdds: 182, overPrice: 115, underTrueOdds: -182, underPrice: -125, edgeOver: -11.05, edgeUnder: 8.98, makePlayoffs: 0.5750, winDivision: 0.3660, winConference: 0.0580, superBowl: 0.0280 },
-            { team: "Cleveland Browns", division: "AFC North", logo: "https://a.espncdn.com/i/teamlogos/nfl/500/cle.png", winTotal: 5.5, btbProjectedWins: 5.4, overTrueOdds: 111, overPrice: -110, underTrueOdds: -111, underPrice: 115, edgeOver: -4.99, edgeUnder: 6.10, makePlayoffs: 0.0640, winDivision: 0.0220, winConference: 0.0010, superBowl: 0.0000 },
-            { team: "Dallas Cowboys", division: "NFC East", logo: "https://a.espncdn.com/i/teamlogos/nfl/500/dal.png", winTotal: 9.5, btbProjectedWins: 9.2, overTrueOdds: 113, overPrice: 110, underTrueOdds: -113, underPrice: -130, edgeOver: -0.67, edgeUnder: -3.47, makePlayoffs: 0.4840, winDivision: 0.2750, winConference: 0.0520, superBowl: 0.0270 },
-            { team: "Denver Broncos", division: "AFC West", logo: "https://a.espncdn.com/i/teamlogos/nfl/500/den.png", winTotal: 9.5, btbProjectedWins: 10.2, overTrueOdds: -149, overPrice: -125, underTrueOdds: 149, underPrice: 105, edgeOver: 4.28, edgeUnder: -8.62, makePlayoffs: 0.6560, winDivision: 0.3620, winConference: 0.0870, superBowl: 0.0370 },
-            { team: "Detroit Lions", division: "NFC North", logo: "https://a.espncdn.com/i/teamlogos/nfl/500/det.png", winTotal: 10.5, btbProjectedWins: 8.9, overTrueOdds: 278, overPrice: -110, underTrueOdds: -278, underPrice: 120, edgeOver: -25.93, edgeUnder: 28.09, makePlayoffs: 0.4300, winDivision: 0.1890, winConference: 0.0580, superBowl: 0.0300 },
-            { team: "Green Bay Packers", division: "NFC North", logo: "https://a.espncdn.com/i/teamlogos/nfl/500/gb.png", winTotal: 9.5, btbProjectedWins: 10.7, overTrueOdds: -208, overPrice: -140, underTrueOdds: 208, underPrice: 115, edgeOver: 9.20, edgeUnder: -14.04, makePlayoffs: 0.7250, winDivision: 0.4980, winConference: 0.1050, superBowl: 0.0600 },
-            { team: "Houston Texans", division: "AFC South", logo: "https://a.espncdn.com/i/teamlogos/nfl/500/hou.png", winTotal: 9.5, btbProjectedWins: 9.6, overTrueOdds: -117, overPrice: -125, underTrueOdds: 117, underPrice: 110, edgeOver: -1.64, edgeUnder: -1.54, makePlayoffs: 0.6180, winDivision: 0.3610, winConference: 0.1020, superBowl: 0.0470 },
-            { team: "Indianapolis Colts", division: "AFC South", logo: "https://a.espncdn.com/i/teamlogos/nfl/500/ind.png", winTotal: 7.5, btbProjectedWins: 8.8, overTrueOdds: -235, overPrice: -125, underTrueOdds: 235, underPrice: 115, edgeOver: 14.59, edgeUnder: -16.66, makePlayoffs: 0.4380, winDivision: 0.2070, winConference: 0.0350, superBowl: 0.0130 },
-            { team: "Jacksonville Jaguars", division: "AFC South", logo: "https://a.espncdn.com/i/teamlogos/nfl/500/jax.png", winTotal: 9.5, btbProjectedWins: 10.1, overTrueOdds: -141, overPrice: 110, underTrueOdds: 141, underPrice: -130, edgeOver: 10.89, edgeUnder: -15.03, makePlayoffs: 0.6530, winDivision: 0.4100, winConference: 0.0920, superBowl: 0.0440 },
-            { team: "Kansas City Chiefs", division: "AFC West", logo: "https://a.espncdn.com/i/teamlogos/nfl/500/kc.png", winTotal: 10.5, btbProjectedWins: 9, overTrueOdds: 238, overPrice: 120, underTrueOdds: -238, underPrice: -140, edgeOver: -15.87, edgeUnder: 12.08, makePlayoffs: 0.4850, winDivision: 0.1940, winConference: 0.0740, superBowl: 0.0380 },
-            { team: "Las Vegas Raiders", division: "AFC West", logo: "https://a.espncdn.com/i/teamlogos/nfl/500/lv.png", winTotal: 5.5, btbProjectedWins: 6.7, overTrueOdds: -221, overPrice: -135, underTrueOdds: 221, underPrice: 135, edgeOver: 11.40, edgeUnder: -11.40, makePlayoffs: 0.1550, winDivision: 0.0500, winConference: 0.0070, superBowl: 0.0020 },
-            { team: "Los Angeles Chargers", division: "AFC West", logo: "https://a.espncdn.com/i/teamlogos/nfl/500/lac.png", winTotal: 9.5, btbProjectedWins: 10.4, overTrueOdds: -192, overPrice: -135, underTrueOdds: 192, underPrice: 115, edgeOver: 8.31, edgeUnder: -12.27, makePlayoffs: 0.6850, winDivision: 0.3940, winConference: 0.0940, superBowl: 0.0430 },
-            { team: "Los Angeles Rams", division: "NFC West", logo: "https://a.espncdn.com/i/teamlogos/nfl/500/lar.png", winTotal: 11.5, btbProjectedWins: 12.1, overTrueOdds: -155, overPrice: -120, underTrueOdds: 155, underPrice: 105, edgeOver: 6.24, edgeUnder: -9.56, makePlayoffs: 0.8740, winDivision: 0.5060, winConference: 0.2720, superBowl: 0.1580 },
-            { team: "Miami Dolphins", division: "AFC East", logo: "https://a.espncdn.com/i/teamlogos/nfl/500/mia.png", winTotal: 4.5, btbProjectedWins: 4.7, overTrueOdds: -107, overPrice: 110, underTrueOdds: 107, underPrice: -130, edgeOver: 4.07, edgeUnder: -8.21, makePlayoffs: 0.0300, winDivision: 0.0070, winConference: 0.0020, superBowl: 0.0010 },
-            { team: "Minnesota Vikings", division: "NFC North", logo: "https://a.espncdn.com/i/teamlogos/nfl/500/min.png", winTotal: 8.5, btbProjectedWins: 8.3, overTrueOdds: 117, overPrice: 100, underTrueOdds: -117, underPrice: 110, edgeOver: -3.92, edgeUnder: 6.30, makePlayoffs: 0.3600, winDivision: 0.1660, winConference: 0.0320, superBowl: 0.0160 },
-            { team: "New England Patriots", division: "AFC East", logo: "https://a.espncdn.com/i/teamlogos/nfl/500/ne.png", winTotal: 10.5, btbProjectedWins: 10.2, overTrueOdds: 119, overPrice: 115, underTrueOdds: -119, underPrice: -140, edgeOver: -0.85, edgeUnder: -4.00, makePlayoffs: 0.6580, winDivision: 0.2650, winConference: 0.0730, superBowl: 0.0320 },
-            { team: "New Orleans Saints", division: "NFC South", logo: "https://a.espncdn.com/i/teamlogos/nfl/500/no.png", winTotal: 7.5, btbProjectedWins: 6.1, overTrueOdds: 282, overPrice: -120, underTrueOdds: -282, underPrice: 105, edgeOver: -28.37, edgeUnder: 25.04, makePlayoffs: 0.1540, winDivision: 0.1220, winConference: 0.0040, superBowl: 0.0020 },
-            { team: "New York Giants", division: "NFC East", logo: "https://a.espncdn.com/i/teamlogos/nfl/500/nyg.png", winTotal: 7.5, btbProjectedWins: 5.5, overTrueOdds: 352, overPrice: -120, underTrueOdds: -352, underPrice: 100, edgeOver: -32.42, edgeUnder: 27.88, makePlayoffs: 0.0800, winDivision: 0.0340, winConference: 0.0030, superBowl: 0.0000 },
-            { team: "New York Jets", division: "AFC East", logo: "https://a.espncdn.com/i/teamlogos/nfl/500/nyj.png", winTotal: 5.5, btbProjectedWins: 4.8, overTrueOdds: 183, overPrice: -120, underTrueOdds: -183, underPrice: 100, edgeOver: -19.21, edgeUnder: 14.66, makePlayoffs: 0.0330, winDivision: 0.0080, winConference: 0.0000, superBowl: 0.0000 },
-            { team: "Philadelphia Eagles", division: "NFC East", logo: "https://a.espncdn.com/i/teamlogos/nfl/500/phi.png", winTotal: 10.5, btbProjectedWins: 10.2, overTrueOdds: 136, overPrice: 125, underTrueOdds: -136, underPrice: -140, edgeOver: -2.07, edgeUnder: -0.71, makePlayoffs: 0.6760, winDivision: 0.5060, winConference: 0.1080, superBowl: 0.0510 },
-            { team: "Pittsburgh Steelers", division: "AFC North", logo: "https://a.espncdn.com/i/teamlogos/nfl/500/pit.png", winTotal: 8.5, btbProjectedWins: 8, overTrueOdds: 146, overPrice: 118, underTrueOdds: -146, underPrice: -120, edgeOver: -5.22, edgeUnder: 4.80, makePlayoffs: 0.3160, winDivision: 0.1500, winConference: 0.0240, superBowl: 0.0080 },
-            { team: "San Francisco 49ers", division: "NFC West", logo: "https://a.espncdn.com/i/teamlogos/nfl/500/sf.png", winTotal: 10.5, btbProjectedWins: 10.8, overTrueOdds: -134, overPrice: 105, underTrueOdds: 134, underPrice: -125, edgeOver: 8.48, edgeUnder: -12.82, makePlayoffs: 0.7320, winDivision: 0.2740, winConference: 0.1050, superBowl: 0.0520 },
-            { team: "Seattle Seahawks", division: "NFC West", logo: "https://a.espncdn.com/i/teamlogos/nfl/500/sea.png", winTotal: 10.5, btbProjectedWins: 10.5, overTrueOdds: -110, overPrice: -115, underTrueOdds: 110, underPrice: -105, edgeOver: -1.11, edgeUnder: -3.60, makePlayoffs: 0.6940, winDivision: 0.2150, winConference: 0.1300, superBowl: 0.0820 },
-            { team: "Tampa Bay Buccaneers", division: "NFC South", logo: "https://a.espncdn.com/i/teamlogos/nfl/500/tb.png", winTotal: 8.5, btbProjectedWins: 9, overTrueOdds: -131, overPrice: 105, underTrueOdds: 131, underPrice: -125, edgeOver: 7.93, edgeUnder: -12.27, makePlayoffs: 0.6050, winDivision: 0.5510, winConference: 0.0440, superBowl: 0.0170 },
-            { team: "Tennessee Titans", division: "AFC South", logo: "https://a.espncdn.com/i/teamlogos/nfl/500/ten.png", winTotal: 6.5, btbProjectedWins: 5.2, overTrueOdds: 251, overPrice: 100, underTrueOdds: -251, underPrice: -115, edgeOver: -21.51, edgeUnder: 18.02, makePlayoffs: 0.0600, winDivision: 0.0230, winConference: 0.0020, superBowl: 0.0000 },
-            { team: "Washington Commanders", division: "NFC East", logo: "https://a.espncdn.com/i/teamlogos/nfl/500/wsh.png", winTotal: 7.5, btbProjectedWins: 8.2, overTrueOdds: -159, overPrice: -120, underTrueOdds: 159, underPrice: 105, edgeOver: 6.84, edgeUnder: -10.17, makePlayoffs: 0.3580, winDivision: 0.1850, winConference: 0.0280, superBowl: 0.0120 }
+            { team: "Arizona Cardinals", division: "NFC West", logo: "https://a.espncdn.com/i/teamlogos/nfl/500/ari.png", winTotal: 4.5, btbProjectedWins: 6.05, overTrueOdds: -187, overPrice: 150, underTrueOdds: 187, underPrice: -140, edgeOver: 25.13, edgeUnder: -23.46, makePlayoffs: 9.7, winDivision: 0.6, divOdds: 10000, divEdge: -0.4, winConference: 0.4, confOdds: 20000, confEdge: -0.1, superBowl: 0.2, sbOdds: 100000, sbEdge: 0.1 },
+            { team: "Atlanta Falcons", division: "NFC South", logo: "https://a.espncdn.com/i/teamlogos/nfl/500/atl.png", winTotal: 7.5, btbProjectedWins: 7.6, overTrueOdds: 102, overPrice: 105, underTrueOdds: -102, underPrice: -120, edgeOver: 0.8, edgeUnder: -4.2, makePlayoffs: 25.8, winDivision: 21.1, divOdds: 425, divEdge: 2.0, winConference: 1.3, confOdds: 5500, confEdge: -0.5, superBowl: 0.5, sbOdds: 13000, sbEdge: -0.3 },
+            { team: "Baltimore Ravens", division: "AFC North", logo: "https://a.espncdn.com/i/teamlogos/nfl/500/bal.png", winTotal: 11.5, btbProjectedWins: 10.3, overTrueOdds: 193, overPrice: 126, underTrueOdds: -193, underPrice: -140, edgeOver: -10.1, edgeUnder: 7.5, makePlayoffs: 67.9, winDivision: 48.4, divOdds: -110, divEdge: -4.0, winConference: 10.9, confOdds: 500, confEdge: -5.8, superBowl: 5.1, sbOdds: 1100, sbEdge: -3.2 },
+            { team: "Buffalo Bills", division: "AFC East", logo: "https://a.espncdn.com/i/teamlogos/nfl/500/buf.png", winTotal: 10.5, btbProjectedWins: 10.8, overTrueOdds: -111, overPrice: -125, underTrueOdds: 111, underPrice: 118, edgeOver: -2.9, edgeUnder: 1.5, makePlayoffs: 79.6, winDivision: 64.8, divOdds: -125, divEdge: 9.3, winConference: 18.1, confOdds: 510, confEdge: 1.7, superBowl: 9.0, sbOdds: 1000, sbEdge: -0.1 },
+            { team: "Carolina Panthers", division: "NFC South", logo: "https://a.espncdn.com/i/teamlogos/nfl/500-dark/car.png", winTotal: 7.5, btbProjectedWins: 6.9, overTrueOdds: 137, overPrice: 115, underTrueOdds: -137, underPrice: -130, edgeOver: -4.3, edgeUnder: 1.2, makePlayoffs: 25.1, winDivision: 16.0, divOdds: 310, divEdge: -8.4, winConference: 1.4, confOdds: 5000, confEdge: -0.6, superBowl: 0.5, sbOdds: 10000, sbEdge: -0.4 },
+            { team: "Chicago Bears", division: "NFC North", logo: "https://a.espncdn.com/i/teamlogos/nfl/500/chi.png", winTotal: 9.5, btbProjectedWins: 9.1, overTrueOdds: 137, overPrice: 110, underTrueOdds: -137, underPrice: -120, edgeOver: -5.3, edgeUnder: 3.2, makePlayoffs: 41.8, winDivision: 17.9, divOdds: 310, divEdge: -6.5, winConference: 4.8, confOdds: 1300, confEdge: -2.4, superBowl: 2.4, sbOdds: 2700, sbEdge: -1.2 },
+            { team: "Cincinnati Bengals", division: "AFC North", logo: "https://a.espncdn.com/i/teamlogos/nfl/500/cin.png", winTotal: 10.5, btbProjectedWins: 9.6, overTrueOdds: 151, overPrice: 115, underTrueOdds: -151, underPrice: -125, edgeOver: -6.7, edgeUnder: 4.7, makePlayoffs: 58.0, winDivision: 31.8, divOdds: 200, divEdge: -1.5, winConference: 6.3, confOdds: 1025, confEdge: -2.5, superBowl: 2.7, sbOdds: 2200, sbEdge: -1.6 },
+            { team: "Cleveland Browns", division: "AFC North", logo: "https://a.espncdn.com/i/teamlogos/nfl/500/cle.png", winTotal: 5.5, btbProjectedWins: 5.9, overTrueOdds: -140, overPrice: -110, underTrueOdds: 140, underPrice: 115, edgeOver: 5.9, edgeUnder: -4.8, makePlayoffs: 9.0, winDivision: 3.5, divOdds: 2200, divEdge: -0.8, winConference: 0.3, confOdds: 8600, confEdge: -0.9, superBowl: 0.1, sbOdds: 35000, sbEdge: -0.2 },
+            { team: "Dallas Cowboys", division: "NFC East", logo: "https://a.espncdn.com/i/teamlogos/nfl/500/dal.png", winTotal: 9.5, btbProjectedWins: 8.9, overTrueOdds: 137, overPrice: 110, underTrueOdds: -137, underPrice: -130, edgeOver: -5.4, edgeUnder: 1.3, makePlayoffs: 45.3, winDivision: 27.7, divOdds: 235, divEdge: -2.2, winConference: 4.8, confOdds: 1300, confEdge: -2.3, superBowl: 2.4, sbOdds: 2500, sbEdge: -1.5 },
+            { team: "Denver Broncos", division: "AFC West", logo: "https://a.espncdn.com/i/teamlogos/nfl/500/den.png", winTotal: 9.5, btbProjectedWins: 9.6, overTrueOdds: -103, overPrice: -125, underTrueOdds: 103, underPrice: 105, edgeOver: -4.8, edgeUnder: 0.5, makePlayoffs: 62.1, winDivision: 34.1, divOdds: 225, divEdge: 3.4, winConference: 9.0, confOdds: 1025, confEdge: 0.1, superBowl: 3.9, sbOdds: 2000, sbEdge: -0.9 },
+            { team: "Detroit Lions", division: "NFC North", logo: "https://a.espncdn.com/i/teamlogos/nfl/500/det.png", winTotal: 10.5, btbProjectedWins: 10.5, overTrueOdds: 121, overPrice: -110, underTrueOdds: -121, underPrice: 120, edgeOver: -7.2, edgeUnder: 9.4, makePlayoffs: 59.9, winDivision: 27.6, divOdds: 180, divEdge: -8.1, winConference: 9.1, confOdds: 930, confEdge: -0.7, superBowl: 4.8, sbOdds: 1900, sbEdge: -0.2 },
+            { team: "Green Bay Packers", division: "NFC North", logo: "https://a.espncdn.com/i/teamlogos/nfl/500/gb.png", winTotal: 9.5, btbProjectedWins: 9.7, overTrueOdds: -110, overPrice: -140, underTrueOdds: 110, underPrice: 115, edgeOver: -6.0, edgeUnder: 1.2, makePlayoffs: 61.0, winDivision: 39.5, divOdds: 270, divEdge: 12.5, winConference: 9.0, confOdds: 1000, confEdge: -0.1, superBowl: 5.0, sbOdds: 2200, sbEdge: 0.7 },
+            { team: "Houston Texans", division: "AFC South", logo: "https://a.espncdn.com/i/teamlogos/nfl/500/hou.png", winTotal: 9.5, btbProjectedWins: 9.7, overTrueOdds: -123, overPrice: -125, underTrueOdds: 123, underPrice: 110, edgeOver: -0.5, edgeUnder: -2.7, makePlayoffs: 69.3, winDivision: 39.1, divOdds: 135, divEdge: -3.5, winConference: 15.4, confOdds: 1000, confEdge: 6.3, superBowl: 7.6, sbOdds: 2000, sbEdge: 2.8 },
+            { team: "Indianapolis Colts", division: "AFC South", logo: "https://a.espncdn.com/i/teamlogos/nfl/500/ind.png", winTotal: 7.5, btbProjectedWins: 8.6, overTrueOdds: -161, overPrice: -125, underTrueOdds: 161, underPrice: 115, edgeOver: 6.1, edgeUnder: -8.2, makePlayoffs: 42.4, winDivision: 18.0, divOdds: 400, divEdge: -2.0, winConference: 3.8, confOdds: 2900, confEdge: 0.5, superBowl: 1.5, sbOdds: 6600, sbEdge: 0.0 },
+            { team: "Jacksonville Jaguars", division: "AFC South", logo: "https://a.espncdn.com/i/teamlogos/nfl/500/jax.png", winTotal: 9.5, btbProjectedWins: 9.2, overTrueOdds: 108, overPrice: 110, underTrueOdds: -108, underPrice: -130, edgeOver: 0.5, edgeUnder: -4.7, makePlayoffs: 57.2, winDivision: 38.1, divOdds: 245, divEdge: 9.1, winConference: 7.4, confOdds: 1500, confEdge: 1.1, superBowl: 3.3, sbOdds: 3000, sbEdge: 0.1 },
+            { team: "Kansas City Chiefs", division: "AFC West", logo: "https://a.espncdn.com/i/teamlogos/nfl/500/kc.png", winTotal: 10.5, btbProjectedWins: 9.3, overTrueOdds: 171, overPrice: 120, underTrueOdds: -171, underPrice: -140, edgeOver: -8.5, edgeUnder: 4.7, makePlayoffs: 52.8, winDivision: 24.8, divOdds: 180, divEdge: -10.9, winConference: 7.7, confOdds: 770, confEdge: -3.8, superBowl: 3.5, sbOdds: 1600, sbEdge: -2.4 },
+            { team: "Las Vegas Raiders", division: "AFC West", logo: "https://a.espncdn.com/i/teamlogos/nfl/500/lv.png", winTotal: 5.5, btbProjectedWins: 6.1, overTrueOdds: -154, overPrice: -135, underTrueOdds: 154, underPrice: 135, edgeOver: 3.2, edgeUnder: -3.2, makePlayoffs: 14.1, winDivision: 4.2, divOdds: 2200, divEdge: -0.2, winConference: 0.5, confOdds: 7600, confEdge: -0.8, superBowl: 0.2, sbOdds: 15000, sbEdge: -0.5 },
+            { team: "Los Angeles Chargers", division: "AFC West", logo: "https://a.espncdn.com/i/teamlogos/nfl/500/lac.png", winTotal: 9.5, btbProjectedWins: 9.5, overTrueOdds: 108, overPrice: -135, underTrueOdds: -108, underPrice: 115, edgeOver: -9.4, edgeUnder: 5.5, makePlayoffs: 58.2, winDivision: 36.9, divOdds: 190, divEdge: 2.4, winConference: 8.1, confOdds: 830, confEdge: -2.7, superBowl: 3.6, sbOdds: 1700, sbEdge: -2.0 },
+            { team: "Los Angeles Rams", division: "NFC West", logo: "https://a.espncdn.com/i/teamlogos/nfl/500/lar.png", winTotal: 11.5, btbProjectedWins: 11.1, overTrueOdds: 121, overPrice: -120, underTrueOdds: -121, underPrice: 105, edgeOver: -9.3, edgeUnder: 6.0, makePlayoffs: 79.8, winDivision: 45.9, divOdds: 100, divEdge: -4.1, winConference: 23.1, confOdds: 300, confEdge: -1.9, superBowl: 14.0, sbOdds: 550, sbEdge: -1.4 },
+            { team: "Miami Dolphins", division: "AFC East", logo: "https://a.espncdn.com/i/teamlogos/nfl/500/mia.png", winTotal: 4.5, btbProjectedWins: 5.3, overTrueOdds: -144, overPrice: 110, underTrueOdds: 144, underPrice: -130, edgeOver: 11.3, edgeUnder: -15.5, makePlayoffs: 7.9, winDivision: 1.2, divOdds: 4000, divEdge: -1.3, winConference: 0.3, confOdds: 15000, confEdge: -0.3, superBowl: 0.1, sbOdds: 60000, sbEdge: 0.0 },
+            { team: "Minnesota Vikings", division: "NFC North", logo: "https://a.espncdn.com/i/teamlogos/nfl/500/min.png", winTotal: 8.5, btbProjectedWins: 8.3, overTrueOdds: 103, overPrice: 100, underTrueOdds: -103, underPrice: 110, edgeOver: -0.8, edgeUnder: 3.2, makePlayoffs: 34.7, winDivision: 14.9, divOdds: 550, divEdge: -0.5, winConference: 2.8, confOdds: 2400, confEdge: -1.2, superBowl: 1.4, sbOdds: 5000, sbEdge: -0.6 },
+            { team: "New England Patriots", division: "AFC East", logo: "https://a.espncdn.com/i/teamlogos/nfl/500/ne.png", winTotal: 10.5, btbProjectedWins: 9.7, overTrueOdds: 150, overPrice: 115, underTrueOdds: -150, underPrice: -140, edgeOver: -6.5, edgeUnder: 1.6, makePlayoffs: 63.9, winDivision: 31.7, divOdds: 145, divEdge: -9.1, winConference: 8.7, confOdds: 850, confEdge: -1.9, superBowl: 3.8, sbOdds: 2000, sbEdge: -0.9 },
+            { team: "New Orleans Saints", division: "NFC South", logo: "https://a.espncdn.com/i/teamlogos/nfl/500/no.png", winTotal: 7.5, btbProjectedWins: 7.2, overTrueOdds: 123, overPrice: -120, underTrueOdds: -123, underPrice: 105, edgeOver: -9.7, edgeUnder: 6.4, makePlayoffs: 20.4, winDivision: 18.2, divOdds: 280, divEdge: -8.2, winConference: 0.8, confOdds: 5000, confEdge: -1.1, superBowl: 0.3, sbOdds: 10000, sbEdge: -0.6 },
+            { team: "New York Giants", division: "NFC East", logo: "https://a.espncdn.com/i/teamlogos/nfl/500/nyg.png", winTotal: 7.5, btbProjectedWins: 7.1, overTrueOdds: 126, overPrice: -120, underTrueOdds: -126, underPrice: 100, edgeOver: -10.2, edgeUnder: 5.7, makePlayoffs: 16.5, winDivision: 8.1, divOdds: 600, divEdge: -6.2, winConference: 0.9, confOdds: 3500, confEdge: -1.9, superBowl: 0.3, sbOdds: 7000, sbEdge: -1.1 },
+            { team: "New York Jets", division: "AFC East", logo: "https://a.espncdn.com/i/teamlogos/nfl/500/nyj.png", winTotal: 5.5, btbProjectedWins: 5.5, overTrueOdds: -106, overPrice: -120, underTrueOdds: 106, underPrice: 100, edgeOver: -3.0, edgeUnder: -1.5, makePlayoffs: 8.7, winDivision: 2.3, divOdds: 2200, divEdge: -2.1, winConference: 0.2, confOdds: 12500, confEdge: -0.6, superBowl: 0.1, sbOdds: 40000, sbEdge: -0.2 },
+            { team: "Philadelphia Eagles", division: "NFC East", logo: "https://a.espncdn.com/i/teamlogos/nfl/500/phi.png", winTotal: 10.5, btbProjectedWins: 9.7, overTrueOdds: 147, overPrice: 125, underTrueOdds: -147, underPrice: -140, edgeOver: -4.0, edgeUnder: 1.3, makePlayoffs: 60.7, winDivision: 47.2, divOdds: 130, divEdge: 3.7, winConference: 8.7, confOdds: 1000, confEdge: -0.4, superBowl: 4.4, sbOdds: 1800, sbEdge: -0.9 },
+            { team: "Pittsburgh Steelers", division: "AFC North", logo: "https://a.espncdn.com/i/teamlogos/nfl/500/pit.png", winTotal: 8.5, btbProjectedWins: 8.3, overTrueOdds: 102, overPrice: 118, underTrueOdds: -102, underPrice: -120, edgeOver: 3.5, edgeUnder: -3.9, makePlayoffs: 35.8, winDivision: 16.2, divOdds: 600, divEdge: 1.9, winConference: 2.8, confOdds: 3500, confEdge: 0.0, superBowl: 1.0, sbOdds: 8000, sbEdge: -0.3 },
+            { team: "San Francisco 49ers", division: "NFC West", logo: "https://a.espncdn.com/i/teamlogos/nfl/500/sf.png", winTotal: 10.5, btbProjectedWins: 9.7, overTrueOdds: 147, overPrice: 105, underTrueOdds: -147, underPrice: -125, edgeOver: -8.2, edgeUnder: 3.9, makePlayoffs: 58.3, winDivision: 24.5, divOdds: 325, divEdge: 0.9, winConference: 7.8, confOdds: 960, confEdge: -1.6, superBowl: 4.0, sbOdds: 1900, sbEdge: -1.0 },
+            { team: "Seattle Seahawks", division: "NFC West", logo: "https://a.espncdn.com/i/teamlogos/nfl/500/sea.png", winTotal: 10.5, btbProjectedWins: 10.6, overTrueOdds: 106, overPrice: -115, underTrueOdds: -106, underPrice: -105, edgeOver: -4.9, edgeUnder: 0.2, makePlayoffs: 74.5, winDivision: 29.0, divOdds: 210, divEdge: -3.3, winConference: 18.1, confOdds: 600, confEdge: 3.8, superBowl: 11.3, sbOdds: 1200, sbEdge: 3.6 },
+            { team: "Tampa Bay Buccaneers", division: "NFC South", logo: "https://a.espncdn.com/i/teamlogos/nfl/500/tb.png", winTotal: 8.5, btbProjectedWins: 8.6, overTrueOdds: -110, overPrice: 105, underTrueOdds: 110, underPrice: -125, edgeOver: 3.5, edgeUnder: -7.9, makePlayoffs: 54.5, winDivision: 44.8, divOdds: 185, divEdge: 9.7, winConference: 4.7, confOdds: 2500, confEdge: 0.9, superBowl: 2.0, sbOdds: 6000, sbEdge: 0.4 },
+            { team: "Tennessee Titans", division: "AFC South", logo: "https://a.espncdn.com/i/teamlogos/nfl/500/ten.png", winTotal: 6.5, btbProjectedWins: 6.4, overTrueOdds: 115, overPrice: 100, underTrueOdds: -115, underPrice: -115, edgeOver: -3.4, edgeUnder: 0.0, makePlayoffs: 12.9, winDivision: 4.8, divOdds: 850, divEdge: -5.7, winConference: 0.5, confOdds: 6600, confEdge: -1.0, superBowl: 0.1, sbOdds: 25000, sbEdge: -0.3 },
+            { team: "Washington Commanders", division: "NFC East", logo: "https://a.espncdn.com/i/teamlogos/nfl/500/wsh.png", winTotal: 7.5, btbProjectedWins: 7.7, overTrueOdds: -119, overPrice: -120, underTrueOdds: 119, underPrice: 105, edgeOver: -0.1, edgeUnder: -3.2, makePlayoffs: 31.9, winDivision: 17.0, divOdds: 525, divEdge: 1.0, winConference: 2.5, confOdds: 3000, confEdge: -0.8, superBowl: 1.1, sbOdds: 6600, sbEdge: -0.4 }
         ];
 
         let currentData = [...teamsData];
@@ -631,20 +638,17 @@
         });
 
         function convertToAmericanOdds(probability) {
-            // Probability is a decimal (0.07 for 7%, 0.60 for 60%, etc.)
             if (probability <= 0.5) {
-                // Positive odds for 50% or lower
                 const odds = Math.round(100 / probability - 100);
                 return '+' + odds;
             } else {
-                // Negative odds for above 50%
                 const odds = Math.round(probability / (1 - probability) * -100);
                 return odds.toString();
             }
         }
 
         function formatPercentage(value) {
-            return (value * 100).toFixed(0) + '%';
+            return value.toFixed(1) + '%';
         }
 
         function formatPrice(value) {
@@ -667,7 +671,8 @@
         }
 
         function createPercentageCell(value) {
-            const americanOdds = convertToAmericanOdds(value);
+            const probability = value / 100;
+            const americanOdds = convertToAmericanOdds(probability);
             return `
                 <div class="tooltip">
                     <span class="percentage">${formatPercentage(value)}</span>
@@ -707,8 +712,8 @@
                     <td class="odds">${formatPrice(row.overPrice)}</td>
                     <td class="odds">${formatPrice(row.underTrueOdds)}</td>
                     <td class="odds">${formatPrice(row.underPrice)}</td>
-                    <td class="${isPositiveEdgeOver ? 'positive' : 'negative'} edge-value">${formatPrice(row.edgeOver)}%</td>
-                    <td class="${isPositiveEdgeUnder ? 'positive' : 'negative'} edge-value">${formatPrice(row.edgeUnder)}%</td>
+                    <td class="${isPositiveEdgeOver ? 'positive' : 'negative'} edge-value">${formatPercentage(row.edgeOver)}</td>
+                    <td class="${isPositiveEdgeUnder ? 'positive' : 'negative'} edge-value">${formatPercentage(row.edgeUnder)}</td>
                 `;
                 tableBody.appendChild(tr);
             });
@@ -735,14 +740,23 @@
 
             data.forEach(row => {
                 const tr = document.createElement('tr');
+                const isPositiveDivEdge = parseFloat(row.divEdge) >= 0;
+                const isPositiveConfEdge = parseFloat(row.confEdge) >= 0;
+                const isPositiveSBEdge = parseFloat(row.sbEdge) >= 0;
 
                 tr.innerHTML = `
                     <td>${createTeamCell(row.team, row.logo)}</td>
                     <td><span class="division-badge ${getDivisionClass(row.division)}">${row.division}</span></td>
                     <td>${createPercentageCell(row.makePlayoffs)}</td>
                     <td>${createPercentageCell(row.winDivision)}</td>
+                    <td class="odds">${row.divOdds}</td>
+                    <td class="${isPositiveDivEdge ? 'positive' : 'negative'} edge-value">${formatPercentage(row.divEdge)}</td>
                     <td>${createPercentageCell(row.winConference)}</td>
+                    <td class="odds">${row.confOdds}</td>
+                    <td class="${isPositiveConfEdge ? 'positive' : 'negative'} edge-value">${formatPercentage(row.confEdge)}</td>
                     <td>${createPercentageCell(row.superBowl)}</td>
+                    <td class="odds">${row.sbOdds}</td>
+                    <td class="${isPositiveSBEdge ? 'positive' : 'negative'} edge-value">${formatPercentage(row.sbEdge)}</td>
                 `;
                 tableBody.appendChild(tr);
             });
@@ -759,7 +773,7 @@
                 header.onclick = () => {
                     const keyMaps = {
                         'win-totals': ['team', 'division', 'winTotal', 'btbProjectedWins', 'overTrueOdds', 'overPrice', 'underTrueOdds', 'underPrice', 'edgeOver', 'edgeUnder'],
-                        'futures': ['team', 'division', 'makePlayoffs', 'winDivision', 'winConference', 'superBowl']
+                        'futures': ['team', 'division', 'makePlayoffs', 'winDivision', 'divOdds', 'divEdge', 'winConference', 'confOdds', 'confEdge', 'superBowl', 'sbOdds', 'sbEdge']
                     };
                     sortData(keyMaps[tab][index], tab);
                 };
@@ -782,7 +796,7 @@
 
             const keyMaps = {
                 'win-totals': ['team', 'division', 'winTotal', 'btbProjectedWins', 'overTrueOdds', 'overPrice', 'underTrueOdds', 'underPrice', 'edgeOver', 'edgeUnder'],
-                'futures': ['team', 'division', 'makePlayoffs', 'winDivision', 'winConference', 'superBowl']
+                'futures': ['team', 'division', 'makePlayoffs', 'winDivision', 'divOdds', 'divEdge', 'winConference', 'confOdds', 'confEdge', 'superBowl', 'sbOdds', 'sbEdge']
             };
             
             const keyMap = keyMaps[tab];
