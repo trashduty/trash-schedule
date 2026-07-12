@@ -657,6 +657,12 @@
             return prefix + value;
         }
 
+        function formatOdds(value) {
+            const num = parseFloat(value);
+            const prefix = num >= 0 ? '+' : '';
+            return prefix + value;
+        }
+
         function getDivisionClass(division) {
             return 'div-' + division.toLowerCase().replace(' ', '-');
         }
@@ -749,13 +755,13 @@
                     <td><span class="division-badge ${getDivisionClass(row.division)}">${row.division}</span></td>
                     <td>${createPercentageCell(row.makePlayoffs)}</td>
                     <td>${createPercentageCell(row.winDivision)}</td>
-                    <td class="odds">${row.divOdds}</td>
+                    <td class="odds">${formatOdds(row.divOdds)}</td>
                     <td class="${isPositiveDivEdge ? 'positive' : 'negative'} edge-value">${formatPercentage(row.divEdge)}</td>
                     <td>${createPercentageCell(row.winConference)}</td>
-                    <td class="odds">${row.confOdds}</td>
+                    <td class="odds">${formatOdds(row.confOdds)}</td>
                     <td class="${isPositiveConfEdge ? 'positive' : 'negative'} edge-value">${formatPercentage(row.confEdge)}</td>
                     <td>${createPercentageCell(row.superBowl)}</td>
-                    <td class="odds">${row.sbOdds}</td>
+                    <td class="odds">${formatOdds(row.sbOdds)}</td>
                     <td class="${isPositiveSBEdge ? 'positive' : 'negative'} edge-value">${formatPercentage(row.sbEdge)}</td>
                 `;
                 tableBody.appendChild(tr);
