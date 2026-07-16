@@ -1,495 +1,22 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2026-27 NFL Futures</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --bg: #071016;
-            --panel: #0d1a22;
-            --panel-2: #101f29;
-            --line: #233641;
-            --text: #f3f7f8;
-            --muted: #9eb0ba;
-            --green: #5ce1a7;
-            --green-dark: #1aa16f;
-            --red: #ff7474;
-            --gold: #f5c66a;
-            --blue: #71b7ff;
-            --shadow: 0 18px 55px rgba(0,0,0,.28);
-        }
-
-        html, body {
-            height: 100%;
-        }
-
-        body {
-            background:
-                radial-gradient(circle at 12% -10%, rgba(92,225,167,.11), transparent 30%),
-                radial-gradient(circle at 95% 5%, rgba(113,183,255,.08), transparent 26%),
-                var(--bg);
-            color: var(--text);
-            font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-            font-size: 16px;
-            line-height: 1.5;
-            padding: 20px;
-            min-height: 100vh;
-        }
-
-        .container {
-            max-width: 1600px;
-            margin: 0 auto;
-        }
-
-        header {
-            margin-bottom: 32px;
-        }
-
-        .eyebrow {
-            display: inline-flex;
-            align-items: center;
-            gap: 9px;
-            color: var(--green);
-            font-size: 0.78rem;
-            font-weight: 800;
-            letter-spacing: 0.13em;
-            text-transform: uppercase;
-            margin-bottom: 16px;
-        }
-
-        .eyebrow:before {
-            content: "";
-            width: 30px;
-            height: 2px;
-            background: var(--green);
-        }
-
-        h1 {
-            font-size: clamp(2.2rem, 5vw, 3rem);
-            font-weight: 800;
-            line-height: 1.02;
-            margin-bottom: 8px;
-            letter-spacing: -0.055em;
-            color: var(--text);
-        }
-
-        .subtitle {
-            color: var(--muted);
-            font-size: clamp(1rem, 1.8vw, 1.1rem);
-            max-width: 700px;
-        }
-
-        .controls {
-            display: flex;
-            gap: 16px;
-            margin-bottom: 24px;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-
-        .search-box,
-        .filter-select {
-            background: var(--panel);
-            border: 1px solid var(--line);
-            color: var(--text);
-            border-radius: 9px;
-            padding: 12px 16px;
-            font-family: inherit;
-            font-size: 1rem;
-            outline: none;
-            transition: border-color 0.2s;
-        }
-
-        .search-box::placeholder,
-        .filter-select {
-            color: var(--muted);
-        }
-
-        .search-box:focus,
-        .filter-select:focus {
-            border-color: var(--green);
-        }
-
-        .search-box {
-            min-width: 280px;
-            flex: 1;
-            min-width: 200px;
-        }
-
-        .filter-select {
-            min-width: 180px;
-        }
-
-        .tabs {
-            display: flex;
-            gap: 0;
-            margin-bottom: 24px;
-            border-bottom: 1px solid var(--line);
-        }
-
-        .tab-button {
-            background: none;
-            border: none;
-            color: var(--muted);
-            padding: 12px 20px;
-            font-size: 0.95rem;
-            font-weight: 600;
-            cursor: pointer;
-            border-bottom: 3px solid transparent;
-            transition: all 0.2s;
-        }
-
-        .tab-button:hover {
-            color: var(--text);
-        }
-
-        .tab-button.active {
-            color: var(--green);
-            border-bottom-color: var(--green);
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        .info-section {
-            margin-bottom: 24px;
-            padding: 16px;
-            background: rgba(16,31,41,0.6);
-            border: 1px solid var(--line);
-            border-radius: 12px;
-            color: var(--muted);
-            font-size: 0.9rem;
-        }
-
-        .table-wrapper {
-            background: linear-gradient(180deg, rgba(16,31,41,.96), rgba(11,24,32,.96));
-            border: 1px solid var(--line);
-            border-radius: 16px;
-            box-shadow: var(--shadow);
-            overflow: hidden;
-            height: auto;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .table-scroll {
-            overflow-x: auto;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            min-width: 1200px;
-        }
-
-        thead {
-            background: rgba(0,0,0,0.3);
-            position: sticky;
-            top: 0;
-            z-index: 10;
-        }
-
-        th {
-            padding: 16px 12px;
-            text-align: left;
-            font-size: 0.73rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.075em;
-            color: var(--green);
-            border-bottom: 1px solid var(--line);
-            cursor: pointer;
-            user-select: none;
-            white-space: nowrap;
-            background: rgba(0,0,0,0.2);
-            transition: background 0.2s;
-            position: relative;
-        }
-
-        th:hover {
-            background: rgba(92,225,167,0.1);
-        }
-
-        th.sortable:after {
-            content: " ⇅";
-            opacity: 0.5;
-            font-size: 0.9em;
-            margin-left: 4px;
-        }
-
-        th.sort-asc:after {
-            content: " ↑";
-            opacity: 1;
-            color: var(--green);
-        }
-
-        th.sort-desc:after {
-            content: " ↓";
-            opacity: 1;
-            color: var(--green);
-        }
-
-        td {
-            padding: 14px 12px;
-            border-bottom: 1px solid var(--line);
-            font-size: 0.9rem;
-            color: var(--text);
-        }
-
-        tbody tr {
-            transition: background-color 0.2s;
-        }
-
-        tbody tr:hover {
-            background-color: rgba(92,225,167,0.05);
-        }
-
-        .team-cell {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-weight: 600;
-            min-width: 220px;
-        }
-
-        .team-logo {
-            width: 32px;
-            height: 32px;
-            border-radius: 4px;
-            background-size: contain;
-            background-repeat: no-repeat;
-            background-position: center;
-            flex-shrink: 0;
-        }
-
-        .team-name {
-            flex: 1;
-        }
-
-        /* Division badge colors */
-        .division-badge {
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 999px;
-            font-size: 0.78rem;
-            font-weight: 700;
-            white-space: nowrap;
-            border: 1px solid;
-        }
-
-        /* AFC divisions - blue family */
-        .div-afc-east,
-        .div-afc-west,
-        .div-afc-north,
-        .div-afc-south {
-            background: rgba(255,116,116,0.15);
-            color: var(--red);
-            border-color: rgba(255,116,116,0.3);
-        }
-
-        /* NFC divisions - green/gold family */
-        .div-nfc-east {
-            background: rgba(113,183,255,0.15);
-            color: var(--blue);
-            border-color: rgba(113,183,255,0.3);
-        }
-
-        .div-nfc-west {
-            background: rgba(113,183,255,0.15);
-            color: var(--blue);
-            border-color: rgba(113,183,255,0.3);
-        }
-
-        .div-nfc-north {
-            background: rgba(113,183,255,0.15);
-            color: var(--blue);
-            border-color: rgba(113,183,255,0.3);
-        }
-
-        .div-nfc-south {
-            background: rgba(113,183,255,0.15);
-            color: var(--blue);
-            border-color: rgba(113,183,255,0.3);
-        }
-
-        .percentage {
-            font-variant-numeric: tabular-nums;
-            font-weight: 600;
-            text-align: center;
-            cursor: help;
-            position: relative;
-        }
-
-        .odds {
-            font-variant-numeric: tabular-nums;
-            font-weight: 600;
-            color: var(--blue);
-            text-align: center;
-        }
-
-        .positive {
-            color: var(--green);
-            font-weight: 700;
-            text-align: center;
-        }
-
-        .negative {
-            color: var(--red);
-            font-weight: 700;
-            text-align: center;
-        }
-
-        .edge-value {
-            font-variant-numeric: tabular-nums;
-            font-weight: 600;
-            text-align: center;
-        }
-
-        .win-total {
-            font-variant-numeric: tabular-nums;
-            font-weight: 600;
-            color: var(--gold);
-            text-align: center;
-        }
-
-        .btb-win-total {
-            font-variant-numeric: tabular-nums;
-            font-weight: 600;
-            color: var(--gold);
-            text-align: center;
-        }
-
-        .no-results {
-            text-align: center;
-            padding: 48px 24px;
-            color: var(--muted);
-            font-size: 1rem;
-        }
-
-        .result-count {
-            padding: 12px 24px;
-            color: var(--muted);
-            font-size: 0.85rem;
-            border-top: 1px solid var(--line);
-            text-align: right;
-            background: rgba(16,31,41,0.6);
-        }
-
-        .tooltip {
-            position: relative;
-            display: inline-block;
-        }
-
-        .tooltip .tooltiptext {
-            visibility: hidden;
-            width: 200px;
-            background-color: rgba(0, 0, 0, 0.9);
-            color: var(--green);
-            text-align: center;
-            border-radius: 6px;
-            padding: 8px 12px;
-            position: absolute;
-            z-index: 1000;
-            bottom: 125%;
-            left: 50%;
-            margin-left: -100px;
-            opacity: 0;
-            transition: opacity 0.3s;
-            font-size: 0.8rem;
-            font-weight: 600;
-            border: 1px solid var(--green);
-            white-space: normal;
-            pointer-events: none;
-        }
-
-        .tooltip .tooltiptext:after {
-            content: "";
-            position: absolute;
-            top: 100%;
-            left: 50%;
-            margin-left: -5px;
-            border-width: 5px;
-            border-style: solid;
-            border-color: rgba(0, 0, 0, 0.9) transparent transparent transparent;
-        }
-
-        .tooltip:hover .tooltiptext {
-            visibility: visible;
-            opacity: 1;
-        }
-
-        @media (max-width: 768px) {
-            .controls {
-                flex-direction: column;
-            }
-
-            .search-box,
-            .filter-select {
-                width: 100%;
-            }
-
-            th, td {
-                padding: 10px 8px;
-                font-size: 0.8rem;
-            }
-
-            .team-cell {
-                gap: 8px;
-                min-width: 150px;
-            }
-
-            .team-logo {
-                width: 28px;
-                height: 28px;
-            }
-
-            h1 {
-                font-size: 1.8rem;
-            }
-
-            .percentage,
-            .odds,
-            .positive,
-            .negative,
-            .edge-value,
-            .win-total {
-                font-size: 0.85rem;
-            }
-
-            .tabs {
-                overflow-x: auto;
-            }
-
-            .tab-button {
-                padding: 10px 16px;
-                font-size: 0.85rem;
-            }
-
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <header>
-            <div class="eyebrow">NFL Futures Analysis</div>
-            <h1>2026-27 NFL Futures</h1>
-            <p class="subtitle">Interactive table with sortable columns, team search, and division filters.</p>
-        </header>
+<!-- Paste this entire snippet into one Squarespace Code Block -->
+<div id="btb-nfl-futures-widget">
+<div class="container">
+        <div class="widget-header">
+            <div class="header-layout">
+                <div class="header-copy">
+                    <div class="eyebrow">NFL Futures Analysis</div>
+                    <h1 class="widget-title">2026-27 NFL Futures</h1>
+                    <p class="subtitle">Interactive table to find the best edges for win totals, make playoffs, and division, conference, and Super Bowl winner. Hover over team percentages to find minimum odds that you can bet to have value</p>
+                </div>
+                <div class="education-note">
+                    To see which bets we're officially taking and to learn how to best use this table, see our
+                    <a href="https://www.btb-analytics.com/education/equvtz0ipctgzhdtoydmb3v4a7wjux" target="_blank" rel="noopener noreferrer">education articles</a>.
+                </div>
+            </div>
+        </div>
 
         <div class="controls">
-            <input type="text" class="search-box" id="searchInput" placeholder="Search team name...">
+            <input type="text" class="search-box" id="searchInput" placeholder="Search one or more teams (comma separated)...">
             <select class="filter-select" id="divisionFilter">
                 <option value="">All Divisions</option>
                 <option value="AFC East">AFC East</option>
@@ -509,7 +36,7 @@
         </div>
 
         <div class="info-section">
-            ℹ️ Click column headers to sort (ascending/descending). Use search to find teams by name. Hover over percentage values for American odds conversion.
+            ℹ️ Click column headers to sort (ascending/descending). Use search to find one or more teams by name; separate multiple teams with commas. Hover over percentage values for American odds conversion.
         </div>
 
         <!-- Win Totals Tab -->
@@ -574,9 +101,461 @@
             </div>
         </div>
     </div>
+</div>
 
-    <script>
-        const teamsData = [
+<style>
+
+#btb-nfl-futures-widget {
+--bg: #071016;
+            --panel: #0d1a22;
+            --panel-2: #101f29;
+            --line: #233641;
+            --text: #f3f7f8;
+            --muted: #9eb0ba;
+            --green: #5ce1a7;
+            --green-dark: #1aa16f;
+            --red: #ff7474;
+            --gold: #f5c66a;
+            --blue: #71b7ff;
+            --shadow: 0 18px 55px rgba(0,0,0,.28);
+    background:
+        radial-gradient(circle at 12% -10%, rgba(92,225,167,.11), transparent 30%),
+        radial-gradient(circle at 95% 5%, rgba(113,183,255,.08), transparent 26%),
+        var(--bg);
+    color: var(--text);
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    padding: 20px;
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+    isolation: isolate;
+}
+
+#btb-nfl-futures-widget,
+#btb-nfl-futures-widget * {
+    box-sizing: border-box;
+}
+
+#btb-nfl-futures-widget button,
+#btb-nfl-futures-widget input,
+#btb-nfl-futures-widget select {
+    font: inherit;
+}
+
+#btb-nfl-futures-widget img {
+    max-width: none;
+}
+
+#btb-nfl-futures-widget .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+#btb-nfl-futures-widget .widget-header {
+            margin-bottom: 32px;
+        }
+#btb-nfl-futures-widget .header-layout {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 32px;
+        }
+#btb-nfl-futures-widget .header-copy {
+            flex: 1 1 700px;
+            min-width: 0;
+        }
+#btb-nfl-futures-widget .education-note {
+            flex: 0 1 430px;
+            margin-top: 34px;
+            padding: 14px 16px;
+            background: rgba(16,31,41,0.6);
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            color: var(--muted);
+            font-size: 0.9rem;
+            line-height: 1.55;
+        }
+#btb-nfl-futures-widget .education-note a {
+            color: var(--green);
+            font-weight: 700;
+            text-decoration: none;
+        }
+#btb-nfl-futures-widget .education-note a:hover {
+            text-decoration: underline;
+        }
+#btb-nfl-futures-widget .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            color: var(--green);
+            font-size: 0.78rem;
+            font-weight: 800;
+            letter-spacing: 0.13em;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+        }
+#btb-nfl-futures-widget .eyebrow:before {
+            content: "";
+            width: 30px;
+            height: 2px;
+            background: var(--green);
+        }
+#btb-nfl-futures-widget .widget-title {
+            font-size: clamp(2.2rem, 5vw, 3rem);
+            font-weight: 800;
+            line-height: 1.02;
+            margin-bottom: 8px;
+            letter-spacing: -0.055em;
+            color: var(--text);
+        }
+#btb-nfl-futures-widget .subtitle {
+            color: var(--muted);
+            font-size: clamp(1rem, 1.8vw, 1.1rem);
+            max-width: 700px;
+        }
+#btb-nfl-futures-widget .controls {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+#btb-nfl-futures-widget .search-box, #btb-nfl-futures-widget .filter-select {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            color: var(--text);
+            border-radius: 9px;
+            padding: 12px 16px;
+            font-family: inherit;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+#btb-nfl-futures-widget .search-box::placeholder, #btb-nfl-futures-widget .filter-select {
+            color: var(--muted);
+        }
+#btb-nfl-futures-widget .search-box:focus, #btb-nfl-futures-widget .filter-select:focus {
+            border-color: var(--green);
+        }
+#btb-nfl-futures-widget .search-box {
+            min-width: 280px;
+            flex: 1;
+            min-width: 200px;
+        }
+#btb-nfl-futures-widget .filter-select {
+            min-width: 180px;
+        }
+#btb-nfl-futures-widget .tabs {
+            display: flex;
+            gap: 0;
+            margin-bottom: 24px;
+            border-bottom: 1px solid var(--line);
+        }
+#btb-nfl-futures-widget .tab-button {
+            background: none;
+            border: none;
+            color: var(--muted);
+            padding: 12px 20px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+        }
+#btb-nfl-futures-widget .tab-button:hover {
+            color: var(--text);
+        }
+#btb-nfl-futures-widget .tab-button.active {
+            color: var(--green);
+            border-bottom-color: var(--green);
+        }
+#btb-nfl-futures-widget .tab-content {
+            display: none;
+        }
+#btb-nfl-futures-widget .tab-content.active {
+            display: block;
+        }
+#btb-nfl-futures-widget .info-section {
+            margin-bottom: 24px;
+            padding: 16px;
+            background: rgba(16,31,41,0.6);
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+#btb-nfl-futures-widget .table-wrapper {
+            background: linear-gradient(180deg, rgba(16,31,41,.96), rgba(11,24,32,.96));
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            height: auto;
+            display: flex;
+            flex-direction: column;
+        }
+#btb-nfl-futures-widget .table-scroll {
+            overflow-x: auto;
+        }
+#btb-nfl-futures-widget table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1200px;
+        }
+#btb-nfl-futures-widget thead {
+            background: rgba(0,0,0,0.3);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+#btb-nfl-futures-widget th {
+            padding: 16px 12px;
+            text-align: left;
+            font-size: 0.73rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.075em;
+            color: var(--green);
+            border-bottom: 1px solid var(--line);
+            cursor: pointer;
+            user-select: none;
+            white-space: nowrap;
+            background: rgba(0,0,0,0.2);
+            transition: background 0.2s;
+            position: relative;
+        }
+#btb-nfl-futures-widget th:hover {
+            background: rgba(92,225,167,0.1);
+        }
+#btb-nfl-futures-widget th.sortable:after {
+            content: " ⇅";
+            opacity: 0.5;
+            font-size: 0.9em;
+            margin-left: 4px;
+        }
+#btb-nfl-futures-widget th.sort-asc:after {
+            content: " ↑";
+            opacity: 1;
+            color: var(--green);
+        }
+#btb-nfl-futures-widget th.sort-desc:after {
+            content: " ↓";
+            opacity: 1;
+            color: var(--green);
+        }
+#btb-nfl-futures-widget td {
+            padding: 14px 12px;
+            border-bottom: 1px solid var(--line);
+            font-size: 0.9rem;
+            color: var(--text);
+        }
+#btb-nfl-futures-widget tbody tr {
+            transition: background-color 0.2s;
+        }
+#btb-nfl-futures-widget tbody tr:hover {
+            background-color: rgba(92,225,167,0.05);
+        }
+#btb-nfl-futures-widget .team-cell {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 600;
+            min-width: 220px;
+        }
+#btb-nfl-futures-widget .team-logo {
+            width: 32px;
+            height: 32px;
+            border-radius: 4px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            flex-shrink: 0;
+        }
+#btb-nfl-futures-widget .team-name {
+            flex: 1;
+        }
+/* Division badge colors */
+#btb-nfl-futures-widget .division-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            white-space: nowrap;
+            border: 1px solid;
+        }
+/* AFC divisions - blue family */
+#btb-nfl-futures-widget .div-afc-east, #btb-nfl-futures-widget .div-afc-west, #btb-nfl-futures-widget .div-afc-north, #btb-nfl-futures-widget .div-afc-south {
+            background: rgba(255,116,116,0.15);
+            color: var(--red);
+            border-color: rgba(255,116,116,0.3);
+        }
+/* NFC divisions - green/gold family */
+#btb-nfl-futures-widget .div-nfc-east {
+            background: rgba(113,183,255,0.15);
+            color: var(--blue);
+            border-color: rgba(113,183,255,0.3);
+        }
+#btb-nfl-futures-widget .div-nfc-west {
+            background: rgba(113,183,255,0.15);
+            color: var(--blue);
+            border-color: rgba(113,183,255,0.3);
+        }
+#btb-nfl-futures-widget .div-nfc-north {
+            background: rgba(113,183,255,0.15);
+            color: var(--blue);
+            border-color: rgba(113,183,255,0.3);
+        }
+#btb-nfl-futures-widget .div-nfc-south {
+            background: rgba(113,183,255,0.15);
+            color: var(--blue);
+            border-color: rgba(113,183,255,0.3);
+        }
+#btb-nfl-futures-widget .percentage {
+            font-variant-numeric: tabular-nums;
+            font-weight: 600;
+            text-align: center;
+            cursor: help;
+            position: relative;
+        }
+#btb-nfl-futures-widget .odds {
+            font-variant-numeric: tabular-nums;
+            font-weight: 600;
+            color: var(--blue);
+            text-align: center;
+        }
+#btb-nfl-futures-widget .positive {
+            color: var(--green);
+            font-weight: 700;
+            text-align: center;
+        }
+#btb-nfl-futures-widget .negative {
+            color: var(--red);
+            font-weight: 700;
+            text-align: center;
+        }
+#btb-nfl-futures-widget .edge-value {
+            font-variant-numeric: tabular-nums;
+            font-weight: 600;
+            text-align: center;
+        }
+#btb-nfl-futures-widget .win-total {
+            font-variant-numeric: tabular-nums;
+            font-weight: 600;
+            color: var(--gold);
+            text-align: center;
+        }
+#btb-nfl-futures-widget .btb-win-total {
+            font-variant-numeric: tabular-nums;
+            font-weight: 600;
+            color: var(--gold);
+            text-align: center;
+        }
+#btb-nfl-futures-widget .no-results {
+            text-align: center;
+            padding: 48px 24px;
+            color: var(--muted);
+            font-size: 1rem;
+        }
+#btb-nfl-futures-widget .result-count {
+            padding: 12px 24px;
+            color: var(--muted);
+            font-size: 0.85rem;
+            border-top: 1px solid var(--line);
+            text-align: right;
+            background: rgba(16,31,41,0.6);
+        }
+#btb-nfl-futures-widget .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+#btb-nfl-futures-widget .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 200px;
+            background-color: rgba(0, 0, 0, 0.9);
+            color: var(--green);
+            text-align: center;
+            border-radius: 6px;
+            padding: 8px 12px;
+            position: absolute;
+            z-index: 1000;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.8rem;
+            font-weight: 600;
+            border: 1px solid var(--green);
+            white-space: normal;
+            pointer-events: none;
+        }
+#btb-nfl-futures-widget .tooltip .tooltiptext:after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: rgba(0, 0, 0, 0.9) transparent transparent transparent;
+        }
+#btb-nfl-futures-widget .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+@media (max-width: 768px) {
+#btb-nfl-futures-widget .header-layout {
+                flex-direction: column;
+                gap: 18px;
+            }
+#btb-nfl-futures-widget .education-note {
+                flex-basis: auto;
+                width: 100%;
+                margin-top: 0;
+            }
+#btb-nfl-futures-widget .controls {
+                flex-direction: column;
+            }
+#btb-nfl-futures-widget .search-box, #btb-nfl-futures-widget .filter-select {
+                width: 100%;
+            }
+#btb-nfl-futures-widget th, #btb-nfl-futures-widget td {
+                padding: 10px 8px;
+                font-size: 0.8rem;
+            }
+#btb-nfl-futures-widget .team-cell {
+                gap: 8px;
+                min-width: 150px;
+            }
+#btb-nfl-futures-widget .team-logo {
+                width: 28px;
+                height: 28px;
+            }
+#btb-nfl-futures-widget .widget-title {
+                font-size: 1.8rem;
+            }
+#btb-nfl-futures-widget .percentage, #btb-nfl-futures-widget .odds, #btb-nfl-futures-widget .positive, #btb-nfl-futures-widget .negative, #btb-nfl-futures-widget .edge-value, #btb-nfl-futures-widget .win-total {
+                font-size: 0.85rem;
+            }
+#btb-nfl-futures-widget .tabs {
+                overflow-x: auto;
+            }
+#btb-nfl-futures-widget .tab-button {
+                padding: 10px 16px;
+                font-size: 0.85rem;
+            }
+}
+</style>
+
+<script>
+(function () {
+    const root = document.getElementById('btb-nfl-futures-widget');
+    if (!root || root.dataset.initialized === 'true') return;
+    root.dataset.initialized = 'true';
+
+const teamsData = [
             { team: "Arizona Cardinals", division: "NFC West", logo: "https://a.espncdn.com/i/teamlogos/nfl/500/ari.png", winTotal: 4.5, btbProjectedWins: 6.1, overTrueOdds: -187, overPrice: 150, underTrueOdds: 187, underPrice: -140, edgeOver: 25.13, edgeUnder: -23.46, makePlayoffs: 9.7, winDivision: 0.6, divOdds: 10000, divEdge: -0.4, winConference: 0.4, confOdds: 20000, confEdge: -0.1, superBowl: 0.2, sbOdds: 100000, sbEdge: 0.1 },
             { team: "Atlanta Falcons", division: "NFC South", logo: "https://a.espncdn.com/i/teamlogos/nfl/500/atl.png", winTotal: 7.5, btbProjectedWins: 7.6, overTrueOdds: 102, overPrice: 105, underTrueOdds: -102, underPrice: -120, edgeOver: 0.8, edgeUnder: -4.2, makePlayoffs: 25.8, winDivision: 21.1, divOdds: 425, divEdge: 2.0, winConference: 1.3, confOdds: 5500, confEdge: -0.5, superBowl: 0.5, sbOdds: 13000, sbEdge: -0.3 },
             { team: "Baltimore Ravens", division: "AFC North", logo: "https://a.espncdn.com/i/teamlogos/nfl/500/bal.png", winTotal: 11.5, btbProjectedWins: 10.3, overTrueOdds: 193, overPrice: 126, underTrueOdds: -193, underPrice: -140, edgeOver: -10.1, edgeUnder: 7.5, makePlayoffs: 67.9, winDivision: 48.4, divOdds: -110, divEdge: -4.0, winConference: 10.9, confOdds: 500, confEdge: -5.8, superBowl: 5.1, sbOdds: 1100, sbEdge: -3.2 },
@@ -840,11 +819,17 @@
         }
 
         function filterData() {
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const rawSearch = document.getElementById('searchInput').value.toLowerCase();
+            const searchTerms = rawSearch
+                .split(',')
+                .map(term => term.trim())
+                .filter(Boolean);
             const selectedDivision = document.getElementById('divisionFilter').value;
 
             currentData = teamsData.filter(row => {
-                const matchesSearch = row.team.toLowerCase().includes(searchTerm);
+                const teamName = row.team.toLowerCase();
+                const matchesSearch = searchTerms.length === 0 ||
+                    searchTerms.some(term => teamName.includes(term));
                 const matchesDivision = !selectedDivision || row.division === selectedDivision;
                 return matchesSearch && matchesDivision;
             });
@@ -862,6 +847,5 @@
 
         // Initial render
         renderWinTotalsTable(currentData);
-    </script>
-</body>
-</html>
+})();
+</script>
