@@ -498,6 +498,24 @@
       return Array.from(map.values());
     }
 
+    function getGroupSortValue(group, key) {
+      // For numeric columns, use the MAX value across all rows in the group
+      // This ensures the game ranks by its best opportunity, not just the first team
+      const vals = group.rows
+        .map(r => r[key])
+        .filter(v => v !== null && v !== undefined && v !== '');
+      
+      if (!vals.length) return null;
+      
+      // If all values are numeric, return the max (for edges, probabilities, etc.)
+      if (vals.every(v => typeof v === 'number')) {
+        return Math.max(...vals);
+      }
+      
+      // Otherwise, use the first value (for text, game names, etc.)
+      return vals[0];
+    }
+
     function sortGroups(groups, sortCfg) {
       if (!sortCfg || !sortCfg.key) {
         return groups.sort((a, b) => {
@@ -513,10 +531,8 @@
       const key = sortCfg.key;
 
       return groups.sort((a, b) => {
-        const aVals = a.rows.map(r => r[key]).filter(v => v !== null && v !== undefined && v !== '');
-        const bVals = b.rows.map(r => r[key]).filter(v => v !== null && v !== undefined && v !== '');
-        const aVal = aVals.length ? aVals[0] : null;
-        const bVal = bVals.length ? bVals[0] : null;
+        const aVal = getGroupSortValue(a, key);
+        const bVal = getGroupSortValue(b, key);
 
         if (aVal === bVal) return 0;
         if (aVal === null) return 1;
