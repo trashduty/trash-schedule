@@ -1,0 +1,38 @@
+name: Send CFB + NFL CSV to Discord
+
+on:
+  push:
+    paths:
+      - "data/26-27-cfb-nfl.csv"
+
+jobs:
+  send-to-discord:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Send CSV as Discord attachment
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          python3 - <<'PY'
+          import os
+          import requests
+
+          webhook_url = os.environ["DISCORD_WEBHOOK_URL"]
+          file_path = "data/26-27-cfb-nfl.csv"
+
+          with open(file_path, "rb") as f:
+              files = {
+                  "file": ("26-27-cfb-nfl.csv", f, "text/csv")
+              }
+              payload = {
+                  "content": "📊 Updated CFB + NFL CSV from Google Sheets"
+              }
+              r = requests.post(webhook_url, data={"payload_json": __import__("json").dumps(payload)}, files=files)
+              r.raise_for_status()
+
+          print("Sent to Discord successfully")
+          PY
