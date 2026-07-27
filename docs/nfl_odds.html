@@ -809,6 +809,15 @@
                 note.textContent = `*Assumes ${qbName} is starting`;
                 wrapper.appendChild(note);
               }
+              
+              // Add notes if they exist and are not empty
+              const notes = (row['Notes'] || '').toString().trim();
+              if (notes) {
+                const notesDiv = document.createElement('div');
+                notesDiv.className = 'qb-note';
+                notesDiv.textContent = notes;
+                wrapper.appendChild(notesDiv);
+              }
 
               td.appendChild(wrapper);
             } else if (hideGame || hideGameTime || hideWeekOnSecondRow) {
