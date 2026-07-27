@@ -1,5 +1,5 @@
 ﻿week,Team,Model Prediction,Spread,Cover Probability (%),Edge,6.094722,Offensive Expected Points (Season),Defensive Expected Points (Season),Offensive Success Rate (%),Defensive Success Rate (%),Offensive Eckel Rate Over Expected (%),Defensive Eckel Rate Over Expected (%),QB Expected Points Added (Career),QB Expected Points Added (Last 10 games),PROE,Qbname,Raw_model,bin_cat,Notes
-1,ARI,11,10.5,48.20%,-0.04181,-1.02208,-1.02208,5.123482,0.436590437,0.51241535,0.5,0.5625,0.302989,0.290386,0.03350283,J.Brissett,50,1,Test notes
+1,ARI,11,10.5,48.20%,-0.04181,-1.02208,-1.02208,5.123482,0.436590437,0.51241535,0.5,0.5625,0.302989,0.290386,0.03350283,J.Brissett,50,1,
 1,ATL,10,2.5,38.99%,-0.13391,-0.32862,-0.32862,0.089067,0.455667789,0.534883721,0.45890411,0.546099291,2.138014,1.531283,-0.070336868,M.Penix,50,1,
 1,BAL,-10,-3.5,52.85%,0.00469,0.685783,0.685783,0.118603,0.43803681,0.569579288,0.506944444,0.537931034,5.103501,0.381001,-0.069552603,L.Jackson,50,1,
 1,BUF,-2.5,-2,51.85%,-0.00531,8.037424,8.037424,-1.22597,0.480263158,0.559259259,0.54676259,0.479166667,6.79112,7.969815,-0.03788065,J.Allen,50,1,
