@@ -209,6 +209,14 @@
       vertical-align: middle;
     }
 
+    .notes-text {
+      font-size: 0.72rem;
+      line-height: 1.2;
+      color: #d32f2f;
+      white-space: normal;
+      font-style: italic;
+    }
+
     th {
       background-color: #2c3e50;
       color: white;
@@ -329,7 +337,8 @@
     const CSV_URLS = {
       spreads: 'https://raw.githubusercontent.com/trashduty/trash-schedule/main/CFB_Odds/Data/spreads_odds.csv',
       totals: 'https://raw.githubusercontent.com/trashduty/trash-schedule/main/CFB_Odds/Data/totals_odds.csv',
-      crosswalk: 'https://raw.githubusercontent.com/trashduty/trash-schedule/main/CFB_Odds/Data/CFB%20Teams%20Full%20Crosswalk.csv'
+      crosswalk: 'https://raw.githubusercontent.com/trashduty/trash-schedule/main/CFB_Odds/Data/CFB%20Teams%20Full%20Crosswalk.csv',
+      model: 'https://raw.githubusercontent.com/trashduty/trash-schedule/main/cfb%20model%20output_new.csv'
     };
 
     const REFRESH_INTERVAL = 60000;
@@ -342,6 +351,7 @@
     };
 
     let teamLookup = {};
+    let notesLookup = {};
 
     function parseCsvFromUrl(url) {
       return fetch(url + '?t=' + Date.now())
@@ -358,6 +368,17 @@
             error: err => reject(err)
           });
         }));
+    }
+
+    function buildNotesLookup(modelRows) {
+      const lookup = {};
+      modelRows.forEach(row => {
+        const team = (row['team'] || '').toString().trim();
+        const notes = (row['Notes'] || '').toString().trim();
+        if (!team) return;
+        if (notes) lookup[team] = notes;
+      });
+      return lookup;
     }
 
     // Mobile-safe strict parser
@@ -605,7 +626,7 @@
       renderTable(tabId);
     }
 
-    function buildTeamCell(teamName, rowLogo) {
+    function buildTeamCell(teamName, rowLogo, notes) {
       const teamKey = (teamName || '').toString().trim();
       const info = teamLookup[teamKey] || {};
       const displayName = info.displayName || teamKey;
@@ -633,6 +654,13 @@
           line.appendChild(img); line.appendChild(document.createTextNode(' '));
         }
         line.appendChild(document.createTextNode(displayName)); wrapper.appendChild(line);
+      }
+
+      if (notes) {
+        const notesDiv = document.createElement('div');
+        notesDiv.className = 'notes-text';
+        notesDiv.textContent = notes;
+        wrapper.appendChild(notesDiv);
       }
 
       return wrapper;
@@ -859,7 +887,9 @@
             const hideWeekOnSecondRow = (col.csv === 'week' && rowIdx > 0);
 
             if (col.csv === 'team') {
-              td.appendChild(buildTeamCell(row.team, row.logo));
+              const teamKey = (row.team || '').toString().trim();
+              const notes = notesLookup[teamKey];
+              td.appendChild(buildTeamCell(row.team, row.logo, notes));
             } else if (hideGame || hideGameTime || hideWeekOnSecondRow) {
               td.textContent = '';
             } else {
@@ -917,10 +947,12 @@
       Promise.all([
         parseCsvFromUrl(CSV_URLS.spreads),
         parseCsvFromUrl(CSV_URLS.totals),
-        parseCsvFromUrl(CSV_URLS.crosswalk)
+        parseCsvFromUrl(CSV_URLS.crosswalk),
+        parseCsvFromUrl(CSV_URLS.model)
       ])
-        .then(([spreadsResults, totalsResults, crosswalkResults]) => {
+        .then(([spreadsResults, totalsResults, crosswalkResults, modelResults]) => {
           teamLookup = buildTeamLookup(crosswalkResults.data || []);
+          notesLookup = buildNotesLookup(modelResults.data || []);
 
           tabState.spreads.rawData = spreadsResults.data || [];
           tabState.spreads.columnMapping = buildColumnMapping(spreadsResults.meta?.fields || []);
