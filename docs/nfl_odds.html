@@ -325,6 +325,7 @@
     let sortConfig = { key: null, direction: 'asc' };
     let columnMapping = [];
     let qbLookup = {};
+    let notesLookup = {};
 
     function parseCsvFromUrl(url) {
       return fetch(url + '?t=' + Date.now())
@@ -358,6 +359,17 @@
         const qbName = normalizeName(row['Qbname']);
         if (!team || !qbName) return;
         lookup[team] = qbName;
+      });
+      return lookup;
+    }
+
+    function buildNotesLookup(modelRows) {
+      const lookup = {};
+      modelRows.forEach(row => {
+        const team = normalizeTeamAbbr(row['Team']);
+        const notes = normalizeName(row['Notes']);
+        if (!team) return;
+        if (notes) lookup[team] = notes;
       });
       return lookup;
     }
@@ -468,10 +480,9 @@
       return `https://www.pro-football-reference.com/boxscores/${dateStr}0${pfrAbbr}.htm`;
     }
 
-    // NEW: kickoff + 5 minutes dropoff
     function parseKickoffFromRow(row) {
-      const dateStr = (row?.game_date_est || '').toString().trim(); // YYYY-MM-DD
-      const timeStr = (row?.game_time_est || '').toString().trim(); // e.g., 1:00 PM ET
+      const dateStr = (row?.game_date_est || '').toString().trim();
+      const timeStr = (row?.game_time_est || '').toString().trim();
       if (!dateStr || !timeStr) return Number.POSITIVE_INFINITY;
 
       const cleanTime = timeStr.replace(/\s*(ET|EST|EDT)\s*$/i, '').trim();
@@ -505,20 +516,16 @@
     }
 
     function getGroupSortValue(group, key) {
-      // For numeric columns, use the MAX value across all rows in the group
-      // This ensures the game ranks by its best opportunity, not just the first team
       const vals = group.rows
         .map(r => r[key])
         .filter(v => v !== null && v !== undefined && v !== '');
       
       if (!vals.length) return null;
       
-      // If all values are numeric, return the max (for edges, probabilities, etc.)
       if (vals.every(v => typeof v === 'number')) {
         return Math.max(...vals);
       }
       
-      // Otherwise, use the first value (for text, game names, etc.)
       return vals[0];
     }
 
@@ -574,6 +581,7 @@
 
           rawData = spreadsResults.data || [];
           qbLookup = buildQbLookup(modelResults.data || []);
+          notesLookup = buildNotesLookup(modelResults.data || []);
 
           hydrateTeams();
           renderTeamPicker();
@@ -705,7 +713,6 @@
         processedData = rawData.filter(row => selectedTeams.has((row['team'] || '').toString().trim()));
       }
 
-      // NEW: apply 5-min-after-kickoff dropoff
       processedData = processedData.filter(isGameVisible);
 
       let groups = createGroupsFromRows(processedData);
@@ -767,6 +774,7 @@
               const url = TEAM_INJURY_URLS[teamKey];
               const logoUrl = row['team_logo_espn'];
               const qbName = qbLookup[teamKey];
+              const notes = notesLookup[teamKey];
               const wrapper = document.createElement('div');
               wrapper.className = 'team-cell';
 
@@ -809,9 +817,7 @@
                 note.textContent = `*Assumes ${qbName} is starting`;
                 wrapper.appendChild(note);
               }
-              
-              // Add notes if they exist and are not empty
-              const notes = (row['Notes'] || '').toString().trim();
+
               if (notes) {
                 const notesDiv = document.createElement('div');
                 notesDiv.className = 'qb-note';
