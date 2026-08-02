@@ -156,7 +156,7 @@
 
     .table-container {
       overflow-x: auto;
-      overflow-y: auto;
+      overflow-y: visible;
       box-shadow: 0 4px 6px rgba(0,0,0,0.1);
       border-radius: 8px;
       background: white;
@@ -353,6 +353,13 @@
     let teamLookup = {};
     let notesLookup = {};
 
+    function notifyParentOfHeight() {
+      if (window.parent !== window) {
+        const height = document.documentElement.scrollHeight;
+        window.parent.postMessage({ type: 'cfb-resize', height: height }, '*');
+      }
+    }
+
     function parseCsvFromUrl(url) {
       return fetch(url + '?t=' + Date.now())
         .then(response => {
@@ -483,6 +490,7 @@
       document.getElementById(`${tabId}-content`).classList.add('active');
       document.querySelectorAll('.subtab').forEach(el => el.classList.remove('active'));
       if (ev && ev.target) ev.target.classList.add('active');
+      setTimeout(() => notifyParentOfHeight(), 100);
     }
 
     function toggleTeamPicker(tabId, forceOpen) {
@@ -496,6 +504,7 @@
       } else {
         picker.setAttribute('hidden', '');
       }
+      setTimeout(() => notifyParentOfHeight(), 100);
     }
 
     function getEdgeGradientColor(value, thresholdPctPoints) {
@@ -844,6 +853,7 @@
           body.appendChild(tr);
         });
 
+        setTimeout(() => notifyParentOfHeight(), 100);
         return;
       }
 
@@ -910,6 +920,8 @@
           body.appendChild(tr);
         });
       });
+
+      setTimeout(() => notifyParentOfHeight(), 100);
     }
 
     function hydrateTeams() {
