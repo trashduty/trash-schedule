@@ -330,7 +330,7 @@ if (!is.null(api_data)) {
     ) 
   
   write_csv(total_summary, "NFL_Odds/Data/totals_odds.csv")
-  write_csv(spread_summary, "NFL_Odds/Data/spreads_odds.csv")
+  write_csv(spread_summary, "NFL_Odds/Data/spreads_oddsbtb.csv")
 } else {
   message("No active NFL games found. Exiting gracefully (off-season or API unavailable).")
 }
