@@ -841,9 +841,11 @@
               const teamKey = (val || '').toString().trim().toUpperCase();
               const url = TEAM_INJURY_URLS[teamKey];
               const logoUrl = row['team_logo_espn'];
-              const qbName = row._promoOriginalTeam === 'MIA' && teamKey === 'MIA'
-                ? 'T.Tagovailoa'
-                : qbLookup[teamKey];
+              let qbName = qbLookup[teamKey];
+              const displayGame = (row.game || '').toString().trim().toUpperCase();
+              if (displayGame === 'NE@MIA' && teamKey === 'MIA') qbName = 'T.Tagovailoa';
+              if (displayGame === 'ATL@CAR' && teamKey === 'CAR') qbName = 'B.Young';
+              if (displayGame === 'ATL@CAR' && teamKey === 'ATL') qbName = 'M.Penix';
               const notes = notesLookup[teamKey];
               const wrapper = document.createElement('div');
               wrapper.className = 'team-cell';
