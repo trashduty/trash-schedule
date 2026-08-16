@@ -441,6 +441,14 @@
         mapped.splice(updatedMarketLineIdx, 0, modelPredictionCol);
       }
 
+      // Move Game Time before Team
+      const teamIdx = mapped.findIndex(c => c.csv === 'team');
+      const newGameTimeIdx = mapped.findIndex(c => c.csv === 'game_time_est');
+      if (teamIdx !== -1 && newGameTimeIdx !== -1 && newGameTimeIdx > teamIdx) {
+        const [gameTimeCol] = mapped.splice(newGameTimeIdx, 1);
+        mapped.splice(teamIdx, 0, gameTimeCol);
+      }
+
       columnMapping = mapped;
     }
 
