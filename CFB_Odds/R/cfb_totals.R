@@ -48,8 +48,8 @@ spreads_games <- read_csv(spreads_output_path, show_col_types = FALSE) |>
 week_zero_start <- as.Date("2026-08-29")
 week_zero_end   <- as.Date("2026-08-31")
 week_one_start  <- as.Date("2026-09-01")
-blended_model_weight <- 0.35
-blended_market_weight <- 0.65
+blended_model_weight <- 0.20
+blended_market_weight <- 0.80
 
 calculate_cfb_week <- function(game_date) {
   case_when(
