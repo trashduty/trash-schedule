@@ -324,8 +324,9 @@
     };
 
     const REFRESH_INTERVAL = 60000;
-    const EXCLUDED_COLUMNS = new Set(['team_logo_espn', 'last_update_api', 'game_date_est']);
+    const EXCLUDED_COLUMNS = new Set(['team_logo_espn', 'last_update_api', 'game_date_est', 'commence_time']);
     const EDGE_THRESHOLD_PERCENT = 4;
+    const DROP_AFTER_START_MINUTES = 10;
 
     let rawData = [];
     let allTeams = [];
@@ -504,21 +505,103 @@
       return `https://www.pro-football-reference.com/boxscores/${dateStr}0${pfrAbbr}.htm`;
     }
 
+    // Parse kickoff into an absolute timestamp.
+    // Prefer commence_time because it should already contain timezone/UTC information.
+    // Fall back to game_date_est + game_time_est and explicitly interpret them
+    // in America/New_York so the viewer's local timezone never affects the cutoff.
     function parseKickoffFromRow(row) {
-      const dateStr = (row?.game_date_est || '').toString().trim();
-      const timeStr = (row?.game_time_est || '').toString().trim();
+      const commenceTime = String(row?.commence_time ?? '').trim();
+
+      if (commenceTime) {
+        const parsed = Date.parse(commenceTime);
+        if (Number.isFinite(parsed)) return parsed;
+      }
+
+      const dateStr = String(row?.game_date_est ?? '').trim();
+      const timeStr = String(row?.game_time_est ?? '').trim();
+
       if (!dateStr || !timeStr) return Number.POSITIVE_INFINITY;
 
+      // Accept YYYY-MM-DD, MM/DD/YYYY, or MM/DD.
+      let year, month, day;
+
+      let dateMatch = dateStr.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+      if (dateMatch) {
+        year = Number(dateMatch[1]);
+        month = Number(dateMatch[2]);
+        day = Number(dateMatch[3]);
+      } else {
+        dateMatch = dateStr.match(/^(\d{1,2})\/(\d{1,2})(?:\/(\d{4}))?$/);
+        if (!dateMatch) return Number.POSITIVE_INFINITY;
+
+        month = Number(dateMatch[1]);
+        day = Number(dateMatch[2]);
+        year = dateMatch[3] ? Number(dateMatch[3]) : new Date().getFullYear();
+      }
+
       const cleanTime = timeStr.replace(/\s*(ET|EST|EDT)\s*$/i, '').trim();
-      const dt = new Date(`${dateStr} ${cleanTime}`);
-      const t = dt.getTime();
-      return Number.isNaN(t) ? Number.POSITIVE_INFINITY : t;
+      const timeMatch = cleanTime.match(/^(\d{1,2}):(\d{2})\s*([AP]M)$/i);
+
+      if (!timeMatch) return Number.POSITIVE_INFINITY;
+
+      let hour = Number(timeMatch[1]);
+      const minute = Number(timeMatch[2]);
+      const ampm = timeMatch[3].toUpperCase();
+
+      if (hour === 12) hour = 0;
+      if (ampm === 'PM') hour += 12;
+
+      const initialGuess = Date.UTC(
+        year,
+        month - 1,
+        day,
+        hour,
+        minute,
+        0,
+        0
+      );
+
+      const formatter = new Intl.DateTimeFormat('en-US', {
+        timeZone: 'America/New_York',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        hourCycle: 'h23'
+      });
+
+      const parts = formatter.formatToParts(new Date(initialGuess));
+      const values = {};
+
+      parts.forEach(part => {
+        if (part.type !== 'literal') {
+          values[part.type] = Number(part.value);
+        }
+      });
+
+      const easternAsUTC = Date.UTC(
+        values.year,
+        values.month - 1,
+        values.day,
+        values.hour,
+        values.minute,
+        0,
+        0
+      );
+
+      const easternOffset = easternAsUTC - initialGuess;
+      return initialGuess - easternOffset;
     }
 
     function isGameVisible(row) {
       const kickoff = parseKickoffFromRow(row);
       if (!Number.isFinite(kickoff)) return true;
-      return Date.now() < (kickoff + 5 * 60 * 1000);
+
+      const cutoff =
+        kickoff + (DROP_AFTER_START_MINUTES * 60 * 1000);
+
+      return Date.now() <= cutoff;
     }
 
     function createGroupsFromRows(rows) {
@@ -556,11 +639,19 @@
     function sortGroups(groups, sortCfg) {
       if (!sortCfg || !sortCfg.key) {
         return groups.sort((a, b) => {
+          const firstA = a.rows && a.rows.length ? a.rows[0] : {};
+          const firstB = b.rows && b.rows.length ? b.rows[0] : {};
+
+          const ta = parseKickoffFromRow(firstA);
+          const tb = parseKickoffFromRow(firstB);
+
+          if (ta !== tb) return ta - tb;
+
           const wa = Number(a.week ?? 9999);
           const wb = Number(b.week ?? 9999);
           if (wa !== wb) return wa - wb;
-          return (a.game_time_est || '').localeCompare(b.game_time_est || '') ||
-                 (a.game || '').localeCompare(b.game || '');
+
+          return (a.game || '').localeCompare(b.game || '');
         });
       }
 
@@ -603,7 +694,7 @@
         .then(([spreadsResults, modelResults]) => {
           if (spreadsResults.meta && spreadsResults.meta.fields) buildColumnMapping(spreadsResults.meta.fields);
 
-          rawData = spreadsResults.data || [];
+          rawData = (spreadsResults.data || []).filter(isGameVisible);
           qbLookup = buildQbLookup(modelResults.data || []);
           notesLookup = buildNotesLookup(modelResults.data || []);
 
