@@ -344,6 +344,7 @@
     const REFRESH_INTERVAL = 60000;
     const EXCLUDED_COLUMNS = new Set(['logo', 'last_update_api', 'commence_time', 'game_date_et', 'game_time_et', 'drive_bin']);
     const EDGE_THRESHOLD_PERCENT = 3;
+    const DROP_AFTER_START_MINUTES = 10;
 
     const tabState = {
       spreads: { rawData: [], allTeams: [], selectedTeams: new Set(), sortConfig: { key: null, direction: 'asc' }, columnMapping: [] },
@@ -409,6 +410,13 @@
 
       const year = new Date().getFullYear();
       return new Date(year, month - 1, day, hour, minute, 0, 0).getTime();
+    }
+
+    function isGameVisible(row) {
+      const kickoffTs = parseEtDateTimeFromRow(row);
+      if (!Number.isFinite(kickoffTs)) return true;
+      const cutoffTs = kickoffTs + (DROP_AFTER_START_MINUTES * 60 * 1000);
+      return Date.now() <= cutoffTs;
     }
 
     function btbTeamToSlug(btbTeam) {
@@ -701,19 +709,12 @@
     }
 
     function getGroupSortValue(group, key) {
-      // For numeric columns, use the MAX value across all rows in the group
       const vals = group.rows
         .map(r => r[key])
         .filter(v => v !== null && v !== undefined && v !== '');
-      
+
       if (!vals.length) return null;
-      
-      // If all values are numeric, return the max
-      if (vals.every(v => typeof v === 'number')) {
-        return Math.max(...vals);
-      }
-      
-      // Otherwise, use the first value
+      if (vals.every(v => typeof v === 'number')) return Math.max(...vals);
       return vals[0];
     }
 
@@ -756,25 +757,18 @@
     }
 
     function sortRowsWithinGroup(rows, sortConfig) {
-      // If no sort config, sort to put away team first, home team second
       if (!sortConfig || !sortConfig.key) {
-        // Assume first occurrence is away team, second is home team
         return rows.slice().sort((a, b) => {
           const aGame = (a['game'] || '').toString().trim();
           const bGame = (b['game'] || '').toString().trim();
-          
-          // Both from same game, so sort by which team is away
+
           if (aGame === bGame) {
             const aTeam = (a['team'] || '').toString().trim();
             const bTeam = (b['team'] || '').toString().trim();
-            
-            // Extract away team from game string (before @)
             const awayTeam = aGame.split('@')[0].trim();
-            
-            // Away team sorts first (a before b)
+
             if (aTeam === awayTeam) return -1;
             if (bTeam === awayTeam) return 1;
-            
             return 0;
           }
           return 0;
@@ -990,28 +984,47 @@
           teamLookup = buildTeamLookup(crosswalkResults.data || []);
           notesLookup = buildNotesLookup(modelResults.data || []);
 
-          tabState.spreads.rawData = spreadsResults.data || [];
+          const visibleSpreads = (spreadsResults.data || []).filter(isGameVisible);
+          const visibleTotals = (totalsResults.data || []).filter(isGameVisible);
+
+          tabState.spreads.rawData = visibleSpreads;
           tabState.spreads.columnMapping = buildColumnMapping(spreadsResults.meta?.fields || []);
           hydrateTeams();
           renderTeamPicker('spreads');
           renderTable('spreads');
 
-          tabState.totals.rawData = totalsResults.data || [];
+          tabState.totals.rawData = visibleTotals;
           tabState.totals.columnMapping = buildColumnMapping(totalsResults.meta?.fields || []);
           hydrateGames();
           renderTeamPicker('totals');
           renderTable('totals');
 
-          document.getElementById('status').textContent = 'Last updated: ' + new Date().toLocaleTimeString();
+          document.getElementById('status').textContent = `Last updated: ${new Date().toLocaleString()}`;
+          setTimeout(() => notifyParentOfHeight(), 100);
         })
-        .catch((err) => {
-          document.getElementById('status').textContent = 'Error loading data: ' + err.message;
+        .catch(error => {
+          document.getElementById('status').textContent = `Error loading data: ${error.message}`;
+          console.error(error);
+          setTimeout(() => notifyParentOfHeight(), 100);
         });
     }
 
-    setupSubtabs();
-    updateTableFromCSV();
-    setInterval(updateTableFromCSV, REFRESH_INTERVAL);
+    function initialize() {
+      setupSubtabs();
+      updateTableFromCSV();
+      setInterval(updateTableFromCSV, REFRESH_INTERVAL);
+
+      window.addEventListener('message', (event) => {
+        if (!event.data || typeof event.data !== 'object') return;
+        if (event.data.type === 'request-cfb-height') {
+          notifyParentOfHeight();
+        }
+      });
+
+      setTimeout(() => notifyParentOfHeight(), 250);
+    }
+
+    document.addEventListener('DOMContentLoaded', initialize);
   </script>
 </body>
 </html>
