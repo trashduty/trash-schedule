@@ -2,14 +2,19 @@ library(tidyverse)
 library(lubridate)
 library(readr)
 
+# Ensure the Reports directory exists
+if (!dir.exists("CFB_Odds/Reports")) {
+  dir.create("CFB_Odds/Reports", recursive = TRUE)
+}
+
 # Read the current odds data
-odds_data <- read_csv("CFB_Odds/Data/spreads_odds.csv")
+odds_data <- read_csv("CFB_Odds/Data/spreads_odds.csv", show_col_types = FALSE)
 
 # Read or initialize the running log
 log_file <- "CFB_Odds/Reports/line_movement_history.csv"
 
 if (file.exists(log_file)) {
-  history <- read_csv(log_file)
+  history <- read_csv(log_file, show_col_types = FALSE)
 } else {
   history <- tibble(
     week = integer(),
@@ -217,7 +222,11 @@ create_html_report <- function(report_data) {
   <div class='container'>
     <div class='header'>
       <h1>📊 CFB Line Movement Tracker</h1>
-      <p>Updated: " %s% format(Sys.time(), "%A, %B %d, %Y at %I:%M %p %Z") %s% "</p>
+      <p>Updated: "
+  
+  html_content <- paste0(html_content, format(Sys.time(), "%A, %B %d, %Y at %I:%M %p %Z"))
+  
+  html_content <- paste0(html_content, "</p>
       <p>Click column headers to sort | Yellow = 3+ pts movement | Red = 5+ pts movement</p>
       <div class='legend'>
         <div class='legend-item'>
@@ -230,7 +239,7 @@ create_html_report <- function(report_data) {
         </div>
       </div>
     </div>
-  "
+  ")
   
   # Build table for each week
   for (w in sort(weeks)) {
@@ -304,11 +313,6 @@ create_html_report <- function(report_data) {
 </html>")
   
   write(html_content, "CFB_Odds/Reports/line_movement_report.html")
-}
-
-# Create output directory if needed
-if (!dir.exists("CFB_Odds/Reports")) {
-  dir.create("CFB_Odds/Reports", recursive = TRUE)
 }
 
 # Generate reports
