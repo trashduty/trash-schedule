@@ -25,6 +25,40 @@ model_output_path <- "cfb model output_new.csv"
 
 cfb_crosswalk <- read_csv(cfb_crosswalk_path, show_col_types = FALSE)
 
+# Build a many-to-one lookup that maps every known name variant for a team
+# (short name, full btb name, cfbfastR name, api name) to that team's team_id.
+# This is used as a failsafe wherever we need to match a team name coming
+# from an external/raw source (model output, odds API) back to a team_id,
+# regardless of which name format that source happens to use.
+create_team_name_lookup <- function(cfb_crosswalk) {
+  name_lookup <- cfb_crosswalk |>
+    select(team_id, btb_team_short, btb_team, cfbfastr_team, api_team) |>
+    pivot_longer(
+      cols = c(btb_team_short, btb_team, cfbfastr_team, api_team),
+      names_to = "name_type",
+      values_to = "team_name"
+    ) |>
+    filter(!is.na(team_name)) |>
+    select(team_id, team_name) |>
+    distinct()
+
+  ambiguous_names <- name_lookup |>
+    distinct(team_id, team_name) |>
+    summarise(n_teams = n_distinct(team_id), .by = team_name) |>
+    filter(n_teams > 1) |>
+    pull(team_name)
+
+  if (length(ambiguous_names) > 0) {
+    warning(glue(
+      "Team name variant(s) map to more than one team_id in the crosswalk: {paste(ambiguous_names, collapse = ', ')}"
+    ))
+  }
+
+  name_lookup
+}
+
+team_name_lookup <- create_team_name_lookup(cfb_crosswalk)
+
 lookup <- read_csv(lookup_path, show_col_types = FALSE) |>
   janitor::clean_names() |>
   select(total_bin, market_spread, true_spread, cover_probability, push_probability)
@@ -90,6 +124,10 @@ get_odds_api <- function(cfb_crosswalk = NULL,
     cfb_crosswalk <- read_csv(cfb_crosswalk_path, show_col_types = FALSE)
   }
 
+  team_name_lookup <- create_team_name_lookup(cfb_crosswalk)
+  team_canonical_lookup <- cfb_crosswalk |>
+    select(team_id, btb_team, logo)
+
   url <- glue("https://api.the-odds-api.com/v4/sports/{sport}/odds/?apiKey={apiKey}&regions={regions}&markets={markets}&oddsFormat={oddsFormat}")
 
   response <- httr::GET(url, httr::add_headers(
@@ -114,12 +152,16 @@ get_odds_api <- function(cfb_crosswalk = NULL,
                                "espnbet", "fanatics", "caesars")) |>
     mutate(commence_ny = lubridate::as_date(lubridate::ymd_hms(commence_time, tz = "America/New_York")),
            .after = commence_time) |>
-    left_join(select(cfb_crosswalk, btb_team, logo),
-              by = c("home_team" = "btb_team")) |>
+    left_join(team_name_lookup, by = c("home_team" = "team_name")) |>
+    left_join(team_canonical_lookup, by = "team_id") |>
+    mutate(home_team = coalesce(btb_team, home_team)) |>
     rename(home_logo = logo) |>
-    left_join(select(cfb_crosswalk, btb_team, logo),
-              by = c("away_team" = "btb_team")) |>
+    select(-team_id, -btb_team) |>
+    left_join(team_name_lookup, by = c("away_team" = "team_name")) |>
+    left_join(team_canonical_lookup, by = "team_id") |>
+    mutate(away_team = coalesce(btb_team, away_team)) |>
     rename(away_logo = logo) |>
+    select(-team_id, -btb_team) |>
     mutate(week = calculate_cfb_week(commence_ny)) |>
     mutate(week = if_else(week == 23, 22, week)) |>
     select(week, commence_time, commence_ny, bookmaker_id,
@@ -156,11 +198,12 @@ api_spreads <- api_data |>
   filter(market == "spreads") |>
   mutate(game = paste0(away_team, "@", home_team)) |>
   filter(game != "NA@UNLV") |>
+  left_join(team_name_lookup, by = c("name" = "team_name")) |>
   left_join(
-    select(cfb_crosswalk, btb_team, logo),
-    by = c("name" = "btb_team")
+    select(cfb_crosswalk, team_id, btb_team, logo),
+    by = "team_id"
   ) |>
-  rename(team = name) |>
+  mutate(team = coalesce(btb_team, name)) |>
   select(
     week,
     game,
