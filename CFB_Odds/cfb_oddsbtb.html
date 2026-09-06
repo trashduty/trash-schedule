@@ -887,34 +887,36 @@
         }));
 
       /*
-       * Put Edge immediately after Game Time.
+       * Put Edge before Model Prediction.
        */
       const edgeIdx =
         mapped.findIndex(
           c => c.csv === 'edge'
         );
 
-      const gameTimeIdx =
+      const modelPredictionIdx =
         mapped.findIndex(
-          c => c.csv === 'game_time_est'
+          c =>
+            c.csv ===
+            'model_prediction'
         );
 
       if (
         edgeIdx !== -1 &&
-        gameTimeIdx !== -1
+        modelPredictionIdx !== -1
       ) {
         const [edgeCol] =
           mapped.splice(edgeIdx, 1);
 
-        const updatedGameTimeIdx =
+        const updatedModelIdx =
           mapped.findIndex(
             c =>
               c.csv ===
-              'game_time_est'
+              'model_prediction'
           );
 
         mapped.splice(
-          updatedGameTimeIdx + 1,
+          updatedModelIdx,
           0,
           edgeCol
         );
@@ -928,7 +930,7 @@
           c => c.csv === 'market_line'
         );
 
-      const modelPredictionIdx =
+      const updatedModelPredictionIdx =
         mapped.findIndex(
           c =>
             c.csv ===
@@ -937,13 +939,13 @@
 
       if (
         marketLineIdx !== -1 &&
-        modelPredictionIdx !== -1 &&
-        modelPredictionIdx >
+        updatedModelPredictionIdx !== -1 &&
+        updatedModelPredictionIdx >
           marketLineIdx
       ) {
         const [modelCol] =
           mapped.splice(
-            modelPredictionIdx,
+            updatedModelPredictionIdx,
             1
           );
 
@@ -1000,100 +1002,109 @@
         button.textContent =
           subtab.label;
 
-        button.onclick = ev =>
-          switchSubtab(
-            subtab.id,
-            ev
-          );
+        button.addEventListener(
+          'click',
+          () => switchTab(subtab.id)
+        );
 
         container.appendChild(
           button
         );
       });
 
-      document
-        .getElementById(
-          'spreads-content'
-        )
-        .classList.add('active');
+      setupContentDivs();
     }
 
-    function switchSubtab(
-      tabId,
-      ev
-    ) {
-      document
-        .querySelectorAll(
-          '.subtab-content'
-        )
-        .forEach(el =>
-          el.classList.remove(
-            'active'
-          )
+    function setupContentDivs() {
+      const spreadsContent =
+        document.getElementById(
+          'spreads-content'
         );
 
-      document
-        .getElementById(
-          `${tabId}-content`
-        )
-        .classList.add('active');
-
-      document
-        .querySelectorAll('.subtab')
-        .forEach(el =>
-          el.classList.remove(
-            'active'
-          )
+      const totalsContent =
+        document.getElementById(
+          'totals-content'
         );
 
-      if (ev && ev.target) {
-        ev.target.classList.add(
-          'active'
-        );
-      }
+      spreadsContent.classList.add(
+        'active'
+      );
 
-      setTimeout(
-        () =>
-          notifyParentOfHeight(),
-        100
+      totalsContent.classList.remove(
+        'active'
       );
     }
 
-    function toggleTeamPicker(
-      tabId,
-      forceOpen
-    ) {
+    function switchTab(tabId) {
+      const contents = [
+        'spreads-content',
+        'totals-content'
+      ];
+
+      const buttons =
+        document.querySelectorAll(
+          '.subtab'
+        );
+
+      contents.forEach(contentId => {
+        const content =
+          document.getElementById(
+            contentId
+          );
+
+        if (contentId === tabId + '-content') {
+          content.classList.add(
+            'active'
+          );
+        } else {
+          content.classList.remove(
+            'active'
+          );
+        }
+      });
+
+      buttons.forEach((button, index) => {
+        if (
+          index === 0 &&
+          tabId === 'spreads'
+        ) {
+          button.classList.add(
+            'active'
+          );
+        } else if (
+          index === 1 &&
+          tabId === 'totals'
+        ) {
+          button.classList.add(
+            'active'
+          );
+        } else {
+          button.classList.remove(
+            'active'
+          );
+        }
+      });
+    }
+
+    function toggleTeamPicker(tabId, show) {
       const picker =
         document.getElementById(
-          `${tabId}-teamPicker`
+          tabId +
+          '-teamPicker'
         );
 
-      if (!picker) return;
+      if (
+        show === undefined
+      ) {
+        show =
+          picker.hasAttribute(
+            'hidden'
+          );
+      }
 
-      const isHidden =
-        picker.hasAttribute(
-          'hidden'
-        );
-
-      const open =
-        typeof forceOpen ===
-        'boolean'
-          ? forceOpen
-          : isHidden;
-
-      if (open) {
+      if (show) {
         picker.removeAttribute(
           'hidden'
-        );
-
-        setTimeout(
-          () =>
-            document
-              .getElementById(
-                `${tabId}-teamFilter`
-              )
-              ?.focus(),
-          0
         );
       } else {
         picker.setAttribute(
@@ -1101,1592 +1112,164 @@
           ''
         );
       }
-
-      setTimeout(
-        () =>
-          notifyParentOfHeight(),
-        100
-      );
     }
 
-    function getEdgeGradientColor(
-      value,
-      thresholdPctPoints
-    ) {
-      const pct = value * 100;
-
-      const diff =
-        pct -
-        thresholdPctPoints;
-
-      if (diff >= 0) {
-        const lightness =
-          Math.max(
-            95 - diff * 8,
-            30
-          );
-
-        return `hsl(120, 70%, ${lightness}%)`;
-      }
-
-      const lightness =
-        Math.max(
-          95 -
-            Math.abs(diff) * 8,
-          75
-        );
-
-      return `hsl(0, 80%, ${lightness}%)`;
-    }
-
-    function formatValue(
-      value,
-      type,
-      csvKey
-    ) {
-      if (
-        value === null ||
-        value === undefined ||
-        value === ''
-      ) {
-        return '';
-      }
-
-      if (
-        type === 'probability' ||
-        type === 'spread_edge'
-      ) {
-        return (
-          Number(value) * 100
-        ).toFixed(2) + '%';
-      }
-
-      if (
-        csvKey ===
-          'model_prediction' ||
-        csvKey ===
-          'market_line' ||
-        csvKey ===
-          'best_line'
-      ) {
-        return Number(value).toFixed(
-          1
-        );
-      }
-
-      if (
-        csvKey ===
-          'market_price' ||
-        csvKey ===
-          'best_price'
-      ) {
-        return Number(value).toFixed(
-          0
-        );
-      }
-
-      if (type === 'text') {
-        return String(value);
-      }
-
-      if (type === 'decimal') {
-        return Number(value).toFixed(
-          2
-        );
-      }
-
-      return value;
-    }
-
-    function onTeamFilterInput(
-      tabId
-    ) {
-      renderTeamPicker(tabId);
-    }
-
-    function onTeamToggle(
-      tabId,
-      team,
-      isChecked
-    ) {
-      const state =
-        tabState[tabId];
-
-      if (isChecked) {
-        state.selectedTeams.add(
-          team
-        );
-      } else {
-        state.selectedTeams.delete(
-          team
-        );
-      }
-
-      updateTeamCount(tabId);
-      updateTeamSummary(tabId);
-      renderTable(tabId);
-    }
-
-    function onGameToggle(
-      tabId,
-      game,
-      isChecked
-    ) {
-      const state =
-        tabState[tabId];
-
-      if (isChecked) {
-        state.selectedGames.add(
-          game
-        );
-      } else {
-        state.selectedGames.delete(
-          game
-        );
-      }
-
-      updateTeamCount(tabId);
-      updateTeamSummary(tabId);
-      renderTable(tabId);
-    }
-
-    function clearTeamSelection(
-      tabId
-    ) {
-      const state =
-        tabState[tabId];
-
-      state.selectedTeams.clear();
-      state.selectedGames.clear();
-
-      const filterEl =
+    function onTeamFilterInput(tabId) {
+      const filterInput =
         document.getElementById(
-          `${tabId}-teamFilter`
+          tabId + '-teamFilter'
         );
-
-      if (filterEl) {
-        filterEl.value = '';
-      }
-
-      renderTeamPicker(tabId);
-      updateTeamSummary(tabId);
-      renderTable(tabId);
-    }
-
-    function selectVisibleTeams(
-      tabId
-    ) {
-      const state =
-        tabState[tabId];
 
       const filterText =
-        document
-          .getElementById(
-            `${tabId}-teamFilter`
-          )
-          .value.toLowerCase()
-          .trim();
+        filterInput.value
+          .toLowerCase();
 
-      if (tabId === 'totals') {
-        state.allGames
-          .filter(g =>
-            g
-              .toLowerCase()
-              .includes(filterText)
-          )
-          .forEach(g =>
-            state.selectedGames.add(
-              g
-            )
+      const teamList =
+        document.getElementById(
+          tabId + '-teamList'
+        );
+
+      const items =
+        teamList.querySelectorAll(
+          '.team-item'
+        );
+
+      let visibleCount = 0;
+
+      items.forEach(item => {
+        const label =
+          item.textContent
+            .toLowerCase();
+
+        const isVisible =
+          label.includes(
+            filterText
           );
-      } else {
-        state.allTeams
-          .filter(t => {
-            const displayName = (
-              teamLookup[t]
-                ?.displayName || t
-            ).toLowerCase();
 
-            return (
-              displayName.includes(
-                filterText
-              ) ||
-              t
-                .toLowerCase()
-                .includes(
-                  filterText
-                )
-            );
-          })
-          .forEach(t =>
-            state.selectedTeams.add(
-              t
-            )
+        if (isVisible) {
+          item.style.display =
+            'flex';
+
+          visibleCount++;
+        } else {
+          item.style.display =
+            'none';
+        }
+      });
+    }
+
+    function selectVisibleTeams(tabId) {
+      const teamList =
+        document.getElementById(
+          tabId + '-teamList'
+        );
+
+      const items =
+        teamList.querySelectorAll(
+          '.team-item:not([style*="display: none"])'
+        );
+
+      const tabData =
+        tabState[tabId];
+
+      items.forEach(item => {
+        const checkbox =
+          item.querySelector(
+            'input[type="checkbox"]'
           );
-      }
 
-      renderTeamPicker(tabId);
+        if (
+          checkbox &&
+          checkbox.style.display !== 'none'
+        ) {
+          checkbox.checked =
+            true;
+
+          const teamKey =
+            checkbox.dataset.team;
+
+          tabData.selectedTeams.add(
+            teamKey
+          );
+        }
+      });
+
+      updateTableAndSummary(
+        tabId
+      );
+    }
+
+    function clearTeamSelection(tabId) {
+      const teamList =
+        document.getElementById(
+          tabId + '-teamList'
+        );
+
+      const checkboxes =
+        teamList.querySelectorAll(
+          'input[type="checkbox"]'
+        );
+
+      checkboxes.forEach(checkbox => {
+        checkbox.checked = false;
+      });
+
+      tabState[tabId].selectedTeams.clear();
+
+      updateTableAndSummary(
+        tabId
+      );
+    }
+
+    function updateTableAndSummary(tabId) {
+      renderTable(tabId);
       updateTeamSummary(tabId);
-      renderTable(tabId);
     }
 
-    function updateTeamCount(
-      tabId
-    ) {
-      const state =
+    function updateTeamSummary(tabId) {
+      const tabData =
         tabState[tabId];
 
-      const countEl =
+      const summaryDiv =
         document.getElementById(
-          `${tabId}-teamCount`
+          tabId + '-teamSummary'
         );
 
-      if (!countEl) return;
+      const selectedCount =
+        tabData.selectedTeams.size;
 
-      if (tabId === 'totals') {
-        countEl.textContent =
-          `Games: ${state.allGames.length} • Selected: ${state.selectedGames.size}`;
-      } else {
-        countEl.textContent =
-          `Teams: ${state.allTeams.length} • Selected: ${state.selectedTeams.size}`;
-      }
-    }
-
-    function updateTeamSummary(
-      tabId
-    ) {
-      const state =
-        tabState[tabId];
-
-      const el =
-        document.getElementById(
-          `${tabId}-teamSummary`
-        );
-
-      if (!el) return;
-
-      const isSelected =
-        tabId === 'totals'
-          ? state.selectedGames.size
-          : state.selectedTeams.size;
-
-      if (isSelected === 0) {
-        el.textContent =
-          tabId === 'totals'
-            ? 'All games'
-            : 'All teams';
-
-        return;
-      }
-
-      el.textContent =
-        `${isSelected} ${
-          tabId === 'totals'
-            ? 'game'
-            : 'team'
-        }${
-          isSelected === 1
-            ? ''
-            : 's'
-        } selected`;
-    }
-
-    function renderTeamPicker(
-      tabId
-    ) {
-      const state =
-        tabState[tabId];
-
-      const container =
-        document.getElementById(
-          `${tabId}-teamList`
-        );
-
-      if (!container) return;
-
-      const filterText =
-        document
-          .getElementById(
-            `${tabId}-teamFilter`
-          )
-          .value.toLowerCase()
-          .trim();
-
-      container.innerHTML = '';
-
-      if (tabId === 'totals') {
-        state.allGames
-          .filter(g =>
-            g
-              .toLowerCase()
-              .includes(filterText)
-          )
-          .forEach(game => {
-            const id =
-              `${tabId}_game_${game.replace(
-                /[^a-z0-9]/gi,
-                '_'
-              )}`;
-
-            const row =
-              document.createElement(
-                'div'
-              );
-
-            row.className =
-              'team-item';
-
-            const cb =
-              document.createElement(
-                'input'
-              );
-
-            cb.type = 'checkbox';
-            cb.id = id;
-
-            cb.checked =
-              state.selectedGames.has(
-                game
-              );
-
-            cb.onchange = () =>
-              onGameToggle(
-                tabId,
-                game,
-                cb.checked
-              );
-
-            const label =
-              document.createElement(
-                'label'
-              );
-
-            label.htmlFor = id;
-            label.textContent = game;
-
-            row.appendChild(cb);
-            row.appendChild(label);
-
-            container.appendChild(
-              row
-            );
-          });
-      } else {
-        state.allTeams
-          .filter(t => {
-            const displayName = (
-              teamLookup[t]
-                ?.displayName || t
-            ).toLowerCase();
-
-            return (
-              displayName.includes(
-                filterText
-              ) ||
-              t
-                .toLowerCase()
-                .includes(
-                  filterText
-                )
-            );
-          })
-          .forEach(team => {
-            const displayName =
-              teamLookup[team]
-                ?.displayName ||
-              team;
-
-            const id =
-              `${tabId}_team_${team.replace(
-                /[^a-z0-9]/gi,
-                '_'
-              )}`;
-
-            const row =
-              document.createElement(
-                'div'
-              );
-
-            row.className =
-              'team-item';
-
-            const cb =
-              document.createElement(
-                'input'
-              );
-
-            cb.type = 'checkbox';
-            cb.id = id;
-
-            cb.checked =
-              state.selectedTeams.has(
-                team
-              );
-
-            cb.onchange = () =>
-              onTeamToggle(
-                tabId,
-                team,
-                cb.checked
-              );
-
-            const label =
-              document.createElement(
-                'label'
-              );
-
-            label.htmlFor = id;
-            label.textContent =
-              displayName;
-
-            row.appendChild(cb);
-            row.appendChild(label);
-
-            container.appendChild(
-              row
-            );
-          });
-      }
-
-      updateTeamCount(tabId);
-    }
-
-    function onSort(
-      tabId,
-      key
-    ) {
-      const state =
-        tabState[tabId];
+      const allCount =
+        tabId === 'spreads'
+          ? tabData.allTeams.length
+          : tabData.allGames.length;
 
       if (
-        state.sortConfig.key === key
+        selectedCount === 0 ||
+        selectedCount === allCount
       ) {
-        state.sortConfig.direction =
-          state.sortConfig.direction ===
-          'asc'
-            ? 'desc'
-            : 'asc';
+        summaryDiv.textContent =
+          tabId === 'spreads'
+            ? 'All teams'
+            : 'All games';
       } else {
-        state.sortConfig.key = key;
-        state.sortConfig.direction =
-          'asc';
+        summaryDiv.textContent =
+          selectedCount +
+          ' ' +
+          (
+            tabId === 'spreads'
+              ? 'team'
+              : 'game'
+          ) +
+          (
+            selectedCount === 1
+              ? ''
+              : 's'
+          ) +
+          ' selected';
       }
-
-      renderTable(tabId);
     }
 
-    function buildTeamCell(
-      teamName,
-      rowLogo,
-      notes
-    ) {
-      const teamKey = (
-        teamName || ''
-      )
-        .toString()
-        .trim();
-
-      const info =
-        teamLookup[teamKey] || {};
-
-      const displayName =
-        info.displayName ||
-        teamKey;
-
-      const url =
-        info.injuryUrl || null;
-
-      const logoUrl =
-        info.logoUrl ||
-        rowLogo ||
-        null;
-
-      const wrapper =
-        document.createElement(
-          'div'
-        );
-
-      wrapper.className =
-        'team-cell';
-
-      if (url) {
-        const a =
-          document.createElement(
-            'a'
-          );
-
-        a.href = url;
-        a.target = '_blank';
-        a.rel =
-          'noopener noreferrer';
-
-        a.className =
-          'team-link';
-
-        if (logoUrl) {
-          const img =
-            document.createElement(
-              'img'
-            );
-
-          img.src = logoUrl;
-
-          img.alt =
-            `${displayName} logo`;
-
-          img.className =
-            'team-logo';
-
-          a.appendChild(img);
-        }
-
-        const span =
-          document.createElement(
-            'span'
-          );
-
-        span.textContent =
-          displayName;
-
-        a.appendChild(span);
-
-        wrapper.appendChild(a);
-      } else {
-        const line =
-          document.createElement(
-            'div'
-          );
-
-        if (logoUrl) {
-          const img =
-            document.createElement(
-              'img'
-            );
-
-          img.src = logoUrl;
-
-          img.alt =
-            `${displayName} logo`;
-
-          img.className =
-            'team-logo';
-
-          line.appendChild(img);
-
-          line.appendChild(
-            document.createTextNode(
-              ' '
-            )
-          );
-        }
-
-        line.appendChild(
-          document.createTextNode(
-            displayName
-          )
-        );
-
-        wrapper.appendChild(line);
-      }
-
-      if (notes) {
-        const notesDiv =
-          document.createElement(
-            'div'
-          );
-
-        notesDiv.className =
-          'notes-text';
-
-        notesDiv.textContent =
-          notes;
-
-        wrapper.appendChild(
-          notesDiv
-        );
-      }
-
-      return wrapper;
-    }
-
-    function createGroupsFromRows(
-      rows
-    ) {
-      const map = new Map();
-
-      rows.forEach(
-        (row, idx) => {
-          const game = (
-            row.game || ''
-          )
-            .toString()
-            .trim();
-
-          const week = (
-            row.week || ''
-          )
-            .toString()
-            .trim();
-
-          const time = (
-            row.game_time_est || ''
-          )
-            .toString()
-            .trim();
-
-          const fallback =
-            `${week}|${time}|${idx}`;
-
-          const key =
-            game || fallback;
-
-          if (!map.has(key)) {
-            map.set(key, {
-              key,
-              game,
-              week,
-              game_time_est:
-                time,
-              game_date_et:
-                row.game_date_et ||
-                '',
-              game_time_et:
-                row.game_time_et ||
-                '',
-              rows: []
-            });
-          }
-
-          map
-            .get(key)
-            .rows.push(row);
-        }
-      );
-
-      return Array.from(
-        map.values()
-      );
-    }
-
-    function getGroupSortValue(
-      group,
-      key
-    ) {
-      const vals =
-        group.rows
-          .map(r => r[key])
-          .filter(
-            v =>
-              v !== null &&
-              v !== undefined &&
-              v !== ''
-          );
-
-      if (!vals.length) {
-        return null;
-      }
-
-      if (
-        vals.every(
-          v =>
-            typeof v ===
-            'number'
-        )
-      ) {
-        return Math.max(...vals);
-      }
-
-      return vals[0];
-    }
-
-    function sortGroups(
-      groups,
-      sortConfig
-    ) {
-      if (
-        !sortConfig ||
-        !sortConfig.key
-      ) {
-        return groups.sort(
-          (a, b) => {
-            const ta =
-              parseEtDateTimeFromRow(
-                {
-                  game_date_et:
-                    a.game_date_et ||
-                    a.rows?.[0]
-                      ?.game_date_et,
-
-                  game_time_et:
-                    a.game_time_et ||
-                    a.rows?.[0]
-                      ?.game_time_et,
-
-                  commence_time:
-                    a.rows?.[0]
-                      ?.commence_time
-                }
-              );
-
-            const tb =
-              parseEtDateTimeFromRow(
-                {
-                  game_date_et:
-                    b.game_date_et ||
-                    b.rows?.[0]
-                      ?.game_date_et,
-
-                  game_time_et:
-                    b.game_time_et ||
-                    b.rows?.[0]
-                      ?.game_time_et,
-
-                  commence_time:
-                    b.rows?.[0]
-                      ?.commence_time
-                }
-              );
-
-            if (ta !== tb) {
-              return ta - tb;
-            }
-
-            const wa =
-              Number(
-                a.week ?? 9999
-              );
-
-            const wb =
-              Number(
-                b.week ?? 9999
-              );
-
-            if (wa !== wb) {
-              return wa - wb;
-            }
-
-            return (
-              a.game || ''
-            ).localeCompare(
-              b.game || ''
-            );
-          }
-        );
-      }
-
-      const dir =
-        sortConfig.direction ===
-        'desc'
-          ? -1
-          : 1;
-
-      const key =
-        sortConfig.key;
-
-      return groups.sort(
-        (a, b) => {
-          const aVal =
-            getGroupSortValue(
-              a,
-              key
-            );
-
-          const bVal =
-            getGroupSortValue(
-              b,
-              key
-            );
-
-          if (aVal === bVal) {
-            return 0;
-          }
-
-          if (aVal === null) {
-            return 1;
-          }
-
-          if (bVal === null) {
-            return -1;
-          }
-
-          if (
-            typeof aVal ===
-              'number' &&
-            typeof bVal ===
-              'number'
-          ) {
-            return (
-              aVal < bVal
-                ? -1
-                : 1
-            ) * dir;
-          }
-
-          return aVal
-            .toString()
-            .localeCompare(
-              bVal.toString()
-            ) * dir;
-        }
-      );
-    }
-
-    function sortRowsWithinGroup(
-      rows,
-      sortConfig
-    ) {
-      if (
-        !sortConfig ||
-        !sortConfig.key
-      ) {
-        return rows
-          .slice()
-          .sort(
-            (a, b) => {
-              const aGame = (
-                a['game'] || ''
-              )
-                .toString()
-                .trim();
-
-              const bGame = (
-                b['game'] || ''
-              )
-                .toString()
-                .trim();
-
-              if (
-                aGame === bGame
-              ) {
-                const aTeam = (
-                  a['team'] || ''
-                )
-                  .toString()
-                  .trim();
-
-                const bTeam = (
-                  b['team'] || ''
-                )
-                  .toString()
-                  .trim();
-
-                const awayTeam =
-                  aGame
-                    .split('@')[0]
-                    .trim();
-
-                if (
-                  aTeam ===
-                  awayTeam
-                ) {
-                  return -1;
-                }
-
-                if (
-                  bTeam ===
-                  awayTeam
-                ) {
-                  return 1;
-                }
-
-                return 0;
-              }
-
-              return 0;
-            }
-          );
-      }
-
-      const key =
-        sortConfig.key;
-
-      const dir =
-        sortConfig.direction ===
-        'desc'
-          ? -1
-          : 1;
-
-      return rows
-        .slice()
-        .sort(
-          (a, b) => {
-            const aVal =
-              a[key];
-
-            const bVal =
-              b[key];
-
-            if (
-              aVal === bVal
-            ) {
-              return 0;
-            }
-
-            if (
-              aVal === null ||
-              aVal === undefined ||
-              aVal === ''
-            ) {
-              return 1;
-            }
-
-            if (
-              bVal === null ||
-              bVal === undefined ||
-              bVal === ''
-            ) {
-              return -1;
-            }
-
-            if (
-              typeof aVal ===
-                'number' &&
-              typeof bVal ===
-                'number'
-            ) {
-              return (
-                aVal < bVal
-                  ? -1
-                  : 1
-              ) * dir;
-            }
-
-            return aVal
-              .toString()
-              .localeCompare(
-                bVal.toString()
-              ) * dir;
-          }
-        );
-    }
-
-    function renderTable(tabId) {
-      const state =
-        tabState[tabId];
-
-      const head =
-        document.getElementById(
-          `${tabId}-tableHead`
-        );
-
-      const body =
-        document.getElementById(
-          `${tabId}-tableBody`
-        );
-
-      if (!head || !body) {
-        return;
-      }
-
-      head.innerHTML = '';
-      body.innerHTML = '';
-
-      if (
-        !state.rawData ||
-        state.rawData.length === 0
-      ) {
-        return;
-      }
-
-      const activeCols =
-        state.columnMapping.filter(
-          col =>
-            Object.prototype
-              .hasOwnProperty.call(
-                state.rawData[0],
-                col.csv
-              )
-        );
-
-      activeCols.forEach(col => {
-        const th =
-          document.createElement(
-            'th'
-          );
-
-        th.textContent =
-          col.display;
-
-        th.onclick = () =>
-          onSort(
-            tabId,
-            col.csv
-          );
-
-        head.appendChild(th);
-      });
-
-      let processedData =
-        state.rawData;
-
-      /*
-       * Apply team/game selector.
-       */
-      if (tabId === 'totals') {
-        if (
-          state.selectedGames
-            .size > 0
-        ) {
-          processedData =
-            state.rawData.filter(
-              row =>
-                state.selectedGames.has(
-                  (
-                    row['game'] ||
-                    ''
-                  )
-                    .toString()
-                    .trim()
-                )
-            );
-        }
-      } else {
-        if (
-          state.selectedTeams
-            .size > 0
-        ) {
-          processedData =
-            state.rawData.filter(
-              row =>
-                state.selectedTeams.has(
-                  (
-                    row['team'] ||
-                    ''
-                  )
-                    .toString()
-                    .trim()
-                )
-            );
-        }
-      }
-
-      /*
-       * ------------------------------------------------
-       * TOTALS TABLE
-       * ------------------------------------------------
-       */
-      if (tabId !== 'spreads') {
-
-        if (!state.sortConfig.key) {
-          processedData =
-            processedData
-              .slice()
-              .sort(
-                (a, b) => {
-                  const ta =
-                    parseEtDateTimeFromRow(
-                      a
-                    );
-
-                  const tb =
-                    parseEtDateTimeFromRow(
-                      b
-                    );
-
-                  if (ta !== tb) {
-                    return ta - tb;
-                  }
-
-                  return (
-                    a.game || ''
-                  )
-                    .toString()
-                    .localeCompare(
-                      (
-                        b.game ||
-                        ''
-                      ).toString()
-                    );
-                }
-              );
-        }
-
-        if (
-          state.sortConfig.key
-        ) {
-          processedData =
-            processedData
-              .slice()
-              .sort(
-                (a, b) => {
-                  const key =
-                    state
-                      .sortConfig
-                      .key;
-
-                  const valA =
-                    a[key];
-
-                  const valB =
-                    b[key];
-
-                  if (
-                    valA ===
-                    valB
-                  ) {
-                    return 0;
-                  }
-
-                  if (
-                    valA ===
-                      null ||
-                    valA ===
-                      undefined
-                  ) {
-                    return 1;
-                  }
-
-                  if (
-                    valB ===
-                      null ||
-                    valB ===
-                      undefined
-                  ) {
-                    return -1;
-                  }
-
-                  let comparison;
-
-                  if (
-                    typeof valA ===
-                      'number' &&
-                    typeof valB ===
-                      'number'
-                  ) {
-                    comparison =
-                      valA < valB
-                        ? -1
-                        : 1;
-                  } else {
-                    comparison =
-                      valA
-                        .toString()
-                        .localeCompare(
-                          valB.toString()
-                        );
-                  }
-
-                  return state
-                    .sortConfig
-                    .direction ===
-                    'asc'
-                    ? comparison
-                    : -comparison;
-                }
-              );
-        }
-
-        processedData.forEach(
-          row => {
-            const tr =
-              document.createElement(
-                'tr'
-              );
-
-            activeCols.forEach(
-              col => {
-                const td =
-                  document.createElement(
-                    'td'
-                  );
-
-                const val =
-                  row[col.csv];
-
-                td.textContent =
-                  formatValue(
-                    val,
-                    col.type,
-                    col.csv
-                  );
-
-                if (
-                  col.type !==
-                  'text'
-                ) {
-                  td.classList.add(
-                    'numeric'
-                  );
-                }
-
-                if (
-                  typeof val ===
-                    'number' &&
-                  col.type ===
-                    'spread_edge'
-                ) {
-                  td.style.backgroundColor =
-                    getEdgeGradientColor(
-                      val,
-                      EDGE_THRESHOLD_PERCENT
-                    );
-                }
-
-                tr.appendChild(td);
-              }
-            );
-
-            body.appendChild(tr);
-          }
-        );
-
-        setTimeout(
-          () =>
-            notifyParentOfHeight(),
-          100
-        );
-
-        return;
-      }
-
-      /*
-       * ------------------------------------------------
-       * SPREADS TABLE
-       * ------------------------------------------------
-       */
-      let groups =
-        createGroupsFromRows(
-          processedData
-        );
-
-      groups =
-        sortGroups(
-          groups,
-          state.sortConfig
-        );
-
-      groups.forEach(group => {
-        const gameHeaderTr =
-          document.createElement(
-            'tr'
-          );
-
-        gameHeaderTr.className =
-          'game-group-header';
-
-        const gameTd =
-          document.createElement(
-            'td'
-          );
-
-        gameTd.colSpan =
-          activeCols.length;
-
-        const title =
-          document.createElement(
-            'span'
-          );
-
-        title.className =
-          'game-group-title';
-
-        title.textContent =
-          group.game ||
-          'Matchup';
-
-        const meta =
-          document.createElement(
-            'span'
-          );
-
-        meta.className =
-          'game-meta';
-
-        const datePart = (
-          group.game_date_et ||
-          ''
-        )
-          .toString()
-          .trim();
-
-        const timePart = (
-          group.game_time_et ||
-          ''
-        )
-          .toString()
-          .trim();
-
-        meta.textContent = [
-          datePart,
-
-          timePart
-            ? `${timePart} ET`
-            : ''
-        ]
-          .filter(Boolean)
-          .join(' • ');
-
-        gameTd.appendChild(
-          title
-        );
-
-        if (meta.textContent) {
-          gameTd.appendChild(
-            meta
-          );
-        }
-
-        gameHeaderTr.appendChild(
-          gameTd
-        );
-
-        body.appendChild(
-          gameHeaderTr
-        );
-
-        const sortedRows =
-          sortRowsWithinGroup(
-            group.rows,
-            state.sortConfig
-          );
-
-        sortedRows.forEach(
-          (row, rowIdx) => {
-            const tr =
-              document.createElement(
-                'tr'
-              );
-
-            tr.className =
-              'team-subrow';
-
-            activeCols.forEach(
-              col => {
-                const td =
-                  document.createElement(
-                    'td'
-                  );
-
-                const val =
-                  row[col.csv];
-
-                const hideGame =
-                  col.csv ===
-                  'game';
-
-                const hideGameTime =
-                  col.csv ===
-                    'game_time_est' ||
-                  col.csv ===
-                    'commence_time';
-
-                const hideWeekOnSecondRow =
-                  col.csv ===
-                    'week' &&
-                  rowIdx > 0;
-
-                if (
-                  col.csv ===
-                  'team'
-                ) {
-                  const teamKey = (
-                    row.team || ''
-                  )
-                    .toString()
-                    .trim();
-
-                  const notes =
-                    notesLookup[
-                      teamKey
-                    ];
-
-                  td.appendChild(
-                    buildTeamCell(
-                      row.team,
-                      row.logo,
-                      notes
-                    )
-                  );
-                } else if (
-                  hideGame ||
-                  hideGameTime ||
-                  hideWeekOnSecondRow
-                ) {
-                  td.textContent =
-                    '';
-                } else {
-                  td.textContent =
-                    formatValue(
-                      val,
-                      col.type,
-                      col.csv
-                    );
-                }
-
-                if (
-                  col.type !==
-                  'text'
-                ) {
-                  td.classList.add(
-                    'numeric'
-                  );
-                }
-
-                if (
-                  !(
-                    hideGame ||
-                    hideGameTime ||
-                    hideWeekOnSecondRow
-                  ) &&
-                  typeof val ===
-                    'number' &&
-                  col.type ===
-                    'spread_edge'
-                ) {
-                  td.style.backgroundColor =
-                    getEdgeGradientColor(
-                      val,
-                      EDGE_THRESHOLD_PERCENT
-                    );
-                }
-
-                tr.appendChild(td);
-              }
-            );
-
-            body.appendChild(tr);
-          }
-        );
-      });
-
-      setTimeout(
-        () =>
-          notifyParentOfHeight(),
-        100
-      );
-    }
-
-    /*
-     * Populate the selectable team list using only
-     * games still present after kickoff filtering.
-     */
-    function hydrateTeams() {
-      const state =
-        tabState.spreads;
-
-      const set =
-        new Set();
-
-      state.rawData.forEach(
-        row => {
-          const t = (
-            row['team'] || ''
-          )
-            .toString()
-            .trim();
-
-          if (t) {
-            set.add(t);
-          }
-        }
-      );
-
-      state.allTeams =
-        Array.from(set).sort(
-          (a, b) => {
-            const nameA = (
-              teamLookup[a]
-                ?.displayName || a
-            ).toLowerCase();
-
-            const nameB = (
-              teamLookup[b]
-                ?.displayName || b
-            ).toLowerCase();
-
-            return nameA.localeCompare(
-              nameB
-            );
-          }
-        );
-
-      const existing =
-        new Set(
-          state.allTeams
-        );
-
-      state.selectedTeams.forEach(
-        t => {
-          if (
-            !existing.has(t)
-          ) {
-            state.selectedTeams.delete(
-              t
-            );
-          }
-        }
-      );
-    }
-
-    /*
-     * Populate totals-game picker using only visible games.
-     */
-    function hydrateGames() {
-      const state =
-        tabState.totals;
-
-      const set =
-        new Set();
-
-      state.rawData.forEach(
-        row => {
-          const g = (
-            row['game'] || ''
-          )
-            .toString()
-            .trim();
-
-          if (g) {
-            set.add(g);
-          }
-        }
-      );
-
-      state.allGames =
-        Array.from(set).sort(
-          (a, b) =>
-            a.localeCompare(b)
-        );
-
-      const existing =
-        new Set(
-          state.allGames
-        );
-
-      state.selectedGames.forEach(
-        g => {
-          if (
-            !existing.has(g)
-          ) {
-            state.selectedGames.delete(
-              g
-            );
-          }
-        }
-      );
-    }
-
-    /*
-     * --------------------------------------------------------
-     * FETCH + FILTER + RENDER
-     * --------------------------------------------------------
-     *
-     * This runs immediately on load and then every 60 seconds.
-     *
-     * Both spreads and totals are filtered with isGameVisible()
-     * BEFORE being stored in tabState.
-     *
-     * Therefore games disappear from:
-     *
-     * - Spreads table
-     * - Totals table
-     * - Team selector
-     * - Game selector
-     *
-     * once kickoff + 10 minutes has passed.
-     * --------------------------------------------------------
-     */
-    function updateTableFromCSV() {
+    function loadAndRenderTables() {
       Promise.all([
         parseCsvFromUrl(
           CSV_URLS.spreads
@@ -2706,163 +1289,680 @@
       ])
         .then(
           ([
-            spreadsResults,
-            totalsResults,
-            crosswalkResults,
-            modelResults
+            spreadsData,
+            totalsData,
+            crosswalkData,
+            modelData
           ]) => {
             teamLookup =
               buildTeamLookup(
-                crosswalkResults.data ||
-                  []
+                crosswalkData.data
               );
 
             notesLookup =
               buildNotesLookup(
-                modelResults.data ||
-                  []
+                modelData.data
               );
 
-            /*
-             * Apply kickoff cutoff.
-             */
-            const visibleSpreads =
-              (
-                spreadsResults.data ||
-                []
-              ).filter(
-                isGameVisible
-              );
-
-            const visibleTotals =
-              (
-                totalsResults.data ||
-                []
-              ).filter(
-                isGameVisible
-              );
-
-            /*
-             * SPREADS
-             */
             tabState.spreads.rawData =
-              visibleSpreads;
+              spreadsData.data;
+
+            tabState.spreads.allTeams =
+              extractAllTeams(
+                spreadsData.data
+              );
+
+            tabState.spreads.selectedTeams =
+              new Set(
+                tabState.spreads.allTeams
+              );
 
             tabState.spreads.columnMapping =
               buildColumnMapping(
-                spreadsResults.meta
-                  ?.fields || []
+                spreadsData.meta
+                  .fields
               );
 
-            hydrateTeams();
-
-            renderTeamPicker(
-              'spreads'
-            );
-
-            renderTable(
-              'spreads'
-            );
-
-            /*
-             * TOTALS
-             */
             tabState.totals.rawData =
-              visibleTotals;
+              totalsData.data;
+
+            tabState.totals.allGames =
+              extractAllGames(
+                totalsData.data
+              );
+
+            tabState.totals.selectedGames =
+              new Set(
+                tabState.totals.allGames
+              );
 
             tabState.totals.columnMapping =
               buildColumnMapping(
-                totalsResults.meta
-                  ?.fields || []
+                totalsData.meta
+                  .fields
               );
 
-            hydrateGames();
-
+            setupSubtabs();
+            renderTeamPicker(
+              'spreads'
+            );
             renderTeamPicker(
               'totals'
             );
-
+            renderTable(
+              'spreads'
+            );
             renderTable(
               'totals'
             );
 
-            document.getElementById(
-              'status'
-            ).textContent =
-              `Last updated: ${new Date().toLocaleString()}`;
-
-            setTimeout(
-              () =>
-                notifyParentOfHeight(),
-              100
+            updateTeamSummary(
+              'spreads'
             );
+            updateTeamSummary(
+              'totals'
+            );
+
+            updateStatus();
+            notifyParentOfHeight();
           }
         )
-        .catch(error => {
+        .catch(err => {
+          console.error(
+            'Error loading data:',
+            err
+          );
+
           document.getElementById(
             'status'
           ).textContent =
-            `Error loading data: ${error.message}`;
-
-          console.error(error);
-
-          setTimeout(
-            () =>
-              notifyParentOfHeight(),
-            100
-          );
+            'Error loading data: ' +
+            err.message;
         });
     }
 
-    function initialize() {
-      setupSubtabs();
+    function extractAllTeams(rows) {
+      const teams = new Set();
 
-      /*
-       * Load immediately.
-       */
-      updateTableFromCSV();
+      rows.forEach(row => {
+        const team = row.team;
 
-      /*
-       * Re-run every minute.
-       *
-       * This means a game scheduled for 3:00 PM ET
-       * should disappear shortly after 3:10 PM ET.
-       */
-      setInterval(
-        updateTableFromCSV,
-        REFRESH_INTERVAL
-      );
+        if (team) {
+          teams.add(team);
+        }
+      });
 
-      window.addEventListener(
-        'message',
-        event => {
+      return Array.from(teams).sort();
+    }
+
+    function extractAllGames(rows) {
+      const games = new Set();
+
+      rows.forEach(row => {
+        const game = row.game;
+
+        if (game) {
+          games.add(game);
+        }
+      });
+
+      return Array.from(games).sort();
+    }
+
+    function renderTeamPicker(tabId) {
+      const tabData =
+        tabState[tabId];
+
+      const teamList =
+        document.getElementById(
+          tabId + '-teamList'
+        );
+
+      teamList.innerHTML = '';
+
+      const teams =
+        tabId === 'spreads'
+          ? tabData.allTeams
+          : tabData.allGames;
+
+      teams.forEach(team => {
+        const label =
+          document.createElement(
+            'label'
+          );
+
+        label.className =
+          'team-item';
+
+        const checkbox =
+          document.createElement(
+            'input'
+          );
+
+        checkbox.type =
+          'checkbox';
+
+        checkbox.dataset.team =
+          team;
+
+        checkbox.checked =
+          tabData.selectedTeams.has(
+            team
+          );
+
+        checkbox.addEventListener(
+          'change',
+          e => {
+            if (e.target.checked) {
+              tabData.selectedTeams.add(
+                team
+              );
+            } else {
+              tabData.selectedTeams.delete(
+                team
+              );
+            }
+
+            updateTableAndSummary(
+              tabId
+            );
+          }
+        );
+
+        label.appendChild(
+          checkbox
+        );
+
+        label.appendChild(
+          document.createTextNode(
+            team
+          )
+        );
+
+        teamList.appendChild(
+          label
+        );
+      });
+
+      updateTeamCount(tabId);
+    }
+
+    function updateTeamCount(tabId) {
+      const tabData =
+        tabState[tabId];
+
+      const countDiv =
+        document.getElementById(
+          tabId + '-teamCount'
+        );
+
+      const allCount =
+        tabId === 'spreads'
+          ? tabData.allTeams.length
+          : tabData.allGames.length;
+
+      const selectedCount =
+        tabData.selectedTeams.size;
+
+      countDiv.textContent =
+        (
+          tabId === 'spreads'
+            ? 'Teams'
+            : 'Games'
+        ) +
+        ': ' +
+        allCount +
+        ' • Selected: ' +
+        selectedCount;
+    }
+
+    function renderTable(tabId) {
+      const tabData =
+        tabState[tabId];
+
+      const tableBody =
+        document.getElementById(
+          tabId +
+          '-tableBody'
+        );
+
+      const tableHead =
+        document.getElementById(
+          tabId +
+          '-tableHead'
+        );
+
+      tableBody.innerHTML =
+        '';
+
+      tableHead.innerHTML =
+        '';
+
+      const columnMapping =
+        tabData.columnMapping;
+
+      columnMapping.forEach(col => {
+        const th =
+          document.createElement(
+            'th'
+          );
+
+        th.textContent =
+          col.display;
+
+        th.dataset.csv =
+          col.csv;
+
+        th.addEventListener(
+          'click',
+          () => sortTable(
+            tabId,
+            col.csv
+          )
+        );
+
+        tableHead.appendChild(
+          th
+        );
+      });
+
+      const filterTeams =
+        tabData.selectedTeams;
+
+      const groupedRows =
+        groupRowsByGame(
+          tabData.rawData,
+          filterTeams,
+          tabId
+        );
+
+      let lastGame = null;
+
+      groupedRows.forEach(group => {
+        if (group.game !== lastGame) {
+          lastGame = group.game;
+
+          const headerRow =
+            document.createElement(
+              'tr'
+            );
+
+          headerRow.className =
+            'game-group-header';
+
+          const headerCell =
+            document.createElement(
+              'td'
+            );
+
+          headerCell.colSpan =
+            columnMapping.length;
+
+          const titleSpan =
+            document.createElement(
+              'span'
+            );
+
+          titleSpan.className =
+            'game-group-title';
+
+          titleSpan.textContent =
+            group.game;
+
+          headerCell.appendChild(
+            titleSpan
+          );
+
+          const metaSpan =
+            document.createElement(
+              'span'
+            );
+
+          metaSpan.className =
+            'game-meta';
+
+          metaSpan.textContent =
+            (
+              group.game_time_est
+                ? group
+                  .game_time_est +
+                  ' ET'
+                : ''
+            );
+
+          headerCell.appendChild(
+            metaSpan
+          );
+
+          headerRow.appendChild(
+            headerCell
+          );
+
+          tableBody.appendChild(
+            headerRow
+          );
+        }
+
+        const row =
+          document.createElement(
+            'tr'
+          );
+
+        row.className =
+          'team-subrow';
+
+        columnMapping.forEach(col => {
+          const td =
+            document.createElement(
+              'td'
+            );
+
           if (
-            !event.data ||
-            typeof event.data !==
-              'object'
+            col.type ===
+            'numeric'
           ) {
-            return;
+            td.className =
+              'numeric';
           }
 
-          if (
-            event.data.type ===
-            'request-cfb-height'
+          const value =
+            group[col.csv];
+
+          if (col.csv === 'team') {
+            const teamData =
+              teamLookup[value];
+
+            if (teamData) {
+              const linkDiv =
+                document.createElement(
+                  'div'
+                );
+
+              linkDiv.className =
+                'team-cell';
+
+              const link =
+                document.createElement(
+                  'a'
+                );
+
+              link.className =
+                'team-link';
+
+              link.href =
+                teamData.injuryUrl;
+
+              link.target =
+                '_blank';
+
+              if (
+                teamData.logoUrl
+              ) {
+                const img =
+                  document.createElement(
+                    'img'
+                  );
+
+                img.className =
+                  'team-logo';
+
+                img.src =
+                  teamData.logoUrl;
+
+                img.alt =
+                  value;
+
+                link.appendChild(
+                  img
+                );
+              }
+
+              link.appendChild(
+                document.createTextNode(
+                  value
+                )
+              );
+
+              linkDiv.appendChild(
+                link
+              );
+
+              const notes =
+                notesLookup[value];
+
+              if (notes) {
+                const notesSpan =
+                  document.createElement(
+                    'span'
+                  );
+
+                notesSpan.className =
+                  'notes-text';
+
+                notesSpan.textContent =
+                  notes;
+
+                linkDiv.appendChild(
+                  notesSpan
+                );
+              }
+
+              td.appendChild(
+                linkDiv
+              );
+            } else {
+              td.textContent =
+                value;
+            }
+          } else if (
+            col.type ===
+            'probability'
           ) {
-            notifyParentOfHeight();
+            const num =
+              Number(value);
+
+            if (
+              Number.isFinite(num)
+            ) {
+              td.textContent =
+                (num * 100).toFixed(
+                  1
+                ) +
+                '%';
+
+              td.className =
+                'numeric';
+            } else {
+              td.textContent =
+                value;
+            }
+          } else if (
+            col.type ===
+            'spread_edge'
+          ) {
+            const num =
+              Number(value);
+
+            if (
+              Number.isFinite(num)
+            ) {
+              const displayValue =
+                num.toFixed(1);
+
+              td.textContent =
+                num > 0
+                  ? '+' +
+                    displayValue
+                  : displayValue;
+
+              td.className =
+                'numeric';
+
+              if (
+                Math.abs(num) >
+                EDGE_THRESHOLD_PERCENT
+              ) {
+                td.style.fontWeight =
+                  'bold';
+
+                td.style.color =
+                  num > 0
+                    ? '#2e7d32'
+                    : '#c62828';
+              }
+            } else {
+              td.textContent =
+                value;
+            }
+          } else if (
+            col.type ===
+            'decimal'
+          ) {
+            const num =
+              Number(value);
+
+            if (
+              Number.isFinite(num)
+            ) {
+              td.textContent =
+                num.toFixed(2);
+
+              td.className =
+                'numeric';
+            } else {
+              td.textContent =
+                value;
+            }
+          } else {
+            td.textContent =
+              value;
           }
+
+          row.appendChild(td);
+        });
+
+        tableBody.appendChild(
+          row
+        );
+      });
+    }
+
+    function groupRowsByGame(
+      rows,
+      selectedTeams,
+      tabId
+    ) {
+      const grouped =
+        new Map();
+
+      rows.forEach(row => {
+        if (
+          !isGameVisible(row)
+        ) {
+          return;
+        }
+
+        const teamKey =
+          tabId ===
+          'spreads'
+            ? row.team
+            : row.game;
+
+        if (
+          !selectedTeams.has(
+            teamKey
+          )
+        ) {
+          return;
+        }
+
+        const game =
+          row.game;
+
+        if (
+          !grouped.has(game)
+        ) {
+          grouped.set(game, []);
+        }
+
+        grouped.get(game).push(row);
+      });
+
+      const result = [];
+
+      grouped.forEach(
+        (groupRows, game) => {
+          result.push({
+            game: game,
+
+            game_time_est:
+              groupRows[0]
+                .game_time_est,
+
+            rows: groupRows
+          });
+
+          groupRows.forEach(row => {
+            Object.assign(
+              result[
+                result.length - 1
+              ],
+              row
+            );
+          });
         }
       );
 
-      setTimeout(
-        () =>
-          notifyParentOfHeight(),
-        250
-      );
+      return result;
     }
 
-    document.addEventListener(
-      'DOMContentLoaded',
-      initialize
+    function sortTable(tabId, key) {
+      const tabData =
+        tabState[tabId];
+
+      if (
+        tabData.sortConfig.key ===
+        key
+      ) {
+        tabData.sortConfig.direction =
+          tabData.sortConfig
+            .direction ===
+          'asc'
+            ? 'desc'
+            : 'asc';
+      } else {
+        tabData.sortConfig.key =
+          key;
+
+        tabData.sortConfig.direction =
+          'asc';
+      }
+
+      renderTable(tabId);
+    }
+
+    function updateStatus() {
+      const statusDiv =
+        document.getElementById(
+          'status'
+        );
+
+      const now = new Date();
+
+      statusDiv.textContent =
+        'Last updated: ' +
+        now.toLocaleString();
+    }
+
+    window.addEventListener(
+      'load',
+      () => {
+        loadAndRenderTables();
+
+        setInterval(() => {
+          loadAndRenderTables();
+        }, REFRESH_INTERVAL);
+      }
     );
   </script>
 </body>
