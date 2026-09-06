@@ -31,7 +31,7 @@ cfb_crosswalk <- read_csv(cfb_crosswalk_path, show_col_types = FALSE)
 # from an external/raw source (model output, odds API) back to a team_id,
 # regardless of which name format that source happens to use.
 create_team_name_lookup <- function(cfb_crosswalk) {
-  cfb_crosswalk |>
+  name_lookup <- cfb_crosswalk |>
     select(team_id, btb_team_short, btb_team, cfbfastr_team, api_team) |>
     pivot_longer(
       cols = c(btb_team_short, btb_team, cfbfastr_team, api_team),
@@ -41,6 +41,20 @@ create_team_name_lookup <- function(cfb_crosswalk) {
     filter(!is.na(team_name)) |>
     select(team_id, team_name) |>
     distinct()
+
+  ambiguous_names <- name_lookup |>
+    distinct(team_id, team_name) |>
+    summarise(n_teams = n_distinct(team_id), .by = team_name) |>
+    filter(n_teams > 1) |>
+    pull(team_name)
+
+  if (length(ambiguous_names) > 0) {
+    warning(glue(
+      "Team name variant(s) map to more than one team_id in the crosswalk: {paste(ambiguous_names, collapse = ', ')}"
+    ))
+  }
+
+  name_lookup
 }
 
 team_name_lookup <- create_team_name_lookup(cfb_crosswalk)
