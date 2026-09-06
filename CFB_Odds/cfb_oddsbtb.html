@@ -887,40 +887,6 @@
         }));
 
       /*
-       * Put Edge immediately after Game Time.
-       */
-      const edgeIdx =
-        mapped.findIndex(
-          c => c.csv === 'edge'
-        );
-
-      const gameTimeIdx =
-        mapped.findIndex(
-          c => c.csv === 'game_time_est'
-        );
-
-      if (
-        edgeIdx !== -1 &&
-        gameTimeIdx !== -1
-      ) {
-        const [edgeCol] =
-          mapped.splice(edgeIdx, 1);
-
-        const updatedGameTimeIdx =
-          mapped.findIndex(
-            c =>
-              c.csv ===
-              'game_time_est'
-          );
-
-        mapped.splice(
-          updatedGameTimeIdx + 1,
-          0,
-          edgeCol
-        );
-      }
-
-      /*
        * Put Model Prediction before Market Line.
        */
       const marketLineIdx =
@@ -958,6 +924,45 @@
           updatedMarketIdx,
           0,
           modelCol
+        );
+      }
+
+      /*
+       * Put Edge immediately before Model Prediction.
+       */
+      const edgeIdx =
+        mapped.findIndex(
+          c => c.csv === 'edge'
+        );
+
+      const currentModelIdx =
+        mapped.findIndex(
+          c =>
+            c.csv ===
+            'model_prediction'
+        );
+
+      if (
+        edgeIdx !== -1 &&
+        currentModelIdx !== -1
+      ) {
+        const [edgeCol] =
+          mapped.splice(
+            edgeIdx,
+            1
+          );
+
+        const updatedModelIdx =
+          mapped.findIndex(
+            c =>
+              c.csv ===
+              'model_prediction'
+          );
+
+        mapped.splice(
+          updatedModelIdx,
+          0,
+          edgeCol
         );
       }
 
