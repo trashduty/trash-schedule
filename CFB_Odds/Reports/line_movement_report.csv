@@ -56,8 +56,8 @@ week,game,team,opening_date,current_date,days_elapsed,opening_line,current_line,
 1,Northern Illinois Huskies@Iowa Hawkeyes,Northern Illinois Huskies,2026-09-02,2026-09-05,3,31.5,31.5,0,0,No Change
 1,North Texas Mean Green@Indiana Hoosiers,Indiana Hoosiers,2026-09-02,2026-09-05,3,-40.5,-40.5,0,0,No Change
 1,North Texas Mean Green@Indiana Hoosiers,North Texas Mean Green,2026-09-02,2026-09-05,3,40.5,40.5,0,0,No Change
-1,SMU Mustangs@Florida State Seminoles,Florida State Seminoles,2026-09-02,2026-09-06,4,3,3,0,0,No Change
-1,SMU Mustangs@Florida State Seminoles,SMU Mustangs,2026-09-02,2026-09-06,4,-3,-3,0,0,No Change
+1,SMU Mustangs@Florida State Seminoles,Florida State Seminoles,2026-09-02,2026-09-07,5,3,3,0,0,No Change
+1,SMU Mustangs@Florida State Seminoles,SMU Mustangs,2026-09-02,2026-09-07,5,-3,-3,0,0,No Change
 1,UCLA Bruins@California Golden Bears,California Golden Bears,2026-09-02,2026-09-05,3,2.5,2.5,0,0,No Change
 1,Tulane Green Wave@Duke Blue Devils,Duke Blue Devils,2026-09-02,2026-09-05,3,-7.5,-7.5,0,0,No Change
 1,Tulane Green Wave@Duke Blue Devils,Tulane Green Wave,2026-09-02,2026-09-05,3,7.5,7.5,0,0,No Change
@@ -85,3 +85,90 @@ week,game,team,opening_date,current_date,days_elapsed,opening_line,current_line,
 1,East Carolina Pirates@Alabama Crimson Tide,East Carolina Pirates,2026-09-02,2026-09-05,3,28,28,0,0,No Change
 1,UMass Minutemen@Rutgers Scarlet Knights,Rutgers Scarlet Knights,2026-09-03,2026-09-03,0,-29,-29,0,0,No Change
 1,UMass Minutemen@Rutgers Scarlet Knights,UMass Minutemen,2026-09-03,2026-09-03,0,29.5,29.5,0,0,No Change
+2,Arkansas Razorbacks@Utah Utes,Utah Utes,2026-09-07,2026-09-07,0,-12.5,-12.5,0,0,No Change
+2,Arkansas Razorbacks@Utah Utes,Arkansas Razorbacks,2026-09-07,2026-09-07,0,12.5,12.5,0,0,No Change
+2,Southern Mississippi Golden Eagles@Auburn Tigers,Auburn Tigers,2026-09-07,2026-09-07,0,-29,-29,0,0,No Change
+2,Southern Mississippi Golden Eagles@Auburn Tigers,Southern Mississippi Golden Eagles,2026-09-07,2026-09-07,0,30.5,30.5,0,0,No Change
+2,Western Kentucky Hilltoppers@Georgia Bulldogs,Georgia Bulldogs,2026-09-07,2026-09-07,0,-40.5,-40.5,0,0,No Change
+2,Western Kentucky Hilltoppers@Georgia Bulldogs,Western Kentucky Hilltoppers,2026-09-07,2026-09-07,0,40.5,40.5,0,0,No Change
+2,Alabama Crimson Tide@Kentucky Wildcats,Kentucky Wildcats,2026-09-07,2026-09-07,0,10,10,0,0,No Change
+2,Alabama Crimson Tide@Kentucky Wildcats,Alabama Crimson Tide,2026-09-07,2026-09-07,0,-10,-10,0,0,No Change
+2,Mississippi State Bulldogs@Minnesota Golden Gophers,Minnesota Golden Gophers,2026-09-07,2026-09-07,0,1,1,0,0,No Change
+2,Mississippi State Bulldogs@Minnesota Golden Gophers,Mississippi State Bulldogs,2026-09-07,2026-09-07,0,-1,-1,0,0,No Change
+2,Missouri Tigers@Kansas Jayhawks,Kansas Jayhawks,2026-09-07,2026-09-07,0,6.5,6.5,0,0,No Change
+2,Missouri Tigers@Kansas Jayhawks,Missouri Tigers,2026-09-07,2026-09-07,0,-6.5,-6.5,0,0,No Change
+2,Oklahoma Sooners@Michigan Wolverines,Michigan Wolverines,2026-09-07,2026-09-07,0,6.5,6.5,0,0,No Change
+2,Oklahoma Sooners@Michigan Wolverines,Oklahoma Sooners,2026-09-07,2026-09-07,0,-6.5,-6.5,0,0,No Change
+2,Tennessee Volunteers@Georgia Tech Yellow Jackets,Georgia Tech Yellow Jackets,2026-09-07,2026-09-07,0,13,13,0,0,No Change
+2,Tennessee Volunteers@Georgia Tech Yellow Jackets,Tennessee Volunteers,2026-09-07,2026-09-07,0,-13,-13,0,0,No Change
+2,Ohio State Buckeyes@Texas Longhorns,Texas Longhorns,2026-09-07,2026-09-07,0,-1.5,-1.5,0,0,No Change
+2,Ohio State Buckeyes@Texas Longhorns,Ohio State Buckeyes,2026-09-07,2026-09-07,0,1,1,0,0,No Change
+2,Arizona State Sun Devils@Texas A&M Aggies,Texas A&M Aggies,2026-09-07,2026-09-07,0,-14.5,-14.5,0,0,No Change
+2,Arizona State Sun Devils@Texas A&M Aggies,Arizona State Sun Devils,2026-09-07,2026-09-07,0,14,14,0,0,No Change
+2,Delaware Blue Hens@Vanderbilt Commodores,Vanderbilt Commodores,2026-09-07,2026-09-07,0,-20.5,-20.5,0,0,No Change
+2,Delaware Blue Hens@Vanderbilt Commodores,Delaware Blue Hens,2026-09-07,2026-09-07,0,20.5,20.5,0,0,No Change
+2,Oregon Ducks@Oklahoma State Cowboys,Oklahoma State Cowboys,2026-09-07,2026-09-07,0,22.5,22.5,0,0,No Change
+2,Oregon Ducks@Oklahoma State Cowboys,Oregon Ducks,2026-09-07,2026-09-07,0,-22.5,-22.5,0,0,No Change
+2,Texas Tech Red Raiders@Oregon State Beavers,Oregon State Beavers,2026-09-07,2026-09-07,0,26.5,26.5,0,0,No Change
+2,Texas Tech Red Raiders@Oregon State Beavers,Texas Tech Red Raiders,2026-09-07,2026-09-07,0,-26,-26,0,0,No Change
+2,Iowa State Cyclones@Iowa Hawkeyes,Iowa Hawkeyes,2026-09-07,2026-09-07,0,-14.5,-14.5,0,0,No Change
+2,Iowa State Cyclones@Iowa Hawkeyes,Iowa State Cyclones,2026-09-07,2026-09-07,0,14,14,0,0,No Change
+2,UCF Knights@Pittsburgh Panthers,Pittsburgh Panthers,2026-09-07,2026-09-07,0,-7.5,-7.5,0,0,No Change
+2,UCF Knights@Pittsburgh Panthers,UCF Knights,2026-09-07,2026-09-07,0,7.5,7.5,0,0,No Change
+2,Arizona Wildcats@BYU Cougars,BYU Cougars,2026-09-07,2026-09-07,0,-7.5,-7.5,0,0,No Change
+2,Arizona Wildcats@BYU Cougars,Arizona Wildcats,2026-09-07,2026-09-07,0,7.5,7.5,0,0,No Change
+2,Rutgers Scarlet Knights@Boston College Eagles,Boston College Eagles,2026-09-07,2026-09-07,0,-3.5,-3.5,0,0,No Change
+2,Rutgers Scarlet Knights@Boston College Eagles,Rutgers Scarlet Knights,2026-09-07,2026-09-07,0,3.5,3.5,0,0,No Change
+2,California Golden Bears@Syracuse Orange,Syracuse Orange,2026-09-07,2026-09-07,0,-3,-3,0,0,No Change
+2,California Golden Bears@Syracuse Orange,California Golden Bears,2026-09-07,2026-09-07,0,3,3,0,0,No Change
+2,Duke Blue Devils@Illinois Fighting Illini,Illinois Fighting Illini,2026-09-07,2026-09-07,0,-6,-6,0,0,No Change
+2,Duke Blue Devils@Illinois Fighting Illini,Duke Blue Devils,2026-09-07,2026-09-07,0,6,6,0,0,No Change
+2,Georgia Southern Eagles@Clemson Tigers,Clemson Tigers,2026-09-07,2026-09-07,0,-21,-21,0,0,No Change
+2,Georgia Southern Eagles@Clemson Tigers,Georgia Southern Eagles,2026-09-07,2026-09-07,0,21,21,0,0,No Change
+2,Old Dominion Monarchs@Virginia Tech Hokies,Virginia Tech Hokies,2026-09-07,2026-09-07,0,-17.5,-17.5,0,0,No Change
+2,Old Dominion Monarchs@Virginia Tech Hokies,Old Dominion Monarchs,2026-09-07,2026-09-07,0,18,18,0,0,No Change
+2,Wake Forest Demon Deacons@Purdue Boilermakers,Purdue Boilermakers,2026-09-07,2026-09-07,0,4.5,4.5,0,0,No Change
+2,Wake Forest Demon Deacons@Purdue Boilermakers,Wake Forest Demon Deacons,2026-09-07,2026-09-07,0,-4.5,-4.5,0,0,No Change
+2,Eastern Michigan Eagles@Michigan State Spartans,Michigan State Spartans,2026-09-07,2026-09-07,0,-17.5,-17.5,0,0,No Change
+2,Eastern Michigan Eagles@Michigan State Spartans,Eastern Michigan Eagles,2026-09-07,2026-09-07,0,17.5,17.5,0,0,No Change
+2,Bowling Green Falcons@Nebraska Cornhuskers,Nebraska Cornhuskers,2026-09-07,2026-09-07,0,-28.5,-28.5,0,0,No Change
+2,Bowling Green Falcons@Nebraska Cornhuskers,Bowling Green Falcons,2026-09-07,2026-09-07,0,28.5,28.5,0,0,No Change
+2,Penn State Nittany Lions@Temple Owls,Temple Owls,2026-09-07,2026-09-07,0,23.5,23.5,0,0,No Change
+2,Penn State Nittany Lions@Temple Owls,Penn State Nittany Lions,2026-09-07,2026-09-07,0,-23.5,-23.5,0,0,No Change
+2,San Diego State Aztecs@UCLA Bruins,UCLA Bruins,2026-09-07,2026-09-07,0,-11.5,-11.5,0,0,No Change
+2,San Diego State Aztecs@UCLA Bruins,San Diego State Aztecs,2026-09-07,2026-09-07,0,11,11,0,0,No Change
+2,Maryland Terrapins@UConn Huskies,UConn Huskies,2026-09-07,2026-09-07,0,12.5,12.5,0,0,No Change
+2,Maryland Terrapins@UConn Huskies,Maryland Terrapins,2026-09-07,2026-09-07,0,-12,-12,0,0,No Change
+2,Louisiana Ragin Cajuns@USC Trojans,USC Trojans,2026-09-07,2026-09-07,0,-30.5,-30.5,0,0,No Change
+2,Louisiana Ragin Cajuns@USC Trojans,Louisiana Ragin Cajuns,2026-09-07,2026-09-07,0,31.5,31.5,0,0,No Change
+2,Memphis Tigers@Boise State Broncos,Boise State Broncos,2026-09-07,2026-09-07,0,-7.5,-7.5,0,0,No Change
+2,Memphis Tigers@Boise State Broncos,Memphis Tigers,2026-09-07,2026-09-07,0,8.5,8.5,0,0,No Change
+2,Sacramento State@Fresno State Bulldogs,Fresno State Bulldogs,2026-09-07,2026-09-07,0,-18.5,-18.5,0,0,No Change
+2,Sacramento State@Fresno State Bulldogs,Sacramento State,2026-09-07,2026-09-07,0,18.5,18.5,0,0,No Change
+2,South Florida Bulls@Army Black Knights,Army Black Knights,2026-09-07,2026-09-07,0,-3.5,-3.5,0,0,No Change
+2,South Florida Bulls@Army Black Knights,South Florida Bulls,2026-09-07,2026-09-07,0,3.5,3.5,0,0,No Change
+2,UNLV Rebels@North Texas Mean Green,North Texas Mean Green,2026-09-07,2026-09-07,0,4.5,4.5,0,0,No Change
+2,UNLV Rebels@North Texas Mean Green,UNLV Rebels,2026-09-07,2026-09-07,0,-4.5,-4.5,0,0,No Change
+2,Tulsa Golden Hurricane@Sam Houston State Bearkats,Sam Houston State Bearkats,2026-09-07,2026-09-07,0,13.5,13.5,0,0,No Change
+2,Tulsa Golden Hurricane@Sam Houston State Bearkats,Tulsa Golden Hurricane,2026-09-07,2026-09-07,0,-13.5,-13.5,0,0,No Change
+2,UL Monroe Warhawks@UAB Blazers,UAB Blazers,2026-09-07,2026-09-07,0,-11,-11,0,0,No Change
+2,UL Monroe Warhawks@UAB Blazers,UL Monroe Warhawks,2026-09-07,2026-09-07,0,11,11,0,0,No Change
+2,North Dakota State@Air Force Falcons,Air Force Falcons,2026-09-07,2026-09-07,0,3.5,3.5,0,0,No Change
+2,North Dakota State@Air Force Falcons,North Dakota State,2026-09-07,2026-09-07,0,-3.5,-3.5,0,0,No Change
+2,App State Mountaineers@East Carolina Pirates,East Carolina Pirates,2026-09-07,2026-09-07,0,-8.5,-8.5,0,0,No Change
+2,App State Mountaineers@East Carolina Pirates,App State Mountaineers,2026-09-07,2026-09-07,0,8.5,8.5,0,0,No Change
+2,South Alabama Jaguars@Tulane Green Wave,Tulane Green Wave,2026-09-07,2026-09-07,0,-10.5,-10.5,0,0,No Change
+2,South Alabama Jaguars@Arkansas State Red Wolves,South Alabama Jaguars,2026-09-07,2026-09-07,0,10.5,10.5,0,0,No Change
+2,South Alabama Jaguars@Tulane Green Wave,South Alabama Jaguars,2026-09-07,2026-09-07,0,10.5,10.5,0,0,No Change
+2,New Mexico State Aggies@Hawaii Rainbow Warriors,Hawaii Rainbow Warriors,2026-09-07,2026-09-07,0,-9.5,-9.5,0,0,No Change
+2,New Mexico State Aggies@Hawaii Rainbow Warriors,New Mexico State Aggies,2026-09-07,2026-09-07,0,10,10,0,0,No Change
+2,Buffalo Bulls@Florida International Panthers,Florida International Panthers,2026-09-07,2026-09-07,0,-10.5,-10.5,0,0,No Change
+2,Buffalo Bulls@Florida International Panthers,Buffalo Bulls,2026-09-07,2026-09-07,0,10.5,10.5,0,0,No Change
+2,Jacksonville State Gamecocks@Ohio Bobcats,Ohio Bobcats,2026-09-07,2026-09-07,0,-2.5,-2.5,0,0,No Change
+2,Jacksonville State Gamecocks@Ohio Bobcats,Jacksonville State Gamecocks,2026-09-07,2026-09-07,0,1.5,1.5,0,0,No Change
+2,Louisiana Tech Bulldogs@LSU Tigers,LSU Tigers,2026-09-07,2026-09-07,0,-33.5,-33.5,0,0,No Change
+2,Louisiana Tech Bulldogs@LSU Tigers,Louisiana Tech Bulldogs,2026-09-07,2026-09-07,0,33.5,33.5,0,0,No Change
+2,Georgia State Panthers@Kennesaw State Owls,Kennesaw State Owls,2026-09-07,2026-09-07,0,-9.5,-9.5,0,0,No Change
+2,Georgia State Panthers@Kennesaw State Owls,Georgia State Panthers,2026-09-07,2026-09-07,0,9.5,9.5,0,0,No Change
+2,Middle Tennessee Blue Raiders@Marshall Thundering Herd,Marshall Thundering Herd,2026-09-07,2026-09-07,0,-14,-14,0,0,No Change
+2,Middle Tennessee Blue Raiders@Marshall Thundering Herd,Middle Tennessee Blue Raiders,2026-09-07,2026-09-07,0,14.5,14.5,0,0,No Change
