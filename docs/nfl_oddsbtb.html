@@ -8,6 +8,11 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
 
   <style>
+    html {
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+    }
+
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       margin: 20px;
@@ -31,6 +36,42 @@
       color: #0052a3;
     }
 
+    .subtabs {
+      display: flex;
+      gap: 0;
+      margin-bottom: 16px;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .subtab {
+      padding: 8px 12px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 0.9rem;
+      color: #666;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      transition: color 0.2s;
+    }
+
+    .subtab:hover {
+      color: #333;
+    }
+
+    .subtab.active {
+      color: #2c3e50;
+      border-bottom-color: #2c3e50;
+    }
+
+    .subtab-content {
+      display: none;
+    }
+
+    .subtab-content.active {
+      display: block;
+    }
+
     .controls {
       margin-bottom: 14px;
       display: flex;
@@ -47,7 +88,10 @@
       cursor: pointer;
       font-size: 0.9rem;
     }
-    button:hover { background: #f4f4f4; }
+
+    button:hover {
+      background: #f4f4f4;
+    }
 
     .team-summary {
       font-size: 0.9rem;
@@ -65,7 +109,9 @@
       margin-top: 10px;
     }
 
-    .team-picker[hidden] { display: none; }
+    .team-picker[hidden] {
+      display: none;
+    }
 
     .team-picker-header {
       display: flex;
@@ -78,7 +124,7 @@
       flex-wrap: wrap;
     }
 
-    #teamFilter {
+    .teamFilter {
       padding: 8px 12px;
       border: 1px solid #ccc;
       border-radius: 6px;
@@ -107,7 +153,10 @@
       font-size: 0.9rem;
       border-bottom: 1px dashed rgba(0,0,0,0.06);
     }
-    .team-item:last-child { border-bottom: none; }
+
+    .team-item:last-child {
+      border-bottom: none;
+    }
 
     .team-count {
       font-size: 0.85rem;
@@ -131,7 +180,8 @@
       font-size: 0.85rem;
     }
 
-    th, td {
+    th,
+    td {
       padding: 10px;
       text-align: left;
       border-bottom: 1px solid #ddd;
@@ -238,44 +288,226 @@
 
 <body>
   <h2 style="margin-bottom:6px;">NFL Model Outputs</h2>
-  <div class="last-updated" id="status">Loading data...</div>
+
+  <div class="last-updated" id="status">
+    Loading data...
+  </div>
+
   <div class="last-updated weather-link">
-    <a href="https://www.covers.com/sport/nfl/weather" target="_blank" rel="noopener noreferrer">Weather Reports</a>
+    <a
+      href="https://www.covers.com/sport/nfl/weather"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      Weather Reports
+    </a>
   </div>
 
-  <div class="controls">
-    <div>
-      <button type="button" id="toggleTeamPickerBtn" onclick="toggleTeamPicker()">
-        Select teams…
-      </button>
-    </div>
-    <div class="team-summary" id="teamSummary">All teams</div>
-  </div>
+  <div class="subtabs" id="subtabs"></div>
 
-  <div class="team-picker" id="teamPicker" hidden>
-    <div class="team-picker-header">
-      <input id="teamFilter" type="text" placeholder="Type to find teams..." oninput="onTeamFilterInput()" />
-      <div class="team-picker-actions">
-        <button type="button" onclick="selectVisibleTeams()">Select visible</button>
-        <button type="button" onclick="clearTeamSelection()">Clear</button>
-        <button type="button" onclick="toggleTeamPicker(false)">Close</button>
+  <!-- SPREADS -->
+  <div class="subtab-content" id="spreads-content">
+    <div class="controls">
+      <div>
+        <button
+          type="button"
+          id="spreads-toggleTeamPickerBtn"
+          onclick="toggleTeamPicker('spreads')"
+        >
+          Select teams…
+        </button>
+      </div>
+
+      <div
+        class="team-summary"
+        id="spreads-teamSummary"
+      >
+        All teams
       </div>
     </div>
 
-    <div class="team-list" id="teamList"></div>
-    <div class="team-count" id="teamCount">Teams: 0 • Selected: 0</div>
+    <div
+      class="team-picker"
+      id="spreads-teamPicker"
+      hidden
+    >
+      <div class="team-picker-header">
+        <input
+          class="teamFilter"
+          id="spreads-teamFilter"
+          type="text"
+          placeholder="Type to find teams..."
+          oninput="onTeamFilterInput('spreads')"
+        />
+
+        <div class="team-picker-actions">
+          <button
+            type="button"
+            onclick="selectVisibleTeams('spreads')"
+          >
+            Select visible
+          </button>
+
+          <button
+            type="button"
+            onclick="clearTeamSelection('spreads')"
+          >
+            Clear
+          </button>
+
+          <button
+            type="button"
+            onclick="toggleTeamPicker('spreads', false)"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+
+      <div
+        class="team-list"
+        id="spreads-teamList"
+      ></div>
+
+      <div
+        class="team-count"
+        id="spreads-teamCount"
+      >
+        Teams: 0 • Selected: 0
+      </div>
+    </div>
+
+    <div class="table-container">
+      <table id="spreads-oddsTable">
+        <thead>
+          <tr id="spreads-tableHead"></tr>
+        </thead>
+
+        <tbody id="spreads-tableBody"></tbody>
+      </table>
+    </div>
   </div>
 
-  <div class="table-container">
-    <table id="oddsTable">
-      <thead><tr id="tableHead"></tr></thead>
-      <tbody id="tableBody"></tbody>
-    </table>
+  <!-- TOTALS -->
+  <div class="subtab-content" id="totals-content">
+    <div class="controls">
+      <div>
+        <button
+          type="button"
+          id="totals-toggleTeamPickerBtn"
+          onclick="toggleTeamPicker('totals')"
+        >
+          Select games…
+        </button>
+      </div>
+
+      <div
+        class="team-summary"
+        id="totals-teamSummary"
+      >
+        All games
+      </div>
+    </div>
+
+    <div
+      class="team-picker"
+      id="totals-teamPicker"
+      hidden
+    >
+      <div class="team-picker-header">
+        <input
+          class="teamFilter"
+          id="totals-teamFilter"
+          type="text"
+          placeholder="Type to find games..."
+          oninput="onTeamFilterInput('totals')"
+        />
+
+        <div class="team-picker-actions">
+          <button
+            type="button"
+            onclick="selectVisibleTeams('totals')"
+          >
+            Select visible
+          </button>
+
+          <button
+            type="button"
+            onclick="clearTeamSelection('totals')"
+          >
+            Clear
+          </button>
+
+          <button
+            type="button"
+            onclick="toggleTeamPicker('totals', false)"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+
+      <div
+        class="team-list"
+        id="totals-teamList"
+      ></div>
+
+      <div
+        class="team-count"
+        id="totals-teamCount"
+      >
+        Games: 0 • Selected: 0
+      </div>
+    </div>
+
+    <div class="table-container">
+      <table id="totals-oddsTable">
+        <thead>
+          <tr id="totals-tableHead"></tr>
+        </thead>
+
+        <tbody id="totals-tableBody"></tbody>
+      </table>
+    </div>
   </div>
 
   <script>
-    const SPREADS_CSV_URL = 'https://raw.githubusercontent.com/trashduty/trash-schedule/main/NFL_Odds/Data/spreads_odds.csv';
-    const MODEL_CSV_URL = 'https://raw.githubusercontent.com/trashduty/trash-schedule/main/Week%201%20model%20pred_updated.csv';
+    const CSV_URLS = {
+      spreads:
+        'https://raw.githubusercontent.com/trashduty/trash-schedule/main/NFL_Odds/Data/spreads_odds.csv',
+
+      totals:
+        'https://raw.githubusercontent.com/trashduty/trash-schedule/main/NFL_Odds/Data/totals_odds.csv',
+
+      model:
+        'https://raw.githubusercontent.com/trashduty/trash-schedule/main/Week%201%20model%20pred_updated.csv'
+    };
+
+    /*
+     * Reload the source CSVs every 60 seconds.
+     */
+    const REFRESH_INTERVAL = 60000;
+
+    /*
+     * Columns retained in the source data but not displayed.
+     *
+     * commence_time remains available on each row even though it is
+     * excluded from the visible table. We use it for kickoff filtering.
+     */
+    const EXCLUDED_COLUMNS = new Set([
+      'team_logo_espn',
+      'last_update_api',
+      'commence_time',
+      'game_date_est',
+      'game_time_est'
+    ]);
+
+    const EDGE_THRESHOLD_PERCENT = 4;
+
+    /*
+     * Game remains visible until this many minutes after kickoff.
+     */
+    const DROP_AFTER_START_MINUTES = 10;
 
     const PFR_TEAM_ABBR = {
       ARI: 'crd', ATL: 'atl', BAL: 'rav', BUF: 'buf', CAR: 'car',
@@ -323,233 +555,551 @@
       WAS: 'https://www.espn.com/nfl/team/injuries/_/name/wsh/washington-commanders',
     };
 
-    const REFRESH_INTERVAL = 60000;
-    const EXCLUDED_COLUMNS = new Set(['team_logo_espn', 'last_update_api', 'game_date_est', 'commence_time']);
-    const EDGE_THRESHOLD_PERCENT = 4;
-    const DROP_AFTER_START_MINUTES = 10;
+    const tabState = {
+      spreads: {
+        rawData: [],
+        allTeams: [],
+        selectedTeams: new Set(),
+        sortConfig: {
+          key: null,
+          direction: 'asc'
+        },
+        columnMapping: []
+      },
 
-    let rawData = [];
-    let allTeams = [];
-    let selectedTeams = new Set();
-    let sortConfig = { key: null, direction: 'asc' };
-    let columnMapping = [];
+      totals: {
+        rawData: [],
+        allGames: [],
+        selectedGames: new Set(),
+        sortConfig: {
+          key: null,
+          direction: 'asc'
+        },
+        columnMapping: []
+      }
+    };
+
     let qbLookup = {};
     let notesLookup = {};
 
     function notifyParentOfHeight() {
       if (window.parent !== window) {
         const height = document.documentElement.scrollHeight;
-        window.parent.postMessage({ type: 'nfl-resize', height: height }, '*');
+
+        window.parent.postMessage(
+          {
+            type: 'nfl-resize',
+            height: height
+          },
+          '*'
+        );
       }
     }
 
     function parseCsvFromUrl(url) {
       return fetch(url + '?t=' + Date.now())
         .then(response => {
-          if (!response.ok) throw new Error('HTTP ' + response.status + ' for ' + url);
+          if (!response.ok) {
+            throw new Error(
+              'HTTP ' + response.status + ' for ' + url
+            );
+          }
+
           return response.text();
         })
-        .then(csvText => new Promise((resolve, reject) => {
-          Papa.parse(csvText, {
-            header: true,
-            dynamicTyping: true,
-            skipEmptyLines: true,
-            complete: results => resolve(results),
-            error: err => reject(err)
-          });
-        }));
-    }
+        .then(
+          csvText =>
+            new Promise((resolve, reject) => {
+              Papa.parse(csvText, {
+                header: true,
+                dynamicTyping: true,
+                skipEmptyLines: true,
 
-    function normalizeTeamAbbr(team) {
-      return (team || '').toString().trim().toUpperCase();
-    }
+                complete: results => resolve(results),
 
-    function normalizeName(name) {
-      return (name || '').toString().trim();
+                error: err => reject(err)
+              });
+            })
+        );
     }
 
     function buildQbLookup(modelRows) {
       const lookup = {};
+
       modelRows.forEach(row => {
-        const team = normalizeTeamAbbr(row['Team']);
-        const qbName = normalizeName(row['Qbname']);
+        const team = (row['Team'] || '')
+          .toString()
+          .trim()
+          .toUpperCase();
+
+        const qbName = (row['Qbname'] || '')
+          .toString()
+          .trim();
+
         if (!team || !qbName) return;
+
         lookup[team] = qbName;
       });
+
       return lookup;
     }
 
     function buildNotesLookup(modelRows) {
       const lookup = {};
+
       modelRows.forEach(row => {
-        const team = normalizeTeamAbbr(row['Team']);
-        const notes = normalizeName(row['Notes']);
+        const team = (row['Team'] || '')
+          .toString()
+          .trim()
+          .toUpperCase();
+
+        const notes = (row['Notes'] || '')
+          .toString()
+          .trim();
+
         if (!team) return;
-        if (notes) lookup[team] = notes;
+
+        if (notes) {
+          lookup[team] = notes;
+        }
       });
+
       return lookup;
     }
 
     function formatHeader(csvHeader) {
-      if (csvHeader === 'game_time_est') return 'Game Time';
+      if (csvHeader === 'game_time_est') {
+        return 'Game Time';
+      }
+
       return csvHeader
         .split('_')
-        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .map(
+          word =>
+            word.charAt(0).toUpperCase() +
+            word.slice(1)
+        )
         .join(' ');
     }
 
     function inferType(csvKey) {
       const k = csvKey.toLowerCase();
-      if (k.includes('probability')) return 'probability';
-      if (k.includes('edge')) return 'spread_edge';
-      if (['week', 'game', 'team', 'game_time_est'].includes(k) || k.includes('book')) return 'text';
+
+      if (k.includes('probability')) {
+        return 'probability';
+      }
+
+      if (k.includes('edge')) {
+        return 'spread_edge';
+      }
+
+      if (
+        [
+          'week',
+          'game',
+          'team',
+          'game_time_est'
+        ].includes(k) ||
+        k.includes('book')
+      ) {
+        return 'text';
+      }
+
       return 'decimal';
     }
 
     function buildColumnMapping(headers) {
       const mapped = headers
-        .filter(h => !EXCLUDED_COLUMNS.has(h))
+        .filter(
+          h => !EXCLUDED_COLUMNS.has(h)
+        )
         .map(h => ({
           csv: h,
           display: formatHeader(h),
           type: inferType(h)
         }));
 
-      if (!headers.includes('lookahead_line')) {
-        const mlIdx = mapped.findIndex(c => c.csv === 'market_line');
-        if (mlIdx !== -1) {
-          mapped.splice(mlIdx + 1, 0, {
-            csv: 'lookahead_line',
-            display: 'Lookahead Line',
-            type: 'decimal'
-          });
-        }
+      /*
+       * Put Model Prediction before Market Line.
+       */
+      const marketLineIdx =
+        mapped.findIndex(
+          c => c.csv === 'market_line'
+        );
+
+      const modelPredictionIdx =
+        mapped.findIndex(
+          c =>
+            c.csv ===
+            'model_prediction'
+        );
+
+      if (
+        marketLineIdx !== -1 &&
+        modelPredictionIdx !== -1 &&
+        modelPredictionIdx >
+          marketLineIdx
+      ) {
+        const [modelCol] =
+          mapped.splice(
+            modelPredictionIdx,
+            1
+          );
+
+        const updatedMarketIdx =
+          mapped.findIndex(
+            c =>
+              c.csv ===
+              'market_line'
+          );
+
+        mapped.splice(
+          updatedMarketIdx,
+          0,
+          modelCol
+        );
       }
 
-      const edgeIdx = mapped.findIndex(c => c.csv === 'edge');
-      const gameTimeIdx = mapped.findIndex(c => c.csv === 'game_time_est');
-      if (edgeIdx !== -1 && gameTimeIdx !== -1) {
-        const [edgeCol] = mapped.splice(edgeIdx, 1);
-        const updatedGameTimeIdx = mapped.findIndex(c => c.csv === 'game_time_est');
-        mapped.splice(updatedGameTimeIdx + 1, 0, edgeCol);
+      /*
+       * Put Edge immediately before Model Prediction.
+       */
+      const edgeIdx =
+        mapped.findIndex(
+          c => c.csv === 'edge'
+        );
+
+      const currentModelIdx =
+        mapped.findIndex(
+          c =>
+            c.csv ===
+            'model_prediction'
+        );
+
+      if (
+        edgeIdx !== -1 &&
+        currentModelIdx !== -1
+      ) {
+        const [edgeCol] =
+          mapped.splice(
+            edgeIdx,
+            1
+          );
+
+        const updatedModelIdx =
+          mapped.findIndex(
+            c =>
+              c.csv ===
+              'model_prediction'
+          );
+
+        mapped.splice(
+          updatedModelIdx,
+          0,
+          edgeCol
+        );
       }
 
-      const modelPredictionIdx = mapped.findIndex(c => c.csv === 'model_prediction');
-      const marketLineIdx = mapped.findIndex(c => c.csv === 'market_line');
-      if (modelPredictionIdx !== -1 && marketLineIdx !== -1) {
-        const [modelPredictionCol] = mapped.splice(modelPredictionIdx, 1);
-        const updatedMarketLineIdx = mapped.findIndex(c => c.csv === 'market_line');
-        mapped.splice(updatedMarketLineIdx, 0, modelPredictionCol);
-      }
-
-      // Move Game Time before Team
-      const teamIdx = mapped.findIndex(c => c.csv === 'team');
-      const newGameTimeIdx = mapped.findIndex(c => c.csv === 'game_time_est');
-      if (teamIdx !== -1 && newGameTimeIdx !== -1 && newGameTimeIdx > teamIdx) {
-        const [gameTimeCol] = mapped.splice(newGameTimeIdx, 1);
-        mapped.splice(teamIdx, 0, gameTimeCol);
-      }
-
-      columnMapping = mapped;
+      return mapped;
     }
 
-    function toggleTeamPicker(forceOpen) {
-      const picker = document.getElementById('teamPicker');
-      const isHidden = picker.hasAttribute('hidden');
-      const open = (typeof forceOpen === 'boolean') ? forceOpen : isHidden;
-      if (open) {
-        picker.removeAttribute('hidden');
-        setTimeout(() => document.getElementById('teamFilter')?.focus(), 0);
-      } else {
-        picker.setAttribute('hidden', '');
-      }
+    function setupSubtabs() {
+      const container =
+        document.getElementById(
+          'subtabs'
+        );
+
+      container.innerHTML = '';
+
+      const subtabs = [
+        {
+          id: 'spreads',
+          label: 'Spreads'
+        },
+        {
+          id: 'totals',
+          label: 'Totals'
+        }
+      ];
+
+      subtabs.forEach((subtab, idx) => {
+        const button =
+          document.createElement(
+            'button'
+          );
+
+        button.className =
+          'subtab' +
+          (
+            idx === 0 ? ' active' : ''
+          );
+
+        button.textContent =
+          subtab.label;
+
+        button.onclick = () =>
+          switchSubtab(subtab.id);
+
+        container.appendChild(button);
+      });
+
+      document
+        .getElementById('spreads-content')
+        .classList.add('active');
+    }
+
+    function switchSubtab(tabId) {
+      document.querySelectorAll(
+        '.subtab-content'
+      ).forEach(el => {
+        el.classList.remove('active');
+      });
+
+      document.querySelectorAll(
+        '.subtab'
+      ).forEach(el => {
+        el.classList.remove('active');
+      });
+
+      document
+        .getElementById(tabId + '-content')
+        .classList.add('active');
+
+      document.querySelector(
+        `.subtab:nth-child(${
+          tabId === 'spreads' ? 1 : 2
+        })`
+      ).classList.add('active');
+
       setTimeout(() => notifyParentOfHeight(), 100);
     }
 
-    function getEdgeGradientColor(value, thresholdPctPoints) {
+    function toggleTeamPicker(tabId, forceOpen) {
+      const picker = document.getElementById(
+        tabId + '-teamPicker'
+      );
+
+      const isHidden =
+        picker.hasAttribute('hidden');
+
+      const open =
+        typeof forceOpen === 'boolean'
+          ? forceOpen
+          : isHidden;
+
+      if (open) {
+        picker.removeAttribute('hidden');
+
+        setTimeout(
+          () =>
+            document
+              .getElementById(
+                tabId + '-teamFilter'
+              )
+              ?.focus(),
+          0
+        );
+      } else {
+        picker.setAttribute('hidden', '');
+      }
+
+      setTimeout(
+        () => notifyParentOfHeight(),
+        100
+      );
+    }
+
+    function getEdgeGradientColor(
+      value,
+      thresholdPctPoints
+    ) {
       const pct = value * 100;
       const diff = pct - thresholdPctPoints;
+
       if (diff >= 0) {
-        const lightness = Math.max(95 - diff * 8, 30);
+        const lightness = Math.max(
+          95 - diff * 8,
+          30
+        );
+
         return `hsl(120, 70%, ${lightness}%)`;
       }
-      const lightness = Math.max(95 - Math.abs(diff) * 8, 75);
+
+      const lightness = Math.max(
+        95 - Math.abs(diff) * 8,
+        75
+      );
+
       return `hsl(0, 80%, ${lightness}%)`;
     }
 
     function formatValue(value, type, csvKey) {
-      if (value === null || value === undefined || value === '') return '';
-      if (type === 'probability' || type === 'spread_edge') return (Number(value) * 100).toFixed(2) + '%';
-      if (csvKey === 'model_prediction' || csvKey === 'market_line' || csvKey === 'best_line' || csvKey === 'lookahead_line') return Number(value).toFixed(1);
-      if (csvKey === 'market_price' || csvKey === 'best_price') return Number(value).toFixed(0);
-      if (type === 'text') return String(value);
-      if (type === 'decimal') return Number(value).toFixed(2);
+      if (
+        value === null ||
+        value === undefined ||
+        value === ''
+      ) {
+        return '';
+      }
+
+      if (
+        type === 'probability' ||
+        type === 'spread_edge'
+      ) {
+        return (Number(value) * 100).toFixed(2) + '%';
+      }
+
+      if (
+        [
+          'model_prediction',
+          'market_line',
+          'best_line',
+          'lookahead_line'
+        ].includes(csvKey)
+      ) {
+        return Number(value).toFixed(1);
+      }
+
+      if (
+        [
+          'market_price',
+          'best_price',
+          'median_over_price',
+          'median_under_price'
+        ].includes(csvKey)
+      ) {
+        return Number(value).toFixed(0);
+      }
+
+      if (type === 'text') {
+        return String(value);
+      }
+
+      if (type === 'decimal') {
+        return Number(value).toFixed(2);
+      }
+
       return value;
     }
 
     function buildPfrGameUrl(row) {
-      const game = (row['game'] || '').toString().trim().toUpperCase();
+      const game = (row['game'] || '')
+        .toString()
+        .trim()
+        .toUpperCase();
+
       const gameDate = row['game_date_est'];
-      if (!game || !gameDate || !game.includes('@')) return null;
+
+      if (!game || !gameDate || !game.includes('@')) {
+        return null;
+      }
 
       const parts = game.split('@');
-      if (parts.length !== 2) return null;
+
+      if (parts.length !== 2) {
+        return null;
+      }
 
       const homeTeamAbbr = parts[1].trim();
       const pfrAbbr = PFR_TEAM_ABBR[homeTeamAbbr];
-      if (!pfrAbbr) return null;
 
-      const dateStr = String(gameDate).trim().replace(/-/g, '');
-      if (!/^\d{8}$/.test(dateStr)) return null;
+      if (!pfrAbbr) {
+        return null;
+      }
+
+      const dateStr = String(gameDate)
+        .trim()
+        .replace(/-/g, '');
+
+      if (!/^\d{8}$/.test(dateStr)) {
+        return null;
+      }
 
       return `https://www.pro-football-reference.com/boxscores/${dateStr}0${pfrAbbr}.htm`;
     }
 
-    // Parse kickoff into an absolute timestamp.
-    // Prefer commence_time because it should already contain timezone/UTC information.
-    // Fall back to game_date_est + game_time_est and explicitly interpret them
-    // in America/New_York so the viewer's local timezone never affects the cutoff.
+    /*
+     * Parse kickoff into an absolute timestamp.
+     * Prefer commence_time because it should already contain timezone/UTC information.
+     * Fall back to game_date_est + game_time_est and explicitly interpret them
+     * in America/New_York so the viewer's local timezone never affects the cutoff.
+     */
     function parseKickoffFromRow(row) {
-      const commenceTime = String(row?.commence_time ?? '').trim();
+      const commenceTime = String(
+        row?.commence_time ?? ''
+      ).trim();
 
       if (commenceTime) {
         const parsed = Date.parse(commenceTime);
-        if (Number.isFinite(parsed)) return parsed;
+
+        if (Number.isFinite(parsed)) {
+          return parsed;
+        }
       }
 
-      const dateStr = String(row?.game_date_est ?? '').trim();
-      const timeStr = String(row?.game_time_est ?? '').trim();
+      const dateStr = String(
+        row?.game_date_est ?? ''
+      ).trim();
 
-      if (!dateStr || !timeStr) return Number.POSITIVE_INFINITY;
+      const timeStr = String(
+        row?.game_time_est ?? ''
+      ).trim();
 
-      // Accept YYYY-MM-DD, MM/DD/YYYY, or MM/DD.
+      if (!dateStr || !timeStr) {
+        return Number.POSITIVE_INFINITY;
+      }
+
+      /*
+       * Accept YYYY-MM-DD, MM/DD/YYYY, or MM/DD.
+       */
       let year, month, day;
 
-      let dateMatch = dateStr.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+      let dateMatch = dateStr.match(
+        /^(\d{4})-(\d{1,2})-(\d{1,2})$/
+      );
+
       if (dateMatch) {
         year = Number(dateMatch[1]);
         month = Number(dateMatch[2]);
         day = Number(dateMatch[3]);
       } else {
-        dateMatch = dateStr.match(/^(\d{1,2})\/(\d{1,2})(?:\/(\d{4}))?$/);
-        if (!dateMatch) return Number.POSITIVE_INFINITY;
+        dateMatch = dateStr.match(
+          /^(\d{1,2})\/(\d{1,2})(?:\/(\d{4}))?$/
+        );
+
+        if (!dateMatch) {
+          return Number.POSITIVE_INFINITY;
+        }
 
         month = Number(dateMatch[1]);
         day = Number(dateMatch[2]);
-        year = dateMatch[3] ? Number(dateMatch[3]) : new Date().getFullYear();
+        year = dateMatch[3]
+          ? Number(dateMatch[3])
+          : new Date().getFullYear();
       }
 
-      const cleanTime = timeStr.replace(/\s*(ET|EST|EDT)\s*$/i, '').trim();
-      const timeMatch = cleanTime.match(/^(\d{1,2}):(\d{2})\s*([AP]M)$/i);
+      const cleanTime = timeStr
+        .replace(/\s*(ET|EST|EDT)\s*$/i, '')
+        .trim();
 
-      if (!timeMatch) return Number.POSITIVE_INFINITY;
+      const timeMatch = cleanTime.match(
+        /^(\d{1,2}):(\d{2})\s*([AP]M)$/i
+      );
+
+      if (!timeMatch) {
+        return Number.POSITIVE_INFINITY;
+      }
 
       let hour = Number(timeMatch[1]);
       const minute = Number(timeMatch[2]);
       const ampm = timeMatch[3].toUpperCase();
 
-      if (hour === 12) hour = 0;
-      if (ampm === 'PM') hour += 12;
+      if (hour === 12) {
+        hour = 0;
+      }
+
+      if (ampm === 'PM') {
+        hour += 12;
+      }
 
       const initialGuess = Date.UTC(
         year,
@@ -561,17 +1111,23 @@
         0
       );
 
-      const formatter = new Intl.DateTimeFormat('en-US', {
-        timeZone: 'America/New_York',
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-        hourCycle: 'h23'
-      });
+      const formatter = new Intl.DateTimeFormat(
+        'en-US',
+        {
+          timeZone: 'America/New_York',
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit',
+          hourCycle: 'h23'
+        }
+      );
 
-      const parts = formatter.formatToParts(new Date(initialGuess));
+      const parts = formatter.formatToParts(
+        new Date(initialGuess)
+      );
+
       const values = {};
 
       parts.forEach(part => {
@@ -590,32 +1146,59 @@
         0
       );
 
-      const easternOffset = easternAsUTC - initialGuess;
+      const easternOffset =
+        easternAsUTC - initialGuess;
+
       return initialGuess - easternOffset;
     }
 
     function isGameVisible(row) {
       const kickoff = parseKickoffFromRow(row);
-      if (!Number.isFinite(kickoff)) return true;
+
+      if (!Number.isFinite(kickoff)) {
+        return true;
+      }
 
       const cutoff =
-        kickoff + (DROP_AFTER_START_MINUTES * 60 * 1000);
+        kickoff +
+        (
+          DROP_AFTER_START_MINUTES *
+          60 *
+          1000
+        );
 
       return Date.now() <= cutoff;
     }
 
     function createGroupsFromRows(rows) {
       const map = new Map();
+
       rows.forEach((row, idx) => {
-        const game = (row.game || '').toString().trim();
-        const week = (row.week || '').toString().trim();
-        const time = (row.game_time_est || '').toString().trim();
+        const game = (row.game || '')
+          .toString()
+          .trim();
+
+        const week = (row.week || '')
+          .toString()
+          .trim();
+
+        const time = (row.game_time_est || '')
+          .toString()
+          .trim();
+
         const fallback = `${week}|${time}|${idx}`;
         const key = game || fallback;
 
         if (!map.has(key)) {
-          map.set(key, { key, game, week, game_time_est: time, rows: [] });
+          map.set(key, {
+            key,
+            game,
+            week,
+            game_time_est: time,
+            rows: []
+          });
         }
+
         map.get(key).rows.push(row);
       });
 
@@ -625,334 +1208,560 @@
     function getGroupSortValue(group, key) {
       const vals = group.rows
         .map(r => r[key])
-        .filter(v => v !== null && v !== undefined && v !== '');
-      
-      if (!vals.length) return null;
-      
-      if (vals.every(v => typeof v === 'number')) {
+        .filter(
+          v =>
+            v !== null &&
+            v !== undefined &&
+            v !== ''
+        );
+
+      if (!vals.length) {
+        return null;
+      }
+
+      if (
+        vals.every(v => typeof v === 'number')
+      ) {
         return Math.max(...vals);
       }
-      
+
       return vals[0];
     }
 
     function sortGroups(groups, sortCfg) {
       if (!sortCfg || !sortCfg.key) {
         return groups.sort((a, b) => {
-          const firstA = a.rows && a.rows.length ? a.rows[0] : {};
-          const firstB = b.rows && b.rows.length ? b.rows[0] : {};
+          const firstA =
+            a.rows && a.rows.length
+              ? a.rows[0]
+              : {};
+
+          const firstB =
+            b.rows && b.rows.length
+              ? b.rows[0]
+              : {};
 
           const ta = parseKickoffFromRow(firstA);
           const tb = parseKickoffFromRow(firstB);
 
-          if (ta !== tb) return ta - tb;
+          if (ta !== tb) {
+            return ta - tb;
+          }
 
           const wa = Number(a.week ?? 9999);
           const wb = Number(b.week ?? 9999);
-          if (wa !== wb) return wa - wb;
 
-          return (a.game || '').localeCompare(b.game || '');
+          if (wa !== wb) {
+            return wa - wb;
+          }
+
+          return (a.game || '').localeCompare(
+            b.game || ''
+          );
         });
       }
 
-      const dir = sortCfg.direction === 'desc' ? -1 : 1;
+      const dir =
+        sortCfg.direction === 'desc' ? -1 : 1;
+
       const key = sortCfg.key;
 
       return groups.sort((a, b) => {
         const aVal = getGroupSortValue(a, key);
         const bVal = getGroupSortValue(b, key);
 
-        if (aVal === bVal) return 0;
-        if (aVal === null) return 1;
-        if (bVal === null) return -1;
+        if (aVal === bVal) {
+          return 0;
+        }
 
-        if (typeof aVal === 'number' && typeof bVal === 'number') return (aVal < bVal ? -1 : 1) * dir;
-        return aVal.toString().localeCompare(bVal.toString()) * dir;
+        if (aVal === null) {
+          return 1;
+        }
+
+        if (bVal === null) {
+          return -1;
+        }
+
+        if (
+          typeof aVal === 'number' &&
+          typeof bVal === 'number'
+        ) {
+          return (aVal < bVal ? -1 : 1) * dir;
+        }
+
+        return (
+          aVal
+            .toString()
+            .localeCompare(bVal.toString()) * dir
+        );
       });
     }
 
     function sortRowsWithinGroup(rows, sortCfg) {
-      if (!sortCfg || !sortCfg.key) return rows;
+      if (!sortCfg || !sortCfg.key) {
+        return rows;
+      }
+
       const key = sortCfg.key;
-      const dir = sortCfg.direction === 'desc' ? -1 : 1;
+      const dir =
+        sortCfg.direction === 'desc' ? -1 : 1;
 
       return rows.slice().sort((a, b) => {
         const aVal = a[key];
         const bVal = b[key];
 
-        if (aVal === bVal) return 0;
-        if (aVal === null || aVal === undefined || aVal === '') return 1;
-        if (bVal === null || bVal === undefined || bVal === '') return -1;
+        if (aVal === bVal) {
+          return 0;
+        }
 
-        if (typeof aVal === 'number' && typeof bVal === 'number') return (aVal < bVal ? -1 : 1) * dir;
-        return aVal.toString().localeCompare(bVal.toString()) * dir;
+        if (
+          aVal === null ||
+          aVal === undefined ||
+          aVal === ''
+        ) {
+          return 1;
+        }
+
+        if (
+          bVal === null ||
+          bVal === undefined ||
+          bVal === ''
+        ) {
+          return -1;
+        }
+
+        if (
+          typeof aVal === 'number' &&
+          typeof bVal === 'number'
+        ) {
+          return (aVal < bVal ? -1 : 1) * dir;
+        }
+
+        return (
+          aVal
+            .toString()
+            .localeCompare(bVal.toString()) * dir
+        );
       });
     }
 
     function updateTableFromCSV() {
-      Promise.all([parseCsvFromUrl(SPREADS_CSV_URL), parseCsvFromUrl(MODEL_CSV_URL)])
-        .then(([spreadsResults, modelResults]) => {
-          if (spreadsResults.meta && spreadsResults.meta.fields) buildColumnMapping(spreadsResults.meta.fields);
+      Promise.all([
+        parseCsvFromUrl(CSV_URLS.spreads),
+        parseCsvFromUrl(CSV_URLS.totals),
+        parseCsvFromUrl(CSV_URLS.model)
+      ])
+        .then(([spreadsResults, totalsResults, modelResults]) => {
+          if (spreadsResults.meta && spreadsResults.meta.fields) {
+            tabState.spreads.columnMapping =
+              buildColumnMapping(
+                spreadsResults.meta.fields
+              );
+          }
 
-          rawData = (spreadsResults.data || []).filter(isGameVisible);
-          qbLookup = buildQbLookup(modelResults.data || []);
-          notesLookup = buildNotesLookup(modelResults.data || []);
+          if (totalsResults.meta && totalsResults.meta.fields) {
+            tabState.totals.columnMapping =
+              buildColumnMapping(
+                totalsResults.meta.fields
+              );
+          }
 
-          hydrateTeams();
-          renderTeamPicker();
-          renderTable();
-          updateTeamSummary();
+          tabState.spreads.rawData = (
+            spreadsResults.data || []
+          ).filter(isGameVisible);
 
-          document.getElementById('status').textContent = 'Last updated: ' + new Date().toLocaleTimeString();
+          tabState.totals.rawData = (
+            totalsResults.data || []
+          ).filter(isGameVisible);
+
+          qbLookup = buildQbLookup(
+            modelResults.data || []
+          );
+
+          notesLookup = buildNotesLookup(
+            modelResults.data || []
+          );
+
+          hydrateTeams('spreads');
+          hydrateTeams('totals');
+
+          renderTeamPicker('spreads');
+          renderTeamPicker('totals');
+
+          renderTable('spreads');
+          renderTable('totals');
+
+          updateTeamSummary('spreads');
+          updateTeamSummary('totals');
+
+          document.getElementById('status').textContent =
+            'Last updated: ' +
+            new Date().toLocaleTimeString();
         })
-        .catch((err) => {
-          document.getElementById('status').textContent = 'Error loading data: ' + err.message;
+        .catch(err => {
+          document.getElementById('status').textContent =
+            'Error loading data: ' + err.message;
         });
     }
 
-    function hydrateTeams() {
+    function hydrateTeams(tabId) {
+      const state = tabState[tabId];
       const set = new Set();
-      rawData.forEach(row => {
-        const t = (row['team'] || '').toString().trim();
-        if (t) set.add(t);
+
+      state.rawData.forEach(row => {
+        const t = (row['game'] || '')
+          .toString()
+          .trim();
+
+        if (t) {
+          set.add(t);
+        }
       });
 
-      allTeams = Array.from(set).sort((a, b) => a.localeCompare(b));
-      const existing = new Set(allTeams);
-      selectedTeams.forEach(t => { if (!existing.has(t)) selectedTeams.delete(t); });
+      state.allGames = Array.from(set).sort(
+        (a, b) => a.localeCompare(b)
+      );
+
+      const existing = new Set(state.allGames);
+
+      state.selectedGames.forEach(t => {
+        if (!existing.has(t)) {
+          state.selectedGames.delete(t);
+        }
+      });
     }
 
-    function onTeamFilterInput() { renderTeamPicker(); }
-
-    function onTeamToggle(team, isChecked) {
-      if (isChecked) selectedTeams.add(team);
-      else selectedTeams.delete(team);
-
-      updateTeamCount();
-      updateTeamSummary();
-      renderTable();
+    function onTeamFilterInput(tabId) {
+      renderTeamPicker(tabId);
     }
 
-    function clearTeamSelection() {
-      selectedTeams.clear();
-      document.getElementById('teamFilter').value = '';
-      renderTeamPicker();
-      updateTeamSummary();
-      renderTable();
+    function onTeamToggle(tabId, game, isChecked) {
+      const state = tabState[tabId];
+
+      if (isChecked) {
+        state.selectedGames.add(game);
+      } else {
+        state.selectedGames.delete(game);
+      }
+
+      updateTeamCount(tabId);
+      updateTeamSummary(tabId);
+      renderTable(tabId);
     }
 
-    function selectVisibleTeams() {
-      const filterText = document.getElementById('teamFilter').value.toLowerCase().trim();
-      const visible = allTeams.filter(t => t.toLowerCase().includes(filterText));
-      visible.forEach(t => selectedTeams.add(t));
-      renderTeamPicker();
-      updateTeamSummary();
-      renderTable();
+    function clearTeamSelection(tabId) {
+      const state = tabState[tabId];
+      state.selectedGames.clear();
+
+      document.getElementById(
+        tabId + '-teamFilter'
+      ).value = '';
+
+      renderTeamPicker(tabId);
+      updateTeamSummary(tabId);
+      renderTable(tabId);
     }
 
-    function updateTeamCount() {
-      document.getElementById('teamCount').textContent = `Teams: ${allTeams.length} • Selected: ${selectedTeams.size}`;
+    function selectVisibleTeams(tabId) {
+      const state = tabState[tabId];
+      const filterText = document
+        .getElementById(tabId + '-teamFilter')
+        .value.toLowerCase()
+        .trim();
+
+      const visible = state.allGames.filter(
+        t =>
+          t
+            .toLowerCase()
+            .includes(filterText)
+      );
+
+      visible.forEach(t =>
+        state.selectedGames.add(t)
+      );
+
+      renderTeamPicker(tabId);
+      updateTeamSummary(tabId);
+      renderTable(tabId);
     }
 
-    function updateTeamSummary() {
-      const el = document.getElementById('teamSummary');
-      if (selectedTeams.size === 0) {
-        el.textContent = 'All teams';
+    function updateTeamCount(tabId) {
+      const state = tabState[tabId];
+
+      document.getElementById(
+        tabId + '-teamCount'
+      ).textContent = `Games: ${state.allGames.length} • Selected: ${state.selectedGames.size}`;
+    }
+
+    function updateTeamSummary(tabId) {
+      const state = tabState[tabId];
+      const el = document.getElementById(
+        tabId + '-teamSummary'
+      );
+
+      if (state.selectedGames.size === 0) {
+        el.textContent = 'All games';
         return;
       }
-      el.textContent = `${selectedTeams.size} team${selectedTeams.size === 1 ? '' : 's'} selected`;
+
+      el.textContent = `${state.selectedGames.size} game${
+        state.selectedGames.size === 1 ? '' : 's'
+      } selected`;
     }
 
-    function renderTeamPicker() {
-      const container = document.getElementById('teamList');
-      const filterText = document.getElementById('teamFilter').value.toLowerCase().trim();
+    function renderTeamPicker(tabId) {
+      const state = tabState[tabId];
+      const container = document.getElementById(
+        tabId + '-teamList'
+      );
+
+      const filterText = document
+        .getElementById(tabId + '-teamFilter')
+        .value.toLowerCase()
+        .trim();
 
       container.innerHTML = '';
-      const filteredTeams = allTeams.filter(t => t.toLowerCase().includes(filterText));
 
-      filteredTeams.forEach(team => {
-        const id = 'team_' + team.replace(/[^a-z0-9]/gi, '_');
+      const filteredGames = state.allGames.filter(
+        t =>
+          t
+            .toLowerCase()
+            .includes(filterText)
+      );
 
-        const row = document.createElement('div');
+      filteredGames.forEach(game => {
+        const id =
+          'game_' +
+          game.replace(/[^a-z0-9]/gi, '_');
+
+        const row = document.createElement(
+          'div'
+        );
+
         row.className = 'team-item';
 
-        const cb = document.createElement('input');
+        const cb = document.createElement(
+          'input'
+        );
+
         cb.type = 'checkbox';
         cb.id = id;
-        cb.checked = selectedTeams.has(team);
-        cb.onchange = () => onTeamToggle(team, cb.checked);
+        cb.checked =
+          state.selectedGames.has(game);
 
-        const label = document.createElement('label');
+        cb.onchange = () =>
+          onTeamToggle(tabId, game, cb.checked);
+
+        const label = document.createElement(
+          'label'
+        );
+
         label.htmlFor = id;
-        label.textContent = team;
+        label.textContent = game;
 
         row.appendChild(cb);
         row.appendChild(label);
         container.appendChild(row);
       });
 
-      updateTeamCount();
+      updateTeamCount(tabId);
     }
 
-    function onSort(key) {
-      if (sortConfig.key === key) sortConfig.direction = sortConfig.direction === 'asc' ? 'desc' : 'asc';
-      else {
-        sortConfig.key = key;
-        sortConfig.direction = 'asc';
+    function onSort(tabId, key) {
+      const state = tabState[tabId];
+
+      if (state.sortConfig.key === key) {
+        state.sortConfig.direction =
+          state.sortConfig.direction === 'asc'
+            ? 'desc'
+            : 'asc';
+      } else {
+        state.sortConfig.key = key;
+        state.sortConfig.direction = 'asc';
       }
-      renderTable();
+
+      renderTable(tabId);
     }
 
-    function renderTable() {
-      const head = document.getElementById('tableHead');
-      const body = document.getElementById('tableBody');
+    function renderTable(tabId) {
+      const state = tabState[tabId];
+      const head = document.getElementById(
+        tabId + '-tableHead'
+      );
+
+      const body = document.getElementById(
+        tabId + '-tableBody'
+      );
 
       head.innerHTML = '';
       body.innerHTML = '';
 
-      if (!rawData || rawData.length === 0) return;
+      if (!state.rawData || state.rawData.length === 0) {
+        return;
+      }
 
-      const activeCols = columnMapping.filter(col =>
-        Object.prototype.hasOwnProperty.call(rawData[0], col.csv)
-      );
+      const activeCols =
+        state.columnMapping.filter(
+          col =>
+            Object.prototype.hasOwnProperty.call(
+              state.rawData[0],
+              col.csv
+            )
+        );
 
       activeCols.forEach(col => {
         const th = document.createElement('th');
+
         th.textContent = col.display;
-        th.onclick = () => onSort(col.csv);
+        th.onclick = () => onSort(tabId, col.csv);
+
         head.appendChild(th);
       });
 
-      let processedData = rawData;
-      if (selectedTeams.size > 0) {
-        processedData = rawData.filter(row => selectedTeams.has((row['team'] || '').toString().trim()));
+      let processedData = state.rawData;
+
+      if (state.selectedGames.size > 0) {
+        processedData = state.rawData.filter(
+          row =>
+            state.selectedGames.has(
+              (row['game'] || '')
+                .toString()
+                .trim()
+            )
+        );
       }
 
-      processedData = processedData.filter(isGameVisible);
+      processedData =
+        processedData.filter(isGameVisible);
 
-      let groups = createGroupsFromRows(processedData);
-      groups = sortGroups(groups, sortConfig);
+      let groups = createGroupsFromRows(
+        processedData
+      );
+
+      groups = sortGroups(
+        groups,
+        state.sortConfig
+      );
 
       groups.forEach(group => {
-        const gameHeaderTr = document.createElement('tr');
-        gameHeaderTr.className = 'game-group-header';
+        const gameHeaderTr =
+          document.createElement('tr');
+
+        gameHeaderTr.className =
+          'game-group-header';
 
         const gameTd = document.createElement('td');
+
         gameTd.colSpan = activeCols.length;
 
-        const title = document.createElement('span');
+        const title = document.createElement(
+          'span'
+        );
+
         title.className = 'game-group-title';
 
-        const firstRow = group.rows && group.rows.length ? group.rows[0] : null;
-        const pfrUrl = firstRow ? buildPfrGameUrl(firstRow) : null;
+        const firstRow =
+          group.rows && group.rows.length
+            ? group.rows[0]
+            : null;
+
+        const pfrUrl = firstRow
+          ? buildPfrGameUrl(firstRow)
+          : null;
+
         const gameText = group.game || 'Matchup';
 
         if (pfrUrl) {
           const a = document.createElement('a');
+
           a.href = pfrUrl;
           a.target = '_blank';
           a.rel = 'noopener noreferrer';
           a.textContent = gameText;
+
           title.appendChild(a);
         } else {
           title.textContent = gameText;
         }
 
         const meta = document.createElement('span');
+
         meta.className = 'game-meta';
-        const weekPart = group.week ? `Week ${group.week}` : '';
-        const timePart = group.game_time_est ? group.game_time_est : '';
-        meta.textContent = [weekPart, timePart].filter(Boolean).join(' • ');
+
+        const weekPart = group.week
+          ? `Week ${group.week}`
+          : '';
+
+        const timePart = group.game_time_est
+          ? group.game_time_est
+          : '';
+
+        meta.textContent = [weekPart, timePart]
+          .filter(Boolean)
+          .join(' • ');
 
         gameTd.appendChild(title);
-        if (meta.textContent) gameTd.appendChild(meta);
+
+        if (meta.textContent) {
+          gameTd.appendChild(meta);
+        }
+
         gameHeaderTr.appendChild(gameTd);
         body.appendChild(gameHeaderTr);
 
-        const sortedRows = sortRowsWithinGroup(group.rows, sortConfig);
+        const sortedRows = sortRowsWithinGroup(
+          group.rows,
+          state.sortConfig
+        );
 
         sortedRows.forEach((row, rowIdx) => {
           const tr = document.createElement('tr');
+
           tr.className = 'team-subrow';
 
           activeCols.forEach(col => {
             const td = document.createElement('td');
+
             const val = row[col.csv];
-            const formatted = formatValue(val, col.type, col.csv);
+            const formatted = formatValue(
+              val,
+              col.type,
+              col.csv
+            );
 
-            const hideGame = (col.csv === 'game');
-            const hideGameTime = (col.csv === 'game_time_est');
-            const hideWeekOnSecondRow = (col.csv === 'week' && rowIdx > 0);
+            const hideGame =
+              col.csv === 'game';
 
-            if (col.csv === 'team') {
-              const teamKey = (val || '').toString().trim().toUpperCase();
-              const url = TEAM_INJURY_URLS[teamKey];
-              const logoUrl = row['team_logo_espn'];
-              const qbName = qbLookup[teamKey];
-              const notes = notesLookup[teamKey];
-              const wrapper = document.createElement('div');
-              wrapper.className = 'team-cell';
+            const hideGameTime =
+              col.csv === 'game_time_est';
 
-              if (url) {
-                const a = document.createElement('a');
-                a.href = url;
-                a.target = '_blank';
-                a.rel = 'noopener noreferrer';
-                a.className = 'team-link';
+            const hideWeekOnSecondRow =
+              col.csv === 'week' && rowIdx > 0;
 
-                if (logoUrl) {
-                  const img = document.createElement('img');
-                  img.src = logoUrl;
-                  img.alt = `${formatted} logo`;
-                  img.className = 'team-logo';
-                  a.appendChild(img);
-                }
-
-                const span = document.createElement('span');
-                span.textContent = formatted;
-                a.appendChild(span);
-                wrapper.appendChild(a);
-              } else {
-                const line = document.createElement('div');
-                if (logoUrl) {
-                  const img = document.createElement('img');
-                  img.src = logoUrl;
-                  img.alt = `${formatted} logo`;
-                  img.className = 'team-logo';
-                  line.appendChild(img);
-                  line.appendChild(document.createTextNode(' '));
-                }
-                line.appendChild(document.createTextNode(formatted));
-                wrapper.appendChild(line);
-              }
-
-              if (qbName) {
-                const note = document.createElement('div');
-                note.className = 'qb-note';
-                note.textContent = `*Assumes ${qbName} is starting`;
-                wrapper.appendChild(note);
-              }
-
-              if (notes) {
-                const notesDiv = document.createElement('div');
-                notesDiv.className = 'notes-text';
-                notesDiv.textContent = notes;
-                wrapper.appendChild(notesDiv);
-              }
-
-              td.appendChild(wrapper);
-            } else if (hideGame || hideGameTime || hideWeekOnSecondRow) {
+            if (hideGame || hideGameTime || hideWeekOnSecondRow) {
               td.textContent = '';
             } else {
               td.textContent = formatted;
             }
 
-            if (col.type !== 'text') td.classList.add('numeric');
+            if (col.type !== 'text') {
+              td.classList.add('numeric');
+            }
 
-            if (!(hideGame || hideGameTime || hideWeekOnSecondRow) &&
-                typeof val === 'number' &&
-                col.type === 'spread_edge') {
-              td.style.backgroundColor = getEdgeGradientColor(val, EDGE_THRESHOLD_PERCENT);
+            if (
+              !(
+                hideGame ||
+                hideGameTime ||
+                hideWeekOnSecondRow
+              ) &&
+              typeof val === 'number' &&
+              col.type === 'spread_edge'
+            ) {
+              td.style.backgroundColor =
+                getEdgeGradientColor(
+                  val,
+                  EDGE_THRESHOLD_PERCENT
+                );
             }
 
             tr.appendChild(td);
@@ -962,9 +1771,13 @@
         });
       });
 
-      setTimeout(() => notifyParentOfHeight(), 100);
+      setTimeout(
+        () => notifyParentOfHeight(),
+        100
+      );
     }
 
+    setupSubtabs();
     updateTableFromCSV();
     setInterval(updateTableFromCSV, REFRESH_INTERVAL);
   </script>
