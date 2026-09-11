@@ -650,18 +650,30 @@
 
     function formatValue(value, type, csvKey) {
       if (value === null || value === undefined || value === '') return '';
-      if (type === 'probability' || type === 'spread_edge') return (Number(value) * 100).toFixed(2) + '%';
+
+      const normalizedValue = String(value).trim().toUpperCase();
+      if (normalizedValue === 'NA' || normalizedValue === 'N/A' || normalizedValue === 'NAN') return '';
+
+      if (type === 'probability' || type === 'spread_edge') {
+        const numberValue = Number(value);
+        return Number.isFinite(numberValue) ? (numberValue * 100).toFixed(2) + '%' : '';
+      }
 
       if (csvKey === 'model_prediction' || csvKey === 'market_line' || csvKey === 'best_line' || csvKey === 'lookahead_line' || csvKey.includes('_line')) {
-        return Number(value).toFixed(1);
+        const numberValue = Number(value);
+        return Number.isFinite(numberValue) ? numberValue.toFixed(1) : '';
       }
 
       if (csvKey === 'market_price' || csvKey === 'best_price' || csvKey.includes('_price')) {
-        return Number(value).toFixed(0);
+        const numberValue = Number(value);
+        return Number.isFinite(numberValue) ? numberValue.toFixed(0) : '';
       }
 
       if (type === 'text') return String(value);
-      if (type === 'decimal') return Number(value).toFixed(2);
+      if (type === 'decimal') {
+        const numberValue = Number(value);
+        return Number.isFinite(numberValue) ? numberValue.toFixed(2) : '';
+      }
       return value;
     }
 
@@ -740,7 +752,21 @@
       return initialGuess - easternOffset;
     }
 
+    function hasValidMatchup(row) {
+      const game = normalizeGame(row?.game);
+
+      if (!game || game === 'NA' || game === 'N/A' || game === 'NAN') {
+        return false;
+      }
+
+      const teams = game.split('@').map(team => team.trim());
+      return teams.length === 2 && Boolean(teams[0]) && Boolean(teams[1]);
+    }
+
     function isGameVisible(row) {
+      // Exclude orphan source rows such as game=NA before applying time logic.
+      if (!hasValidMatchup(row)) return false;
+
       const kickoff = parseKickoffFromRow(row);
       if (!Number.isFinite(kickoff)) return true;
       const cutoff = kickoff + (DROP_AFTER_START_MINUTES * 60 * 1000);
