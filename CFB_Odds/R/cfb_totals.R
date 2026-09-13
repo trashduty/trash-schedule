@@ -220,9 +220,53 @@ api_totals_bookmaker <- api_data |>
     total_price = price
   )
 
-spreads_predictions <- read_csv(spreads_output_path, show_col_types = FALSE) |>
+spreads_predictions_raw <- read_csv(
+  spreads_output_path,
+  show_col_types = FALSE
+) |>
   janitor::clean_names() |>
-  select(game, model_prediction, market_line) |>
+  select(game, model_prediction, market_line)
+
+# Diagnose values that cannot safely be used by calculate_drive_bin().
+# Pick'em labels are valid spreads and are converted to zero. Any other
+# nonblank, nonnumeric value is printed with its game and stops the workflow.
+spreads_predictions_checked <- spreads_predictions_raw |>
+  mutate(
+    market_line_raw = str_trim(as.character(market_line)),
+    market_line_upper = str_to_upper(market_line_raw),
+    market_line_numeric = case_when(
+      market_line_upper %in% c("PK", "PICK", "PICK'EM", "PICKEM") ~ 0,
+      TRUE ~ suppressWarnings(readr::parse_number(
+        market_line_raw,
+        na = c("", "NA", "N/A", "NULL", "OFF", "-")
+      ))
+    )
+  )
+
+invalid_market_lines <- spreads_predictions_checked |>
+  filter(
+    !is.na(market_line_raw),
+    market_line_raw != "",
+    !market_line_upper %in% c("NA", "N/A", "NULL", "OFF", "-"),
+    is.na(market_line_numeric)
+  ) |>
+  distinct(game, market_line = market_line_raw)
+
+if (nrow(invalid_market_lines) > 0) {
+  message("Invalid market_line value(s) found in ", spreads_output_path, ":")
+  print(invalid_market_lines, n = Inf)
+  stop(
+    "market_line contains nonnumeric values. See the game/value rows printed above.",
+    call. = FALSE
+  )
+}
+
+spreads_predictions <- spreads_predictions_checked |>
+  transmute(
+    game,
+    model_prediction = suppressWarnings(as.numeric(model_prediction)),
+    market_line = market_line_numeric
+  ) |>
   distinct()
 
 totals_lookup_joined <- model_with_game |>
