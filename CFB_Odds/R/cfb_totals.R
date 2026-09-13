@@ -414,16 +414,25 @@ if (nrow(totals_summary) == 0) {
 
   print(unmatched_api_games, n = Inf)
 
-  stop(
+  warning(
     paste0(
       "CFB totals pipeline produced zero rows. ",
-      "Existing totals_odds.csv was not overwritten."
+      "The totals model may not yet be updated for the current week. ",
+      "Existing totals_odds.csv was preserved."
     ),
-    call. = FALSE
+    call. = FALSE,
+    immediate. = TRUE
+  )
+
+} else {
+  write_csv(
+    totals_summary,
+    "CFB_Odds/Data/totals_odds.csv"
+  )
+
+  message(
+    "Successfully wrote ",
+    nrow(totals_summary),
+    " games to CFB_Odds/Data/totals_odds.csv."
   )
 }
-
-write_csv(
-  totals_summary,
-  "CFB_Odds/Data/totals_odds.csv"
-)
