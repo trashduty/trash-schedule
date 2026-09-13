@@ -86,8 +86,6 @@ week,game,team,opening_date,current_date,days_elapsed,opening_line,current_line,
 1,UMass Minutemen@Rutgers Scarlet Knights,Rutgers Scarlet Knights,2026-09-03,2026-09-03,0,-29,-29,0,0,No Change
 1,UMass Minutemen@Rutgers Scarlet Knights,UMass Minutemen,2026-09-03,2026-09-03,0,29.5,29.5,0,0,No Change
 2,Southern Mississippi Golden Eagles@Auburn Tigers,Auburn Tigers,2026-09-07,2026-09-12,5,-29,-32.5,-3.5,3.5,Moved Down
-2,New Mexico State Aggies@Hawaii Rainbow Warriors,New Mexico State Aggies,2026-09-07,2026-09-12,5,10,7,-3,3,Moved Down
-2,New Mexico State Aggies@Hawaii Rainbow Warriors,Hawaii Rainbow Warriors,2026-09-07,2026-09-12,5,-9.5,-7,2.5,2.5,Moved Up
 2,Southern Mississippi Golden Eagles@Auburn Tigers,Southern Mississippi Golden Eagles,2026-09-07,2026-09-12,5,30.5,32.5,2,2,Moved Up
 2,Oklahoma Sooners@Michigan Wolverines,Michigan Wolverines,2026-09-07,2026-09-12,5,6.5,4.5,-2,2,Moved Down
 2,Bowling Green Falcons@Nebraska Cornhuskers,Nebraska Cornhuskers,2026-09-07,2026-09-12,5,-28.5,-30.5,-2,2,Moved Down
@@ -111,6 +109,7 @@ week,game,team,opening_date,current_date,days_elapsed,opening_line,current_line,
 2,UL Monroe Warhawks@UAB Blazers,UAB Blazers,2026-09-07,2026-09-12,5,-11,-9.5,1.5,1.5,Moved Up
 2,UL Monroe Warhawks@UAB Blazers,UL Monroe Warhawks,2026-09-07,2026-09-12,5,11,9.5,-1.5,1.5,Moved Down
 2,North Dakota State@Air Force Falcons,North Dakota State,2026-09-07,2026-09-12,5,-3.5,-2,1.5,1.5,Moved Up
+2,New Mexico State Aggies@Hawaii Rainbow Warriors,New Mexico State Aggies,2026-09-07,2026-09-13,6,10,11.5,1.5,1.5,Moved Up
 2,Missouri Tigers@Kansas Jayhawks,Kansas Jayhawks,2026-09-07,2026-09-11,4,6.5,5.5,-1,1,Moved Down
 2,Missouri Tigers@Kansas Jayhawks,Missouri Tigers,2026-09-07,2026-09-11,4,-6.5,-5.5,1,1,Moved Up
 2,Oklahoma Sooners@Michigan Wolverines,Oklahoma Sooners,2026-09-07,2026-09-12,5,-6.5,-5.5,1,1,Moved Up
@@ -127,6 +126,7 @@ week,game,team,opening_date,current_date,days_elapsed,opening_line,current_line,
 2,North Dakota State@Air Force Falcons,Air Force Falcons,2026-09-07,2026-09-12,5,3.5,2.5,-1,1,Moved Down
 2,South Alabama Jaguars@Tulane Green Wave,Tulane Green Wave,2026-09-07,2026-09-12,5,-10.5,-9.5,1,1,Moved Up
 2,South Alabama Jaguars@Tulane Green Wave,South Alabama Jaguars,2026-09-07,2026-09-12,5,10.5,9.5,-1,1,Moved Down
+2,New Mexico State Aggies@Hawaii Rainbow Warriors,Hawaii Rainbow Warriors,2026-09-07,2026-09-13,6,-9.5,-10.5,-1,1,Moved Down
 2,Jacksonville State Gamecocks@Ohio Bobcats,Jacksonville State Gamecocks,2026-09-07,2026-09-12,5,1.5,2.5,1,1,Moved Up
 2,Georgia State Panthers@Kennesaw State Owls,Kennesaw State Owls,2026-09-07,2026-09-12,5,-9.5,-8.5,1,1,Moved Up
 2,Georgia State Panthers@Kennesaw State Owls,Georgia State Panthers,2026-09-07,2026-09-12,5,9.5,8.5,-1,1,Moved Down
