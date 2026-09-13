@@ -371,4 +371,59 @@ totals_summary <- totals_last_update |>
   left_join(totals_median_summary, by = c("week", "game")) |>
   left_join(totals_best_summary, by = c("week", "game"))
 
-write_csv(totals_summary, "CFB_Odds/Data/totals_odds.csv")
+message("\n===== CFB TOTALS PIPELINE COUNTS =====")
+message("model_raw: ", nrow(model_raw))
+message("spreads_games: ", nrow(spreads_games))
+message("model_joined: ", nrow(model_joined))
+message("model_with_game: ", nrow(model_with_game))
+message("api_data: ", nrow(api_data))
+message("api_totals_bookmaker: ", nrow(api_totals_bookmaker))
+message("spreads_predictions: ", nrow(spreads_predictions))
+message("totals_lookup_joined: ", nrow(totals_lookup_joined))
+message("totals_calculated: ", nrow(totals_calculated))
+message("totals_last_update: ", nrow(totals_last_update))
+message("totals_median_summary: ", nrow(totals_median_summary))
+message("totals_best_summary: ", nrow(totals_best_summary))
+message("totals_summary: ", nrow(totals_summary))
+
+if (nrow(totals_summary) == 0) {
+  message("\nModel matchups not found in spreads data:")
+
+  unmatched_model_games <- model_joined |>
+    anti_join(
+      select(spreads_games, matchup_key),
+      by = "matchup_key"
+    ) |>
+    distinct(
+      week,
+      model_team,
+      model_opponent,
+      matchup_key
+    )
+
+  print(unmatched_model_games, n = Inf)
+
+  message("\nAPI totals games not found in matched model games:")
+
+  unmatched_api_games <- api_totals_bookmaker |>
+    anti_join(
+      distinct(model_with_game, game),
+      by = "game"
+    ) |>
+    distinct(week, game)
+
+  print(unmatched_api_games, n = Inf)
+
+  stop(
+    paste0(
+      "CFB totals pipeline produced zero rows. ",
+      "Existing totals_odds.csv was not overwritten."
+    ),
+    call. = FALSE
+  )
+}
+
+write_csv(
+  totals_summary,
+  "CFB_Odds/Data/totals_odds.csv"
+)
