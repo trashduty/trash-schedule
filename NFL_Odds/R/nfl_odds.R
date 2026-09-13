@@ -14,6 +14,10 @@ get_odds_api <- function(sport = "americanfootball_nfl",
                          markets = "spreads,totals", 
                          year = nflreadr::get_current_season(roster = TRUE), 
                          oddsFormat = "american"){
+
+  # Capture one consistent cutoff time for the entire API pull. Games at or
+  # after kickoff are excluded so in-game/live lines never enter the model.
+  pipeline_started_utc <- lubridate::now(tzone = "UTC")
   
   load_reg_schedule <- function(yr) {
     tryCatch(
@@ -100,7 +104,13 @@ get_odds_api <- function(sport = "americanfootball_nfl",
       game_date_est = as_date(commence_time_est),
       game_time_est = format(commence_time_est, "%I:%M %p"),
       commence_ny = as_date(commence_time_est)
-    ) |> 
+    ) |>
+    # Drop games as soon as kickoff arrives. This prevents sportsbook live
+    # lines from being mixed into pregame spreads and totals calculations.
+    filter(
+      !is.na(commence_time_parsed),
+      commence_time_parsed > pipeline_started_utc
+    ) |>
     left_join(teams, by = c("home_team" = "team_name")) |> 
     rename(home_abbr = team_abbr) |> 
     left_join(teams, by = c("away_team" = "team_name")) |> 
@@ -129,6 +139,14 @@ get_odds_api <- function(sport = "americanfootball_nfl",
       point
     )
   
+  if (nrow(api_unnested) == 0) {
+    message(
+      "Odds API returned no upcoming NFL games after the kickoff filter. ",
+      "Existing output files will not be overwritten."
+    )
+    return(invisible(NULL))
+  }
+
   return(api_unnested)
 }
 
@@ -245,16 +263,18 @@ if (!is.null(api_data)) {
       game_date_est = first(game_date_est),
       game_time_est = first(game_time_est),
       last_update_api = max(last_update_api, na.rm = TRUE), 
-      model_prediction = true_spread[median_edge_row],
-      market_line = spread[median_edge_row],
-      market_price = spread_price[median_edge_row], 
-      cover_probability = spread_cover_probability[median_edge_row],
-      edge = spread_edge[median_edge_row],
-      best_book = bookmaker[highest_edge_row],
-      best_line = spread[highest_edge_row],
-      best_price = spread_price[highest_edge_row], 
-      best_cover_probability = spread_cover_probability[highest_edge_row], 
-      best_edge = spread_edge[highest_edge_row],
+      # first() guarantees exactly one result even if duplicate sportsbook
+      # rows or an unexpected tie create more than one flagged row.
+      model_prediction = first(true_spread[median_edge_row]),
+      market_line = first(spread[median_edge_row]),
+      market_price = first(spread_price[median_edge_row]), 
+      cover_probability = first(spread_cover_probability[median_edge_row]),
+      edge = first(spread_edge[median_edge_row]),
+      best_book = first(bookmaker[highest_edge_row]),
+      best_line = first(spread[highest_edge_row]),
+      best_price = first(spread_price[highest_edge_row]), 
+      best_cover_probability = first(spread_cover_probability[highest_edge_row]), 
+      best_edge = first(spread_edge[highest_edge_row]),
       .by = c(week, game, team, team_logo_espn)
     )
 
@@ -329,6 +349,18 @@ if (!is.null(api_data)) {
       .groups = "drop"
     ) 
   
+  if (nrow(spread_summary) == 0 || nrow(total_summary) == 0) {
+    stop(
+      paste0(
+        "NFL pipeline produced zero rows for spreads or totals ",
+        "(spreads: ", nrow(spread_summary),
+        ", totals: ", nrow(total_summary), "). ",
+        "Existing output files were not overwritten."
+      ),
+      call. = FALSE
+    )
+  }
+
   write_csv(total_summary, "NFL_Odds/Data/totals_odds.csv")
   write_csv(spread_summary, "NFL_Odds/Data/spreads_odds.csv")
 } else {
