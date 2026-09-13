@@ -220,8 +220,26 @@ if (!is.null(api_data)) {
       ), 
       by = c("week", "team")
     ) |> 
-    mutate(median_spread = median(spread, na.rm = TRUE), 
-           .by = c(game, team), .after = spread) |> 
+    mutate(
+      median_spread_raw = median(spread, na.rm = TRUE),
+      .by = c(game, team),
+      .after = spread
+    ) |>
+    mutate(
+      median_abs_spread_raw = median(abs(spread), na.rm = TRUE),
+      .by = game,
+      .after = median_spread_raw
+    ) |>
+    mutate(
+      # Use one consensus absolute spread for the game and apply the correct
+      # direction for each team. This guarantees inverse displayed lines.
+      median_spread = case_when(
+        is.na(median_spread_raw) | is.na(median_abs_spread_raw) ~ NA_real_,
+        median_spread_raw < 0 ~ -(round(median_abs_spread_raw * 2) / 2),
+        median_spread_raw > 0 ~  (round(median_abs_spread_raw * 2) / 2),
+        TRUE ~ 0
+      )
+    ) |>
     mutate(true_spread = ((model_prediction * 0.35) + (median_spread * 0.65)),  
            .after = spread) |> 
     mutate(true_spread = round(true_spread * 2) / 2) |> 
@@ -242,6 +260,7 @@ if (!is.null(api_data)) {
       game_date_est,
       game_time_est,
       true_spread,
+      median_spread,
       spread,
       spread_price,
       spread_cover_probability,
@@ -250,11 +269,27 @@ if (!is.null(api_data)) {
       raw_model,
       last_update_api
     ) |> 
-    group_by(week, game, team) |> 
     mutate(
-      median_edge_row = row_number(-spread_edge) == ceiling(n()/2),
-      highest_edge_row = row_number(-spread_edge) == 1
-    ) |> 
+      distance_from_median = abs(spread - median_spread)
+    ) |>
+    group_by(week, game, team) |>
+    arrange(
+      distance_from_median,
+      desc(spread_edge),
+      bookmaker,
+      .by_group = TRUE
+    ) |>
+    mutate(
+      median_line_row = row_number() == 1
+    ) |>
+    arrange(
+      desc(spread_edge),
+      bookmaker,
+      .by_group = TRUE
+    ) |>
+    mutate(
+      highest_edge_row = row_number() == 1
+    ) |>
     ungroup() |> 
     arrange(week, game, team, -spread_edge)
   
@@ -265,11 +300,11 @@ if (!is.null(api_data)) {
       last_update_api = max(last_update_api, na.rm = TRUE), 
       # first() guarantees exactly one result even if duplicate sportsbook
       # rows or an unexpected tie create more than one flagged row.
-      model_prediction = first(true_spread[median_edge_row]),
-      market_line = first(spread[median_edge_row]),
-      market_price = first(spread_price[median_edge_row]), 
-      cover_probability = first(spread_cover_probability[median_edge_row]),
-      edge = first(spread_edge[median_edge_row]),
+      model_prediction = first(true_spread[median_line_row]),
+      market_line = first(median_spread[median_line_row]),
+      market_price = first(spread_price[median_line_row]), 
+      cover_probability = first(spread_cover_probability[median_line_row]),
+      edge = first(spread_edge[median_line_row]),
       best_book = first(bookmaker[highest_edge_row]),
       best_line = first(spread[highest_edge_row]),
       best_price = first(spread_price[highest_edge_row]), 
