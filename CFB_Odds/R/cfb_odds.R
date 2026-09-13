@@ -240,7 +240,21 @@ odds_lookup_joined <- model_raw |>
     .by = c(game, team),
     .after = spread
   ) |>
-  mutate(median_spread = round(median_spread_raw * 2) / 2) |>
+  mutate(
+    median_abs_spread_raw = safe_median(abs(spread)),
+    .by = game,
+    .after = median_spread_raw
+  ) |>
+  mutate(
+    # Calculate one consensus absolute spread for the game, then apply each
+    # team's direction. This guarantees inverse market lines for both teams.
+    median_spread = case_when(
+      is.na(median_spread_raw) | is.na(median_abs_spread_raw) ~ NA_real_,
+      median_spread_raw < 0 ~ -(round(median_abs_spread_raw * 2) / 2),
+      median_spread_raw > 0 ~  (round(median_abs_spread_raw * 2) / 2),
+      TRUE ~ 0
+    )
+  ) |>
   mutate(
     true_spread = ((model_prediction_raw * 0.35) + (median_spread * 0.65)),
     .after = spread
@@ -255,12 +269,28 @@ odds_lookup_joined <- model_raw |>
   )
 
 odds_calculated <- odds_lookup_joined |>
-  mutate(cover_edge = cover_probability - implied_odds_spread) |>
-  mutate(no_cover_edge = (1 - cover_probability) - implied_odds_spread) |>
-  group_by(week, game, team) |>
   mutate(
-    median_cover_row = row_number(-cover_edge) == ceiling(n() / 2),
-    highest_cover_row = row_number(-cover_edge) == 1
+    cover_edge = cover_probability - implied_odds_spread,
+    no_cover_edge = (1 - cover_probability) - implied_odds_spread,
+    distance_from_median = abs(spread - median_spread)
+  ) |>
+  group_by(week, game, team) |>
+  arrange(
+    distance_from_median,
+    desc(cover_edge),
+    bookmaker,
+    .by_group = TRUE
+  ) |>
+  mutate(
+    median_line_row = row_number() == 1
+  ) |>
+  arrange(
+    desc(cover_edge),
+    bookmaker,
+    .by_group = TRUE
+  ) |>
+  mutate(
+    highest_cover_row = row_number() == 1
   ) |>
   ungroup()
 
@@ -268,16 +298,16 @@ spread_summary <- odds_calculated |>
   summarise(
     last_update_api = safe_max_datetime(last_update_api),
     commence_time = safe_max_datetime(lubridate::ymd_hms(commence_time, quiet = TRUE)),
-    model_prediction = true_spread[median_cover_row],
-    market_line = spread[median_cover_row],
-    market_price = spread_price[median_cover_row],
-    median_cover_probability = cover_probability[median_cover_row],
-    edge = cover_edge[median_cover_row],
-    best_book = bookmaker[highest_cover_row],
-    best_line = spread[highest_cover_row],
-    best_price = spread_price[highest_cover_row],
-    best_cover_probability = cover_probability[highest_cover_row],
-    best_edge = cover_edge[highest_cover_row],
+    model_prediction = first(true_spread[median_line_row]),
+    market_line = first(median_spread[median_line_row]),
+    market_price = first(spread_price[median_line_row]),
+    median_cover_probability = first(cover_probability[median_line_row]),
+    edge = first(cover_edge[median_line_row]),
+    best_book = first(bookmaker[highest_cover_row]),
+    best_line = first(spread[highest_cover_row]),
+    best_price = first(spread_price[highest_cover_row]),
+    best_cover_probability = first(cover_probability[highest_cover_row]),
+    best_edge = first(cover_edge[highest_cover_row]),
     .by = c(week, game, team, logo)
   ) |>
   mutate(
