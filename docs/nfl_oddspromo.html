@@ -1183,46 +1183,60 @@
       setTimeout(notifyParentOfHeight, 100);
     }
 
-    function updateTableFromCSV() {
-      Promise.all([
-        parseCsvFromUrl(CSV_URLS.spreads),
-        parseCsvFromUrl(CSV_URLS.totals),
-        parseCsvFromUrl(CSV_URLS.model)
-      ])
-        .then(([spreadsResults, totalsResults, modelResults]) => {
-          const spreadsRows = spreadsResults.data || [];
-          const totalsRows = enrichTotalsWithKickoff(totalsResults.data || [], spreadsRows);
+function updateTableFromCSV() {
+  Promise.all([
+    parseCsvFromUrl(CSV_URLS.spreads),
+    parseCsvFromUrl(CSV_URLS.totals)
+  ])
+    .then(([spreadsResults, totalsResults]) => {
+      const spreadsRows = spreadsResults.data || [];
 
-          qbLookup = buildQbLookup(modelResults.data || []);
-          notesLookup = buildNotesLookup(modelResults.data || []);
+      const totalsRows = enrichTotalsWithKickoff(
+        totalsResults.data || [],
+        spreadsRows
+      );
 
-          // Keep prior-week promotional games visible regardless of kickoff time.
-          tabState.spreads.rawData = spreadsRows.filter(hasValidMatchup);
-          tabState.spreads.columnMapping = buildSpreadColumnMapping(spreadsResults.meta?.fields || []);
+      // The promo CSV does not contain separate QB or notes data.
+      qbLookup = {};
+      notesLookup = {};
 
-          tabState.totals.rawData = totalsRows.filter(hasValidMatchup);
-          tabState.totals.columnMapping = buildTotalsColumnMapping(totalsResults.meta?.fields || []);
+      // Only remove malformed rows. Do not apply the kickoff-time filter.
+      tabState.spreads.rawData = spreadsRows.filter(hasValidMatchup);
+      tabState.spreads.columnMapping = buildSpreadColumnMapping(
+        spreadsResults.meta?.fields || []
+      );
 
-          hydrateTeams();
-          hydrateGames();
+      tabState.totals.rawData = totalsRows.filter(hasValidMatchup);
+      tabState.totals.columnMapping = buildTotalsColumnMapping(
+        totalsResults.meta?.fields || []
+      );
 
-          renderTeamPicker('spreads');
-          renderTeamPicker('totals');
-          renderTable('spreads');
-          renderTable('totals');
+      hydrateTeams();
+      hydrateGames();
 
-          updateTeamSummary('spreads');
-          updateTeamSummary('totals');
+      renderTeamPicker('spreads');
+      renderTeamPicker('totals');
 
-          document.getElementById('status').textContent = 'Illustrative example using previous week\u2019s data';
-          setTimeout(notifyParentOfHeight, 100);
-        })
-        .catch(err => {
-          document.getElementById('status').textContent = 'Error loading data: ' + err.message;
-          console.error(err);
-          setTimeout(notifyParentOfHeight, 100);
-        });
-    }
+      renderTable('spreads');
+      renderTable('totals');
+
+      updateTeamSummary('spreads');
+      updateTeamSummary('totals');
+
+      document.getElementById('status').textContent =
+        'Illustrative example using previous week\u2019s data';
+
+      setTimeout(notifyParentOfHeight, 100);
+    })
+    .catch(err => {
+      document.getElementById('status').textContent =
+        'Error loading promotional data: ' + err.message;
+
+      console.error('Promotional table loading error:', err);
+
+      setTimeout(notifyParentOfHeight, 100);
+    });
+}
 
     function initialize() {
       setupSubtabs();
