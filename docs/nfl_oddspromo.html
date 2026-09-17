@@ -1002,7 +1002,8 @@
         head.appendChild(th);
       });
 
-      let processedData = state.rawData.filter(isGameVisible);
+      // Static promotional data: retain past games when rendering.
+      let processedData = state.rawData.slice();
 
       if (tabId === 'totals') {
         if (state.selectedGames.size > 0) {
