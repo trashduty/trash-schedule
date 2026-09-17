@@ -1,0 +1,1243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NFL Model Outputs</title>
+
+  <!--
+    Games remain visible through kickoff and are removed 10 minutes later.
+    The totals rows inherit kickoff metadata from the matching spreads rows.
+  -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+
+  <style>
+    html {
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      margin: 20px;
+      background-color: #f4f7f6;
+    }
+
+    .last-updated {
+      margin-bottom: 10px;
+      font-style: italic;
+      color: #666;
+      font-size: 0.8rem;
+    }
+
+    .weather-link a {
+      font-size: 1.1rem;
+      color: #0066cc;
+      text-decoration: underline;
+    }
+
+    .weather-link a:hover {
+      color: #0052a3;
+    }
+
+    .subtabs {
+      display: flex;
+      gap: 0;
+      margin-bottom: 16px;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .subtab {
+      padding: 8px 12px;
+      background: none;
+      border: none;
+      border-radius: 0;
+      cursor: pointer;
+      font-size: 0.9rem;
+      color: #666;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      transition: color 0.2s;
+    }
+
+    .subtab:hover {
+      color: #333;
+      background: none;
+    }
+
+    .subtab.active {
+      color: #2c3e50;
+      border-bottom-color: #2c3e50;
+    }
+
+    .subtab-content {
+      display: none;
+    }
+
+    .subtab-content.active {
+      display: block;
+    }
+
+    .controls {
+      margin-bottom: 14px;
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      border: 1px solid #ccc;
+      background: #fff;
+      border-radius: 6px;
+      padding: 8px 12px;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+
+    button:hover {
+      background: #f4f4f4;
+    }
+
+    .team-summary {
+      font-size: 0.9rem;
+      color: #333;
+      padding-top: 8px;
+    }
+
+    .team-picker {
+      width: 360px;
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.06);
+      overflow: hidden;
+      margin-top: 10px;
+      margin-bottom: 14px;
+    }
+
+    .team-picker[hidden] {
+      display: none;
+    }
+
+    .team-picker-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px;
+      border-bottom: 1px solid #eee;
+      background: #fafafa;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .teamFilter {
+      padding: 8px 12px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      width: 220px;
+      font-size: 0.9rem;
+      background: #fff;
+    }
+
+    .team-picker-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .team-list {
+      max-height: 220px;
+      overflow: auto;
+      padding: 8px 10px;
+    }
+
+    .team-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 2px;
+      font-size: 0.9rem;
+      border-bottom: 1px dashed rgba(0,0,0,0.06);
+    }
+
+    .team-item:last-child {
+      border-bottom: none;
+    }
+
+    .team-count {
+      font-size: 0.85rem;
+      color: #555;
+      padding: 8px 10px 10px 10px;
+      border-top: 1px solid #eee;
+      background: #fafafa;
+    }
+
+    .table-container {
+      overflow-x: auto;
+      overflow-y: visible;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      border-radius: 8px;
+      background: white;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: auto;
+      font-size: 0.85rem;
+    }
+
+    th,
+    td {
+      padding: 10px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+      white-space: nowrap;
+      vertical-align: top;
+    }
+
+    td.numeric {
+      text-align: right;
+    }
+
+    table a {
+      color: inherit;
+      text-decoration: underline;
+    }
+
+    table a:hover {
+      opacity: 0.75;
+    }
+
+    .team-cell {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 3px;
+    }
+
+    .team-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .team-logo {
+      width: 22px;
+      height: 22px;
+      object-fit: contain;
+      vertical-align: middle;
+    }
+
+    .qb-note {
+      font-size: 0.72rem;
+      line-height: 1.2;
+      color: #666;
+      white-space: normal;
+      font-style: italic;
+    }
+
+    .notes-text {
+      font-size: 0.72rem;
+      line-height: 1.2;
+      color: #d32f2f;
+      white-space: normal;
+      font-style: italic;
+    }
+
+    th {
+      background-color: #2c3e50;
+      color: white;
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    th:after {
+      content: ' \21D5';
+      font-size: 0.7rem;
+      opacity: 0.5;
+    }
+
+    tr:hover td {
+      background-color: rgba(0,0,0,0.04) !important;
+    }
+
+    .game-group-header td {
+      background: #eef3f8;
+      border-top: 2px solid #d8e2ee;
+      border-bottom: 1px solid #d8e2ee;
+      font-weight: 600;
+      color: #243447;
+    }
+
+    .game-group-title {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+    }
+
+    .game-meta {
+      color: #41566e;
+      font-weight: 500;
+      margin-left: 12px;
+      font-size: 0.82rem;
+    }
+
+    .team-subrow td:first-child {
+      padding-left: 20px;
+    }
+  </style>
+</head>
+
+<body>
+  <h2 style="margin-bottom:6px;">NFL Model Outputs</h2>
+
+  <div class="last-updated" id="status">Loading data...</div>
+
+  <div class="last-updated weather-link">
+    <a href="https://www.covers.com/sport/nfl/weather" target="_blank" rel="noopener noreferrer">
+      Weather Reports
+    </a>
+  </div>
+
+  <div class="subtabs" id="subtabs"></div>
+
+  <!-- SPREADS -->
+  <div class="subtab-content" id="spreads-content">
+    <div class="controls">
+      <div>
+        <button type="button" id="spreads-toggleTeamPickerBtn" onclick="toggleTeamPicker('spreads')">
+          Select teams…
+        </button>
+      </div>
+
+      <div class="team-summary" id="spreads-teamSummary">All teams</div>
+    </div>
+
+    <div class="team-picker" id="spreads-teamPicker" hidden>
+      <div class="team-picker-header">
+        <input
+          class="teamFilter"
+          id="spreads-teamFilter"
+          type="text"
+          placeholder="Type to find teams..."
+          oninput="onTeamFilterInput('spreads')"
+        />
+
+        <div class="team-picker-actions">
+          <button type="button" onclick="selectVisibleTeams('spreads')">Select visible</button>
+          <button type="button" onclick="clearTeamSelection('spreads')">Clear</button>
+          <button type="button" onclick="toggleTeamPicker('spreads', false)">Close</button>
+        </div>
+      </div>
+
+      <div class="team-list" id="spreads-teamList"></div>
+      <div class="team-count" id="spreads-teamCount">Teams: 0 • Selected: 0</div>
+    </div>
+
+    <div class="table-container">
+      <table id="spreads-oddsTable">
+        <thead><tr id="spreads-tableHead"></tr></thead>
+        <tbody id="spreads-tableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- TOTALS -->
+  <div class="subtab-content" id="totals-content">
+    <div class="controls">
+      <div>
+        <button type="button" id="totals-toggleTeamPickerBtn" onclick="toggleTeamPicker('totals')">
+          Select games…
+        </button>
+      </div>
+
+      <div class="team-summary" id="totals-teamSummary">All games</div>
+    </div>
+
+    <div class="team-picker" id="totals-teamPicker" hidden>
+      <div class="team-picker-header">
+        <input
+          class="teamFilter"
+          id="totals-teamFilter"
+          type="text"
+          placeholder="Type to find games..."
+          oninput="onTeamFilterInput('totals')"
+        />
+
+        <div class="team-picker-actions">
+          <button type="button" onclick="selectVisibleTeams('totals')">Select visible</button>
+          <button type="button" onclick="clearTeamSelection('totals')">Clear</button>
+          <button type="button" onclick="toggleTeamPicker('totals', false)">Close</button>
+        </div>
+      </div>
+
+      <div class="team-list" id="totals-teamList"></div>
+      <div class="team-count" id="totals-teamCount">Games: 0 • Selected: 0</div>
+    </div>
+
+    <div class="table-container">
+      <table id="totals-oddsTable">
+        <thead><tr id="totals-tableHead"></tr></thead>
+        <tbody id="totals-tableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    const CSV_URLS = {
+      spreads: 'https://raw.githubusercontent.com/trashduty/trash-schedule/main/NFL_Odds/Data/spreads_odds.csv',
+      totals: 'https://raw.githubusercontent.com/trashduty/trash-schedule/main/NFL_Odds/Data/totals_odds.csv',
+      model: 'https://raw.githubusercontent.com/trashduty/trash-schedule/main/Week%201%20model%20pred_updated.csv'
+    };
+
+    const PFR_TEAM_ABBR = {
+      ARI: 'crd', ATL: 'atl', BAL: 'rav', BUF: 'buf', CAR: 'car',
+      CHI: 'chi', CIN: 'cin', CLE: 'cle', DAL: 'dal', DEN: 'den',
+      DET: 'det', GB: 'gnb', HOU: 'htx', IND: 'clt', JAX: 'jax',
+      KC: 'kan', LAC: 'sdg', LAR: 'ram', LA: 'ram', LV: 'rai', MIA: 'mia',
+      MIN: 'min', NE: 'nwe', NO: 'nor', NYG: 'nyg', NYJ: 'nyj',
+      PHI: 'phi', PIT: 'pit', SF: 'sfo', SEA: 'sea', TB: 'tam',
+      TEN: 'oti', WAS: 'was'
+    };
+
+    const TEAM_INJURY_URLS = {
+      ARI: 'https://www.espn.com/nfl/team/injuries/_/name/ari/arizona-cardinals',
+      ATL: 'https://www.espn.com/nfl/team/injuries/_/name/atl/atlanta-falcons',
+      BAL: 'https://www.espn.com/nfl/team/injuries/_/name/bal/baltimore-ravens',
+      BUF: 'https://www.espn.com/nfl/team/injuries/_/name/buf/buffalo-bills',
+      CAR: 'https://www.espn.com/nfl/team/injuries/_/name/car/carolina-panthers',
+      CHI: 'https://www.espn.com/nfl/team/injuries/_/name/chi/chicago-bears',
+      CIN: 'https://www.espn.com/nfl/team/injuries/_/name/cin/cincinnati-bengals',
+      CLE: 'https://www.espn.com/nfl/team/injuries/_/name/cle/cleveland-browns',
+      DAL: 'https://www.espn.com/nfl/team/injuries/_/name/dal/dallas-cowboys',
+      DEN: 'https://www.espn.com/nfl/team/injuries/_/name/den/denver-broncos',
+      DET: 'https://www.espn.com/nfl/team/injuries/_/name/det/detroit-lions',
+      GB:  'https://www.espn.com/nfl/team/injuries/_/name/gb/green-bay-packers',
+      HOU: 'https://www.espn.com/nfl/team/injuries/_/name/hou/houston-texans',
+      IND: 'https://www.espn.com/nfl/team/injuries/_/name/ind/indianapolis-colts',
+      JAX: 'https://www.espn.com/nfl/team/injuries/_/name/jax/jacksonville-jaguars',
+      KC:  'https://www.espn.com/nfl/team/injuries/_/name/kc/kansas-city-chiefs',
+      LAC: 'https://www.espn.com/nfl/team/injuries/_/name/lac/los-angeles-chargers',
+      LAR: 'https://www.espn.com/nfl/team/injuries/_/name/lar/los-angeles-rams',
+      LA:  'https://www.espn.com/nfl/team/injuries/_/name/lar/los-angeles-rams',
+      LV:  'https://www.espn.com/nfl/team/injuries/_/name/lv/las-vegas-raiders',
+      MIA: 'https://www.espn.com/nfl/team/injuries/_/name/mia/miami-dolphins',
+      MIN: 'https://www.espn.com/nfl/team/injuries/_/name/min/minnesota-vikings',
+      NE:  'https://www.espn.com/nfl/team/injuries/_/name/ne/new-england-patriots',
+      NO:  'https://www.espn.com/nfl/team/injuries/_/name/no/new-orleans-saints',
+      NYG: 'https://www.espn.com/nfl/team/injuries/_/name/nyg/new-york-giants',
+      NYJ: 'https://www.espn.com/nfl/team/injuries/_/name/nyj/new-york-jets',
+      PHI: 'https://www.espn.com/nfl/team/injuries/_/name/phi/philadelphia-eagles',
+      PIT: 'https://www.espn.com/nfl/team/injuries/_/name/pit/pittsburgh-steelers',
+      SEA: 'https://www.espn.com/nfl/team/injuries/_/name/sea/seattle-seahawks',
+      SF:  'https://www.espn.com/nfl/team/injuries/_/name/sf/san-francisco-49ers',
+      TB:  'https://www.espn.com/nfl/team/injuries/_/name/tb/tampa-bay-buccaneers',
+      TEN: 'https://www.espn.com/nfl/team/injuries/_/name/ten/tennessee-titans',
+      WAS: 'https://www.espn.com/nfl/team/injuries/_/name/wsh/washington-commanders'
+    };
+
+    const REFRESH_INTERVAL = 60000;
+    const EDGE_THRESHOLD_PERCENT = 4;
+    const DROP_AFTER_START_MINUTES = 10;
+
+    const SPREAD_EXCLUDED_COLUMNS = new Set([
+      'team_logo_espn',
+      'last_update_api',
+      'game_date_est',
+      'commence_time'
+    ]);
+
+    const TOTALS_EXCLUDED_COLUMNS = new Set([
+      'last_update_api',
+      'game_date_est',
+      'game_time_est',
+      'commence_time'
+    ]);
+
+    const tabState = {
+      spreads: {
+        rawData: [],
+        allTeams: [],
+        selectedTeams: new Set(),
+        sortConfig: { key: null, direction: 'asc' },
+        columnMapping: []
+      },
+      totals: {
+        rawData: [],
+        allGames: [],
+        selectedGames: new Set(),
+        sortConfig: { key: null, direction: 'asc' },
+        columnMapping: []
+      }
+    };
+
+    let qbLookup = {};
+    let notesLookup = {};
+
+    function notifyParentOfHeight() {
+      if (window.parent !== window) {
+        const height = document.documentElement.scrollHeight;
+        window.parent.postMessage({ type: 'nfl-resize', height }, '*');
+      }
+    }
+
+    function parseCsvFromUrl(url) {
+      return fetch(url + '?t=' + Date.now())
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('HTTP ' + response.status + ' for ' + url);
+          }
+          return response.text();
+        })
+        .then(csvText => new Promise((resolve, reject) => {
+          Papa.parse(csvText, {
+            header: true,
+            dynamicTyping: true,
+            skipEmptyLines: true,
+            complete: results => resolve(results),
+            error: err => reject(err)
+          });
+        }));
+    }
+
+    function normalizeTeamAbbr(team) {
+      return (team || '').toString().trim().toUpperCase();
+    }
+
+    function normalizeName(name) {
+      return (name || '').toString().trim();
+    }
+
+    function normalizeGame(game) {
+      return (game || '').toString().trim().toUpperCase();
+    }
+
+    function buildQbLookup(modelRows) {
+      const lookup = {};
+      modelRows.forEach(row => {
+        const team = normalizeTeamAbbr(row['Team']);
+        const qbName = normalizeName(row['Qbname']);
+        if (!team || !qbName) return;
+        lookup[team] = qbName;
+      });
+      return lookup;
+    }
+
+    function buildNotesLookup(modelRows) {
+      const lookup = {};
+      modelRows.forEach(row => {
+        const team = normalizeTeamAbbr(row['Team']);
+        const notes = normalizeName(row['Notes']);
+        if (!team) return;
+        if (notes) lookup[team] = notes;
+      });
+      return lookup;
+    }
+
+    function formatHeader(csvHeader) {
+      if (csvHeader === 'game_time_est') return 'Game Time';
+      return csvHeader
+        .split('_')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ');
+    }
+
+    function inferType(csvKey) {
+      const k = csvKey.toLowerCase();
+      if (k.includes('probability')) return 'probability';
+      if (k.includes('edge')) return 'spread_edge';
+      if (['week', 'game', 'team', 'game_time_est'].includes(k) || k.includes('book')) return 'text';
+      return 'decimal';
+    }
+
+    function buildSpreadColumnMapping(headers) {
+      const mapped = headers
+        .filter(h => !SPREAD_EXCLUDED_COLUMNS.has(h))
+        .map(h => ({ csv: h, display: formatHeader(h), type: inferType(h) }));
+
+      if (!headers.includes('lookahead_line')) {
+        const marketLineIdx = mapped.findIndex(c => c.csv === 'market_line');
+        if (marketLineIdx !== -1) {
+          mapped.splice(marketLineIdx + 1, 0, {
+            csv: 'lookahead_line',
+            display: 'Lookahead Line',
+            type: 'decimal'
+          });
+        }
+      }
+
+      const edgeIdx = mapped.findIndex(c => c.csv === 'edge');
+      const gameTimeIdx = mapped.findIndex(c => c.csv === 'game_time_est');
+      if (edgeIdx !== -1 && gameTimeIdx !== -1) {
+        const [edgeCol] = mapped.splice(edgeIdx, 1);
+        const updatedGameTimeIdx = mapped.findIndex(c => c.csv === 'game_time_est');
+        mapped.splice(updatedGameTimeIdx + 1, 0, edgeCol);
+      }
+
+      const modelPredictionIdx = mapped.findIndex(c => c.csv === 'model_prediction');
+      const marketLineIdx = mapped.findIndex(c => c.csv === 'market_line');
+      if (modelPredictionIdx !== -1 && marketLineIdx !== -1) {
+        const [modelPredictionCol] = mapped.splice(modelPredictionIdx, 1);
+        const updatedMarketLineIdx = mapped.findIndex(c => c.csv === 'market_line');
+        mapped.splice(updatedMarketLineIdx, 0, modelPredictionCol);
+      }
+
+      const teamIdx = mapped.findIndex(c => c.csv === 'team');
+      const newGameTimeIdx = mapped.findIndex(c => c.csv === 'game_time_est');
+      if (teamIdx !== -1 && newGameTimeIdx !== -1 && newGameTimeIdx > teamIdx) {
+        const [gameTimeCol] = mapped.splice(newGameTimeIdx, 1);
+        mapped.splice(teamIdx, 0, gameTimeCol);
+      }
+
+      return mapped;
+    }
+
+    function buildTotalsColumnMapping(headers) {
+      return headers
+        .filter(h => !TOTALS_EXCLUDED_COLUMNS.has(h))
+        .map(h => ({ csv: h, display: formatHeader(h), type: inferType(h) }));
+    }
+
+    function setupSubtabs() {
+      const container = document.getElementById('subtabs');
+      container.innerHTML = '';
+      [{ id: 'spreads', label: 'Spreads' }, { id: 'totals', label: 'Totals' }].forEach(subtab => {
+        const button = document.createElement('button');
+        button.className = 'subtab' + (subtab.id === 'spreads' ? ' active' : '');
+        button.textContent = subtab.label;
+        button.onclick = ev => switchSubtab(subtab.id, ev);
+        container.appendChild(button);
+      });
+      document.getElementById('spreads-content').classList.add('active');
+    }
+
+    function switchSubtab(tabId, ev) {
+      document.querySelectorAll('.subtab-content').forEach(el => el.classList.remove('active'));
+      document.getElementById(`${tabId}-content`).classList.add('active');
+      document.querySelectorAll('.subtab').forEach(el => el.classList.remove('active'));
+      if (ev && ev.target) ev.target.classList.add('active');
+      setTimeout(notifyParentOfHeight, 100);
+    }
+
+    function toggleTeamPicker(tabId, forceOpen) {
+      const picker = document.getElementById(`${tabId}-teamPicker`);
+      if (!picker) return;
+      const isHidden = picker.hasAttribute('hidden');
+      const open = typeof forceOpen === 'boolean' ? forceOpen : isHidden;
+
+      if (open) {
+        picker.removeAttribute('hidden');
+        setTimeout(() => document.getElementById(`${tabId}-teamFilter`)?.focus(), 0);
+      } else {
+        picker.setAttribute('hidden', '');
+      }
+
+      setTimeout(notifyParentOfHeight, 100);
+    }
+
+    function getEdgeGradientColor(value, thresholdPctPoints) {
+      const pct = value * 100;
+      const diff = pct - thresholdPctPoints;
+      if (diff >= 0) return `hsl(120, 70%, ${Math.max(95 - diff * 8, 30)}%)`;
+      return `hsl(0, 80%, ${Math.max(95 - Math.abs(diff) * 8, 75)}%)`;
+    }
+
+    function formatValue(value, type, csvKey) {
+      if (value === null || value === undefined || value === '') return '';
+
+      const normalizedValue = String(value).trim().toUpperCase();
+      if (normalizedValue === 'NA' || normalizedValue === 'N/A' || normalizedValue === 'NAN') return '';
+
+      if (type === 'probability' || type === 'spread_edge') {
+        const numberValue = Number(value);
+        return Number.isFinite(numberValue) ? (numberValue * 100).toFixed(2) + '%' : '';
+      }
+
+      if (csvKey === 'model_prediction' || csvKey === 'market_line' || csvKey === 'best_line' || csvKey === 'lookahead_line' || csvKey.includes('_line')) {
+        const numberValue = Number(value);
+        return Number.isFinite(numberValue) ? numberValue.toFixed(1) : '';
+      }
+
+      if (csvKey === 'market_price' || csvKey === 'best_price' || csvKey.includes('_price')) {
+        const numberValue = Number(value);
+        return Number.isFinite(numberValue) ? numberValue.toFixed(0) : '';
+      }
+
+      if (type === 'text') return String(value);
+      if (type === 'decimal') {
+        const numberValue = Number(value);
+        return Number.isFinite(numberValue) ? numberValue.toFixed(2) : '';
+      }
+      return value;
+    }
+
+    function buildPfrGameUrl(row) {
+      const game = normalizeGame(row['game']);
+      const gameDate = row['game_date_est'];
+      if (!game || !gameDate || !game.includes('@')) return null;
+
+      const parts = game.split('@');
+      if (parts.length !== 2) return null;
+
+      const homeTeamAbbr = parts[1].trim();
+      const pfrAbbr = PFR_TEAM_ABBR[homeTeamAbbr];
+      if (!pfrAbbr) return null;
+
+      const dateStr = String(gameDate).trim().replace(/-/g, '');
+      if (!/^\d{8}$/.test(dateStr)) return null;
+
+      return `https://www.pro-football-reference.com/boxscores/${dateStr}0${pfrAbbr}.htm`;
+    }
+
+    function parseKickoffFromRow(row) {
+      const commenceTime = String(row?.commence_time ?? '').trim();
+      if (commenceTime) {
+        const parsed = Date.parse(commenceTime);
+        if (Number.isFinite(parsed)) return parsed;
+      }
+
+      const dateStr = String(row?.game_date_est ?? row?.game_date_et ?? '').trim();
+      const rawTime = String(row?.game_time_est ?? row?.game_time_et ?? '').trim();
+      if (!dateStr || !rawTime) return Number.POSITIVE_INFINITY;
+
+      let year, month, day;
+      let m = dateStr.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+      if (m) {
+        year = Number(m[1]);
+        month = Number(m[2]);
+        day = Number(m[3]);
+      } else {
+        m = dateStr.match(/^(\d{1,2})\/(\d{1,2})(?:\/(\d{4}))?$/);
+        if (!m) return Number.POSITIVE_INFINITY;
+        month = Number(m[1]);
+        day = Number(m[2]);
+        year = m[3] ? Number(m[3]) : new Date().getFullYear();
+      }
+
+      const cleanTime = rawTime.replace(/\s*(ET|EST|EDT)\s*$/i, '').trim();
+      const t = cleanTime.match(/^(\d{1,2}):(\d{2})\s*([AP]M)$/i);
+      if (!t) return Number.POSITIVE_INFINITY;
+
+      let hour = Number(t[1]);
+      const minute = Number(t[2]);
+      const ampm = t[3].toUpperCase();
+      if (hour === 12) hour = 0;
+      if (ampm === 'PM') hour += 12;
+
+      const initialGuess = Date.UTC(year, month - 1, day, hour, minute, 0, 0);
+      const formatter = new Intl.DateTimeFormat('en-US', {
+        timeZone: 'America/New_York',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        hourCycle: 'h23'
+      });
+
+      const parts = formatter.formatToParts(new Date(initialGuess));
+      const values = {};
+      parts.forEach(part => {
+        if (part.type !== 'literal') values[part.type] = Number(part.value);
+      });
+
+      const easternAsUTC = Date.UTC(values.year, values.month - 1, values.day, values.hour, values.minute, 0, 0);
+      const easternOffset = easternAsUTC - initialGuess;
+      return initialGuess - easternOffset;
+    }
+
+    function hasValidMatchup(row) {
+      const game = normalizeGame(row?.game);
+
+      if (!game || game === 'NA' || game === 'N/A' || game === 'NAN') {
+        return false;
+      }
+
+      const teams = game.split('@').map(team => team.trim());
+      return teams.length === 2 && Boolean(teams[0]) && Boolean(teams[1]);
+    }
+
+    function isGameVisible(row) {
+      // Exclude orphan source rows such as game=NA before applying time logic.
+      if (!hasValidMatchup(row)) return false;
+
+      const kickoff = parseKickoffFromRow(row);
+      if (!Number.isFinite(kickoff)) return true;
+      const cutoff = kickoff + (DROP_AFTER_START_MINUTES * 60 * 1000);
+      return Date.now() <= cutoff;
+    }
+
+    function buildKickoffLookup(spreadRows) {
+      const lookup = new Map();
+      spreadRows.forEach(row => {
+        const game = normalizeGame(row.game);
+        if (!game || lookup.has(game)) return;
+        lookup.set(game, {
+          commence_time: row.commence_time,
+          game_date_est: row.game_date_est,
+          game_time_est: row.game_time_est
+        });
+      });
+      return lookup;
+    }
+
+    function enrichTotalsWithKickoff(totalsRows, spreadRows) {
+      const kickoffLookup = buildKickoffLookup(spreadRows);
+      return totalsRows.map(row => {
+        const match = kickoffLookup.get(normalizeGame(row.game));
+        if (!match) return { ...row };
+        return {
+          ...row,
+          commence_time: row.commence_time || match.commence_time,
+          game_date_est: row.game_date_est || match.game_date_est,
+          game_time_est: row.game_time_est || match.game_time_est
+        };
+      });
+    }
+
+    function createGroupsFromRows(rows) {
+      const map = new Map();
+      rows.forEach((row, idx) => {
+        const game = normalizeGame(row.game);
+        const week = (row.week || '').toString().trim();
+        const time = (row.game_time_est || '').toString().trim();
+        const fallback = `${week}|${time}|${idx}`;
+        const key = game || fallback;
+        if (!map.has(key)) map.set(key, { key, game, week, game_time_est: time, rows: [] });
+        map.get(key).rows.push(row);
+      });
+      return Array.from(map.values());
+    }
+
+    function getGroupSortValue(group, key) {
+      const vals = group.rows.map(r => r[key]).filter(v => v !== null && v !== undefined && v !== '');
+      if (!vals.length) return null;
+      if (vals.every(v => typeof v === 'number')) return Math.max(...vals);
+      return vals[0];
+    }
+
+    function sortGroups(groups, sortCfg) {
+      if (!sortCfg || !sortCfg.key) {
+        return groups.sort((a, b) => {
+          const firstA = a.rows?.length ? a.rows[0] : {};
+          const firstB = b.rows?.length ? b.rows[0] : {};
+          const ta = parseKickoffFromRow(firstA);
+          const tb = parseKickoffFromRow(firstB);
+          if (ta !== tb) return ta - tb;
+          const wa = Number(a.week ?? 9999);
+          const wb = Number(b.week ?? 9999);
+          if (wa !== wb) return wa - wb;
+          return (a.game || '').localeCompare(b.game || '');
+        });
+      }
+
+      const dir = sortCfg.direction === 'desc' ? -1 : 1;
+      const key = sortCfg.key;
+
+      return groups.sort((a, b) => {
+        const aVal = getGroupSortValue(a, key);
+        const bVal = getGroupSortValue(b, key);
+        if (aVal === bVal) return 0;
+        if (aVal === null) return 1;
+        if (bVal === null) return -1;
+        if (typeof aVal === 'number' && typeof bVal === 'number') return (aVal < bVal ? -1 : 1) * dir;
+        return aVal.toString().localeCompare(bVal.toString()) * dir;
+      });
+    }
+
+    function sortRowsWithinGroup(rows, sortCfg) {
+      if (!sortCfg || !sortCfg.key) return rows;
+      const key = sortCfg.key;
+      const dir = sortCfg.direction === 'desc' ? -1 : 1;
+
+      return rows.slice().sort((a, b) => {
+        const aVal = a[key];
+        const bVal = b[key];
+        if (aVal === bVal) return 0;
+        if (aVal === null || aVal === undefined || aVal === '') return 1;
+        if (bVal === null || bVal === undefined || bVal === '') return -1;
+        if (typeof aVal === 'number' && typeof bVal === 'number') return (aVal < bVal ? -1 : 1) * dir;
+        return aVal.toString().localeCompare(bVal.toString()) * dir;
+      });
+    }
+
+    function onTeamFilterInput(tabId) { renderTeamPicker(tabId); }
+
+    function onTeamToggle(tabId, team, isChecked) {
+      const state = tabState[tabId];
+      if (isChecked) state.selectedTeams.add(team); else state.selectedTeams.delete(team);
+      updateTeamCount(tabId); updateTeamSummary(tabId); renderTable(tabId);
+    }
+
+    function onGameToggle(tabId, game, isChecked) {
+      const state = tabState[tabId];
+      if (isChecked) state.selectedGames.add(game); else state.selectedGames.delete(game);
+      updateTeamCount(tabId); updateTeamSummary(tabId); renderTable(tabId);
+    }
+
+    function clearTeamSelection(tabId) {
+      const state = tabState[tabId];
+      state.selectedTeams?.clear();
+      state.selectedGames?.clear();
+      const filterEl = document.getElementById(`${tabId}-teamFilter`);
+      if (filterEl) filterEl.value = '';
+      renderTeamPicker(tabId); updateTeamSummary(tabId); renderTable(tabId);
+    }
+
+    function selectVisibleTeams(tabId) {
+      const state = tabState[tabId];
+      const filterText = document.getElementById(`${tabId}-teamFilter`).value.toLowerCase().trim();
+
+      if (tabId === 'totals') {
+        state.allGames.filter(g => g.toLowerCase().includes(filterText)).forEach(g => state.selectedGames.add(g));
+      } else {
+        state.allTeams.filter(t => t.toLowerCase().includes(filterText)).forEach(t => state.selectedTeams.add(t));
+      }
+
+      renderTeamPicker(tabId); updateTeamSummary(tabId); renderTable(tabId);
+    }
+
+    function updateTeamCount(tabId) {
+      const state = tabState[tabId];
+      const countEl = document.getElementById(`${tabId}-teamCount`);
+      if (!countEl) return;
+      countEl.textContent = tabId === 'totals'
+        ? `Games: ${state.allGames.length} • Selected: ${state.selectedGames.size}`
+        : `Teams: ${state.allTeams.length} • Selected: ${state.selectedTeams.size}`;
+    }
+
+    function updateTeamSummary(tabId) {
+      const state = tabState[tabId];
+      const el = document.getElementById(`${tabId}-teamSummary`);
+      if (!el) return;
+
+      const selectedCount = tabId === 'totals' ? state.selectedGames.size : state.selectedTeams.size;
+      if (selectedCount === 0) {
+        el.textContent = tabId === 'totals' ? 'All games' : 'All teams';
+        return;
+      }
+
+      el.textContent = `${selectedCount} ${tabId === 'totals' ? 'game' : 'team'}${selectedCount === 1 ? '' : 's'} selected`;
+    }
+
+    function renderTeamPicker(tabId) {
+      const state = tabState[tabId];
+      const container = document.getElementById(`${tabId}-teamList`);
+      if (!container) return;
+
+      const filterText = document.getElementById(`${tabId}-teamFilter`).value.toLowerCase().trim();
+      container.innerHTML = '';
+
+      if (tabId === 'totals') {
+        state.allGames.filter(g => g.toLowerCase().includes(filterText)).forEach(game => {
+          const id = `${tabId}_game_${game.replace(/[^a-z0-9]/gi, '_')}`;
+          const row = document.createElement('div'); row.className = 'team-item';
+          const cb = document.createElement('input'); cb.type = 'checkbox'; cb.id = id;
+          cb.checked = state.selectedGames.has(game); cb.onchange = () => onGameToggle(tabId, game, cb.checked);
+          const label = document.createElement('label'); label.htmlFor = id; label.textContent = game;
+          row.appendChild(cb); row.appendChild(label); container.appendChild(row);
+        });
+      } else {
+        state.allTeams.filter(t => t.toLowerCase().includes(filterText)).forEach(team => {
+          const id = `${tabId}_team_${team.replace(/[^a-z0-9]/gi, '_')}`;
+          const row = document.createElement('div'); row.className = 'team-item';
+          const cb = document.createElement('input'); cb.type = 'checkbox'; cb.id = id;
+          cb.checked = state.selectedTeams.has(team); cb.onchange = () => onTeamToggle(tabId, team, cb.checked);
+          const label = document.createElement('label'); label.htmlFor = id; label.textContent = team;
+          row.appendChild(cb); row.appendChild(label); container.appendChild(row);
+        });
+      }
+
+      updateTeamCount(tabId);
+    }
+
+    function hydrateTeams() {
+      const state = tabState.spreads;
+      const set = new Set();
+      state.rawData.forEach(row => { const team = (row.team || '').toString().trim(); if (team) set.add(team); });
+      state.allTeams = Array.from(set).sort((a, b) => a.localeCompare(b));
+      const existing = new Set(state.allTeams);
+      state.selectedTeams.forEach(team => { if (!existing.has(team)) state.selectedTeams.delete(team); });
+    }
+
+    function hydrateGames() {
+      const state = tabState.totals;
+      const set = new Set();
+      state.rawData.forEach(row => { const game = normalizeGame(row.game); if (game) set.add(game); });
+      state.allGames = Array.from(set).sort((a, b) => a.localeCompare(b));
+      const existing = new Set(state.allGames);
+      state.selectedGames.forEach(game => { if (!existing.has(game)) state.selectedGames.delete(game); });
+    }
+
+    function onSort(tabId, key) {
+      const state = tabState[tabId];
+      if (state.sortConfig.key === key) {
+        state.sortConfig.direction = state.sortConfig.direction === 'asc' ? 'desc' : 'asc';
+      } else {
+        state.sortConfig.key = key;
+        state.sortConfig.direction = 'asc';
+      }
+      renderTable(tabId);
+    }
+
+    function renderTable(tabId) {
+      const state = tabState[tabId];
+      const head = document.getElementById(`${tabId}-tableHead`);
+      const body = document.getElementById(`${tabId}-tableBody`);
+      if (!head || !body) return;
+
+      head.innerHTML = '';
+      body.innerHTML = '';
+      if (!state.rawData || state.rawData.length === 0) return;
+
+      const activeCols = state.columnMapping.filter(col => Object.prototype.hasOwnProperty.call(state.rawData[0], col.csv));
+      activeCols.forEach(col => {
+        const th = document.createElement('th');
+        th.textContent = col.display;
+        th.onclick = () => onSort(tabId, col.csv);
+        head.appendChild(th);
+      });
+
+      let processedData = state.rawData.filter(isGameVisible);
+
+      if (tabId === 'totals') {
+        if (state.selectedGames.size > 0) {
+          processedData = processedData.filter(row => state.selectedGames.has(normalizeGame(row.game)));
+        }
+
+        if (!state.sortConfig.key) {
+          processedData = processedData.slice().sort((a, b) => {
+            const ta = parseKickoffFromRow(a);
+            const tb = parseKickoffFromRow(b);
+            if (ta !== tb) return ta - tb;
+
+            const wa = Number(a.week ?? 9999);
+            const wb = Number(b.week ?? 9999);
+            if (wa !== wb) return wa - wb;
+
+            return normalizeGame(a.game).localeCompare(normalizeGame(b.game));
+          });
+        } else {
+          const key = state.sortConfig.key;
+          const dir = state.sortConfig.direction === 'asc' ? 1 : -1;
+          processedData = processedData.slice().sort((a, b) => {
+            const valA = a[key];
+            const valB = b[key];
+            if (valA === valB) return 0;
+            if (valA === null || valA === undefined || valA === '') return 1;
+            if (valB === null || valB === undefined || valB === '') return -1;
+            if (typeof valA === 'number' && typeof valB === 'number') return (valA < valB ? -1 : 1) * dir;
+            return valA.toString().localeCompare(valB.toString()) * dir;
+          });
+        }
+
+        processedData.forEach(row => {
+          const tr = document.createElement('tr');
+          activeCols.forEach(col => {
+            const td = document.createElement('td');
+            const val = row[col.csv];
+            td.textContent = formatValue(val, col.type, col.csv);
+            if (col.type !== 'text') td.classList.add('numeric');
+            if (typeof val === 'number' && col.type === 'spread_edge') {
+              td.style.backgroundColor = getEdgeGradientColor(val, EDGE_THRESHOLD_PERCENT);
+            }
+            tr.appendChild(td);
+          });
+          body.appendChild(tr);
+        });
+
+        setTimeout(notifyParentOfHeight, 100);
+        return;
+      }
+
+      if (state.selectedTeams.size > 0) {
+        processedData = processedData.filter(row => state.selectedTeams.has((row.team || '').toString().trim()));
+      }
+
+      let groups = createGroupsFromRows(processedData);
+      groups = sortGroups(groups, state.sortConfig);
+
+      groups.forEach(group => {
+        const gameHeaderTr = document.createElement('tr');
+        gameHeaderTr.className = 'game-group-header';
+        const gameTd = document.createElement('td');
+        gameTd.colSpan = activeCols.length;
+
+        const title = document.createElement('span');
+        title.className = 'game-group-title';
+
+        const firstRow = group.rows?.length ? group.rows[0] : null;
+        const pfrUrl = firstRow ? buildPfrGameUrl(firstRow) : null;
+        const gameText = group.game || 'Matchup';
+
+        if (pfrUrl) {
+          const a = document.createElement('a');
+          a.href = pfrUrl; a.target = '_blank'; a.rel = 'noopener noreferrer';
+          a.textContent = gameText;
+          title.appendChild(a);
+        } else {
+          title.textContent = gameText;
+        }
+
+        const meta = document.createElement('span');
+        meta.className = 'game-meta';
+        const weekPart = group.week ? `Week ${group.week}` : '';
+        const timePart = group.game_time_est || '';
+        meta.textContent = [weekPart, timePart].filter(Boolean).join(' • ');
+
+        gameTd.appendChild(title);
+        if (meta.textContent) gameTd.appendChild(meta);
+        gameHeaderTr.appendChild(gameTd);
+        body.appendChild(gameHeaderTr);
+
+        const sortedRows = sortRowsWithinGroup(group.rows, state.sortConfig);
+        sortedRows.forEach((row, rowIdx) => {
+          const tr = document.createElement('tr');
+          tr.className = 'team-subrow';
+
+          activeCols.forEach(col => {
+            const td = document.createElement('td');
+            const val = row[col.csv];
+            const formatted = formatValue(val, col.type, col.csv);
+
+            const hideGame = col.csv === 'game';
+            const hideGameTime = col.csv === 'game_time_est';
+            const hideWeekOnSecondRow = col.csv === 'week' && rowIdx > 0;
+
+            if (col.csv === 'team') {
+              const teamKey = normalizeTeamAbbr(val);
+              const url = TEAM_INJURY_URLS[teamKey];
+              const logoUrl = row['team_logo_espn'];
+              const qbName = qbLookup[teamKey];
+              const notes = notesLookup[teamKey];
+
+              const wrapper = document.createElement('div');
+              wrapper.className = 'team-cell';
+
+              if (url) {
+                const a = document.createElement('a');
+                a.href = url; a.target = '_blank'; a.rel = 'noopener noreferrer';
+                a.className = 'team-link';
+
+                if (logoUrl) {
+                  const img = document.createElement('img');
+                  img.src = logoUrl; img.alt = `${formatted} logo`; img.className = 'team-logo';
+                  a.appendChild(img);
+                }
+
+                const span = document.createElement('span');
+                span.textContent = formatted;
+                a.appendChild(span);
+                wrapper.appendChild(a);
+              } else {
+                const line = document.createElement('div');
+                if (logoUrl) {
+                  const img = document.createElement('img');
+                  img.src = logoUrl; img.alt = `${formatted} logo`; img.className = 'team-logo';
+                  line.appendChild(img);
+                  line.appendChild(document.createTextNode(' '));
+                }
+                line.appendChild(document.createTextNode(formatted));
+                wrapper.appendChild(line);
+              }
+
+              if (qbName) {
+                const note = document.createElement('div');
+                note.className = 'qb-note';
+                note.textContent = `*Assumes ${qbName} is starting`;
+                wrapper.appendChild(note);
+              }
+
+              if (notes) {
+                const notesDiv = document.createElement('div');
+                notesDiv.className = 'notes-text';
+                notesDiv.textContent = notes;
+                wrapper.appendChild(notesDiv);
+              }
+
+              td.appendChild(wrapper);
+            } else if (hideGame || hideGameTime || hideWeekOnSecondRow) {
+              td.textContent = '';
+            } else {
+              td.textContent = formatted;
+            }
+
+            if (col.type !== 'text') td.classList.add('numeric');
+
+            if (!(hideGame || hideGameTime || hideWeekOnSecondRow) && typeof val === 'number' && col.type === 'spread_edge') {
+              td.style.backgroundColor = getEdgeGradientColor(val, EDGE_THRESHOLD_PERCENT);
+            }
+
+            tr.appendChild(td);
+          });
+
+          body.appendChild(tr);
+        });
+      });
+
+      setTimeout(notifyParentOfHeight, 100);
+    }
+
+    function updateTableFromCSV() {
+      Promise.all([
+        parseCsvFromUrl(CSV_URLS.spreads),
+        parseCsvFromUrl(CSV_URLS.totals),
+        parseCsvFromUrl(CSV_URLS.model)
+      ])
+        .then(([spreadsResults, totalsResults, modelResults]) => {
+          const spreadsRows = spreadsResults.data || [];
+          const totalsRows = enrichTotalsWithKickoff(totalsResults.data || [], spreadsRows);
+
+          qbLookup = buildQbLookup(modelResults.data || []);
+          notesLookup = buildNotesLookup(modelResults.data || []);
+
+          tabState.spreads.rawData = spreadsRows.filter(isGameVisible);
+          tabState.spreads.columnMapping = buildSpreadColumnMapping(spreadsResults.meta?.fields || []);
+
+          tabState.totals.rawData = totalsRows.filter(isGameVisible);
+          tabState.totals.columnMapping = buildTotalsColumnMapping(totalsResults.meta?.fields || []);
+
+          hydrateTeams();
+          hydrateGames();
+
+          renderTeamPicker('spreads');
+          renderTeamPicker('totals');
+          renderTable('spreads');
+          renderTable('totals');
+
+          updateTeamSummary('spreads');
+          updateTeamSummary('totals');
+
+          document.getElementById('status').textContent = 'Last updated: ' + new Date().toLocaleString();
+          setTimeout(notifyParentOfHeight, 100);
+        })
+        .catch(err => {
+          document.getElementById('status').textContent = 'Error loading data: ' + err.message;
+          console.error(err);
+          setTimeout(notifyParentOfHeight, 100);
+        });
+    }
+
+    function initialize() {
+      setupSubtabs();
+      updateTableFromCSV();
+      setInterval(updateTableFromCSV, REFRESH_INTERVAL);
+
+      window.addEventListener('message', event => {
+        if (!event.data || typeof event.data !== 'object') return;
+        if (event.data.type === 'request-nfl-height') notifyParentOfHeight();
+      });
+
+      setTimeout(notifyParentOfHeight, 250);
+    }
+
+    document.addEventListener('DOMContentLoaded', initialize);
+  </script>
+</body>
+</html>
