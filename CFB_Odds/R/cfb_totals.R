@@ -1,96 +1,112 @@
-# (Use your current file, but apply these full integrated edits)
-# Key additions:
-# 1) keep commence_time in api_totals_bookmaker
-# 2) carry commence_time through totals_lookup_joined
-# 3) add commence_time + game_date_et + game_time_et in totals_last_update
+    logo,
+    model_prediction = true_total,
+    market_line = total,
+    market_price = total_price,
+    market_under_price,
+    over_probability,
+    under_probability,
+    over_edge,
+    under_edge,
+    drive_bin
+  )
 
-library(dplyr)
-library(tidyr)
-library(readr)
-library(janitor)
-library(nflreadr)
-library(httr)
-library(jsonlite)
-library(glue)
-library(lubridate)
-library(stringr)
-library(cfbfastR)
+totals_best_summary <- totals_calculated |>
+  filter(side == "Over") |>
+  arrange(week, game, desc(over_edge), bookmaker) |>
+  slice_head(n = 1, by = c(week, game)) |>
+  transmute(
+    week,
+    game,
+    best_book = bookmaker,
+    best_line = total,
+    best_price = total_price,
+    best_over_probability = over_probability,
+    best_under_probability = under_probability,
+    best_over_edge = over_edge,
+    best_under_edge = under_edge
+  )
 
-options(scipen=999)
+totals_best_under_summary <- totals_calculated |>
+  filter(side == "Under") |>
+  arrange(week, game, desc(under_edge), bookmaker) |>
+  slice_head(n = 1, by = c(week, game)) |>
+  transmute(
+    week,
+    game,
+    best_under_book = bookmaker,
+    best_under_line = total,
+    best_under_price = total_price,
+    best_under_cover_probability = under_probability,
+    best_under_valid_edge = under_edge
+  )
 
-cfb_crosswalk_path <- "CFB_Odds/Data/CFB Teams Full Crosswalk.csv"
-lookup_path <- "CFB_Odds/Data/CFB_Totals_Pricing_Table_By_Drive_Bin.csv"
-model_output_path <- "CFB Total Output.csv"
-spreads_output_path <- "CFB_Odds/Data/spreads_odds.csv"
+totals_summary <- totals_last_update |>
+  left_join(totals_median_summary, by = c("week", "game")) |>
+  left_join(totals_best_summary, by = c("week", "game")) |>
+  left_join(totals_best_under_summary, by = c("week", "game"))
 
-cfb_crosswalk <- read_csv(cfb_crosswalk_path, show_col_types = FALSE)
+message("\n===== CFB TOTALS PIPELINE COUNTS =====")
+message("model_raw: ", nrow(model_raw))
+message("spreads_games: ", nrow(spreads_games))
+message("model_joined: ", nrow(model_joined))
+message("model_with_game: ", nrow(model_with_game))
+message("api_data: ", nrow(api_data))
+message("api_totals_bookmaker: ", nrow(api_totals_bookmaker))
+message("spreads_predictions: ", nrow(spreads_predictions))
+message("totals_lookup_joined: ", nrow(totals_lookup_joined))
+message("totals_calculated: ", nrow(totals_calculated))
+message("totals_last_update: ", nrow(totals_last_update))
+message("totals_median_summary: ", nrow(totals_median_summary))
+message("totals_best_summary: ", nrow(totals_best_summary))
+message("totals_summary: ", nrow(totals_summary))
 
-# Build a many-to-one lookup that maps every known name variant for a team
-# (short name, full btb name, cfbfastR name, api name) to that team's team_id.
-# This is used as a failsafe wherever we need to match a team name coming
-# from an external/raw source (model output, odds API) back to a team_id,
-# regardless of which name format that source happens to use.
-create_team_name_lookup <- function(cfb_crosswalk) {
-  name_lookup <- cfb_crosswalk |>
-    select(team_id, btb_team_short, btb_team, cfbfastr_team, api_team) |>
-    pivot_longer(
-      cols = c(btb_team_short, btb_team, cfbfastr_team, api_team),
-      names_to = "name_type",
-      values_to = "team_name"
+if (nrow(totals_summary) == 0) {
+  message("\nModel matchups not found in spreads data:")
+
+  unmatched_model_games <- model_joined |>
+    anti_join(
+      select(spreads_games, matchup_key),
+      by = "matchup_key"
     ) |>
-    filter(!is.na(team_name)) |>
-    select(team_id, team_name) |>
-    distinct()
+    distinct(
+      week,
+      model_team,
+      model_opponent,
+      matchup_key
+    )
 
-  ambiguous_names <- name_lookup |>
-    distinct(team_id, team_name) |>
-    summarise(n_teams = n_distinct(team_id), .by = team_name) |>
-    filter(n_teams > 1) |>
-    pull(team_name)
+  print(unmatched_model_games, n = Inf)
 
-  if (length(ambiguous_names) > 0) {
-    warning(glue(
-      "Team name variant(s) map to more than one team_id in the crosswalk: {paste(ambiguous_names, collapse = ', ')}"
-    ))
-  }
+  message("\nAPI totals games not found in matched model games:")
 
-  name_lookup
-}
+  unmatched_api_games <- api_totals_bookmaker |>
+    anti_join(
+      distinct(model_with_game, game),
+      by = "game"
+    ) |>
+    distinct(week, game)
 
-team_name_lookup <- create_team_name_lookup(cfb_crosswalk)
+  print(unmatched_api_games, n = Inf)
 
-lookup <- read_csv(lookup_path, show_col_types = FALSE) |>
-  janitor::clean_names() |>
-  select(drive_bin, market_total, true_total, over_probability, under_probability, push_probability)
-
-model_raw <- read_csv(
-  model_output_path,
-  show_col_types = FALSE,
-  na = c("", ".", "NA")
-) |>
-  janitor::clean_names()
-
-spreads_games <- read_csv(spreads_output_path, show_col_types = FALSE) |>
-  janitor::clean_names() |>
-  distinct(game) |>
-  mutate(
-    away_team = sub("@.*", "", game),
-    home_team = sub(".*@", "", game),
-    matchup_key = paste(pmin(away_team, home_team), pmax(away_team, home_team), sep = "|")
+  warning(
+    paste0(
+      "CFB totals pipeline produced zero rows. ",
+      "The totals model may not yet be updated for the current week. ",
+      "Existing totals_odds.csv was preserved."
+    ),
+    call. = FALSE,
+    immediate. = TRUE
   )
 
-week_zero_start <- as.Date("2026-08-29")
-week_zero_end   <- as.Date("2026-08-31")
-week_one_start  <- as.Date("2026-09-01")
-blended_model_weight <- 0.20
-blended_market_weight <- 0.80
+} else {
+  write_csv(
+    totals_summary,
+    "CFB_Odds/Data/totals_odds.csv"
+  )
 
-calculate_cfb_week <- function(game_date) {
-  case_when(
-    game_date >= week_zero_start & game_date <= week_zero_end ~ 0,
-    TRUE ~ as.numeric(floor((game_date - week_one_start) / 7) + 1)
+  message(
+    "Successfully wrote ",
+    nrow(totals_summary),
+    " games to CFB_Odds/Data/totals_odds.csv."
   )
 }
-
-team_id_lookup <- cfb_crosswalk |>
-  select(team_id, btb_team)
