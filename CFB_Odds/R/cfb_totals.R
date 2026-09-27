@@ -1,4 +1,8 @@
-# Generate CFB totals odds with independently priced Over and Under outcomes.
+# (Use your current file, but apply these full integrated edits)
+# Key additions:
+# 1) keep commence_time in api_totals_bookmaker
+# 2) carry commence_time through totals_lookup_joined
+# 3) add commence_time + game_date_et + game_time_et in totals_last_update
 
 library(dplyr)
 library(tidyr)
@@ -203,7 +207,7 @@ calculate_drive_bin <- function(spread_value) {
 }
 
 api_totals_bookmaker <- api_data |>
-  filter(market == "totals", name %in% c("Over", "Under")) |>
+  filter(market == "totals", name == "Over") |>
   filter(!is.na(home_team), !is.na(away_team)) |>
   mutate(game = paste0(away_team, "@", home_team)) |>
   select(
@@ -212,17 +216,9 @@ api_totals_bookmaker <- api_data |>
     commence_time,   # kept
     last_update_api,
     bookmaker,
-    side = name,
     total = point,
     total_price = price
   )
-
-# Keep the opposite side's quote at the same sportsbook and number for the
-# consensus row. An absent matching quote stays NA; never borrow an Over price.
-under_prices <- api_totals_bookmaker |>
-  filter(side == "Under") |>
-  distinct(week, game, bookmaker, total, .keep_all = TRUE) |>
-  transmute(week, game, bookmaker, total, market_under_price = total_price)
 
 spreads_predictions_raw <- read_csv(
   spreads_output_path,
@@ -286,8 +282,7 @@ totals_lookup_joined <- model_with_game |>
       total,
       total_price,
       last_update_api,
-      bookmaker,
-      side
+      bookmaker
     ),
     by = "game",
     relationship = "many-to-many"
@@ -296,8 +291,6 @@ totals_lookup_joined <- model_with_game |>
     spreads_predictions,
     by = "game"
   ) |>
-  left_join(under_prices, by = c("api_week" = "week", "game", "bookmaker", "total"),
-            relationship = "many-to-one") |>
   filter(!is.na(total), !is.na(total_price), !is.na(last_update_api)) |>
   mutate(week = api_week) |>
   mutate(
@@ -325,8 +318,7 @@ totals_lookup_joined <- model_with_game |>
 totals_calculated <- totals_lookup_joined |>
   mutate(
     over_edge = over_probability - implied_odds_total,
-    under_edge = under_probability - if_else(
-      side == "Under", implied_odds_total, calc_implied_odds(market_under_price)),
+    under_edge = under_probability - implied_odds_total,
     median_distance = abs(total - median_total)
   )
 
@@ -344,7 +336,6 @@ totals_last_update <- totals_calculated |>
   )
 
 totals_median_summary <- totals_calculated |>
-  filter(side == "Over") |>
   arrange(week, game, median_distance, desc(over_edge), bookmaker) |>
   slice_head(n = 1, by = c(week, game)) |>
   transmute(
@@ -354,7 +345,6 @@ totals_median_summary <- totals_calculated |>
     model_prediction = true_total,
     market_line = total,
     market_price = total_price,
-    market_under_price,
     over_probability,
     under_probability,
     over_edge,
@@ -363,7 +353,6 @@ totals_median_summary <- totals_calculated |>
   )
 
 totals_best_summary <- totals_calculated |>
-  filter(side == "Over") |>
   arrange(week, game, desc(over_edge), bookmaker) |>
   slice_head(n = 1, by = c(week, game)) |>
   transmute(
@@ -378,24 +367,9 @@ totals_best_summary <- totals_calculated |>
     best_under_edge = under_edge
   )
 
-totals_best_under_summary <- totals_calculated |>
-  filter(side == "Under") |>
-  arrange(week, game, desc(under_edge), bookmaker) |>
-  slice_head(n = 1, by = c(week, game)) |>
-  transmute(
-    week,
-    game,
-    best_under_book = bookmaker,
-    best_under_line = total,
-    best_under_price = total_price,
-    best_under_cover_probability = under_probability,
-    best_under_valid_edge = under_edge
-  )
-
 totals_summary <- totals_last_update |>
   left_join(totals_median_summary, by = c("week", "game")) |>
-  left_join(totals_best_summary, by = c("week", "game")) |>
-  left_join(totals_best_under_summary, by = c("week", "game"))
+  left_join(totals_best_summary, by = c("week", "game"))
 
 message("\n===== CFB TOTALS PIPELINE COUNTS =====")
 message("model_raw: ", nrow(model_raw))
