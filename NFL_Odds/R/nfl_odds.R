@@ -10,7 +10,7 @@ library(lubridate)
 
 get_odds_api <- function(sport = "americanfootball_nfl", 
                          apiKey = Sys.getenv("ODDS_API_KEY"), 
-                         regions = "us", 
+                         regions = "us,us2"
                          markets = "spreads,totals", 
                          year = nflreadr::get_current_season(roster = TRUE), 
                          oddsFormat = "american"){
@@ -97,7 +97,7 @@ get_odds_api <- function(sport = "americanfootball_nfl",
     rename(bookmaker_id = key_7, market = key_10, bookmaker = title, 
            last_update_api = last_update_9, last_update_markets = last_update_11) |> 
     filter(bookmaker_id %in% c("betmgm", "betrivers", "draftkings", "fanduel", 
-                               "espnbet", "fanatics", "caesars")) |> 
+                               "espnbet", "fanatics", "williamhill_us")) |> 
     mutate(
       commence_time_parsed = ymd_hms(commence_time, tz = "UTC"),
       commence_time_est = with_tz(commence_time_parsed, tzone = "America/New_York"),
