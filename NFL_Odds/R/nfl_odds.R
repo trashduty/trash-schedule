@@ -10,7 +10,7 @@ library(lubridate)
 
 get_odds_api <- function(sport = "americanfootball_nfl", 
                          apiKey = Sys.getenv("ODDS_API_KEY"), 
-                         regions = "us,us2"
+                         regions = "us,us2",
                          markets = "spreads,totals", 
                          year = nflreadr::get_current_season(roster = TRUE), 
                          oddsFormat = "american"){
