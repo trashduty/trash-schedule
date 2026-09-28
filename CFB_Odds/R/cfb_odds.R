@@ -115,7 +115,7 @@ model_raw <- model_joined |>
 get_odds_api <- function(cfb_crosswalk = NULL,
                          sport = "americanfootball_ncaaf",
                          apiKey = Sys.getenv("ODDS_API_KEY"),
-                         regions = "us",
+                         regions = "us,us2",
                          markets = "spreads,totals",
                          year = nflreadr::get_current_season(roster = TRUE),
                          oddsFormat = "american"){
@@ -149,7 +149,7 @@ get_odds_api <- function(cfb_crosswalk = NULL,
     rename(bookmaker_id = key_7, market = key_10, bookmaker = title,
            last_update_api = last_update_9, last_update_markets = last_update_11) |>
     filter(bookmaker_id %in% c("betmgm", "betrivers", "draftkings", "fanduel",
-                               "espnbet", "fanatics", "caesars")) |>
+                               "espnbet", "fanatics", "williamhill_us")) |>
     mutate(commence_ny = lubridate::as_date(lubridate::ymd_hms(commence_time, tz = "America/New_York")),
            .after = commence_time) |>
     left_join(team_name_lookup, by = c("home_team" = "team_name")) |>
