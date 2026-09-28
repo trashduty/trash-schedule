@@ -293,6 +293,32 @@ odds_calculated <- odds_lookup_joined |>
     highest_cover_row = row_number() == 1
   ) |>
   ungroup()
+cfb_sportsbook_odds_audit <- odds_calculated |>
+  select(
+    week,
+    game,
+    team,
+    bookmaker,
+    spread,
+    spread_price,
+    median_spread,
+    true_spread,
+    cover_probability,
+    implied_odds_spread,
+    cover_edge,
+    distance_from_median,
+    median_line_row,
+    highest_cover_row,
+    last_update_api,
+    commence_time
+  ) |>
+  arrange(week, game, team, spread, bookmaker)
+
+write_csv(
+  cfb_sportsbook_odds_audit,
+  "CFB_Odds/Data/spreads_odds_audit.csv"
+)
+
 
 spread_summary <- odds_calculated |>
   summarise(
