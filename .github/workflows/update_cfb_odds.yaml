@@ -1,19 +1,17 @@
 on:
   schedule:
-    # CFB: Every 10 minutes on Friday and Saturday from 7:30 AM to 8:00 PM LA time (Aug-Jan)
-    - cron: '30,40,50 14 * 1,8-12 5'    # Friday 7:30-7:50 AM LA
-    - cron: '0,10,20,30,40,50 15-23 * 1,8-12 5'  # Friday 8:00 AM-3:50 PM LA
-    - cron: '0,10,20,30,40,50 0-3 * 1,8-12 5'    # Friday 4:00-7:50 PM LA
-    - cron: '0 4 * 1,8-12 5'                     # Friday 8:00 PM LA
-    
-    - cron: '30,40,50 14 * 1,8-12 6'    # Saturday 7:30-7:50 AM LA
-    - cron: '0,10,20,30,40,50 15-23 * 1,8-12 6'  # Saturday 8:00 AM-3:50 PM LA
-    - cron: '0,10,20,30,40,50 0-3 * 1,8-12 6'    # Saturday 4:00-7:50 PM LA
-    - cron: '0 4 * 1,8-12 6'                     # Saturday 8:00 PM LA
-    
-    # CFB: Hourly on all other days (Sunday-Thursday) during Aug-Jan
-    - cron: '0 * * 1,8-12 0,1,2,3,4'    # Sunday-Thursday hourly
-    
+    # Friday and Saturday, 7:30 AM–8:00 PM Los Angeles time (Aug–Jan)
+    - cron: '30,40,50 7 * 1,8-12 5,6'
+      timezone: America/Los_Angeles
+    - cron: '0,10,20,30,40,50 8-19 * 1,8-12 5,6'
+      timezone: America/Los_Angeles
+    - cron: '0 20 * 1,8-12 5,6'
+      timezone: America/Los_Angeles
+
+    # Sunday–Thursday, hourly (Aug–Jan)
+    - cron: '0 * * 1,8-12 0-4'
+      timezone: America/Los_Angeles    
+  
   workflow_dispatch:
 
   push:
