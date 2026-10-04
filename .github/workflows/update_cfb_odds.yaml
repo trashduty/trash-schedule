@@ -1,24 +1,8 @@
 on:
   schedule:
-    # Friday and Saturday, 7:30 AM–8:00 PM Los Angeles time (Aug–Jan)
-    - cron: '30,40,50 7 * 1,8-12 5,6'
-      timezone: America/Los_Angeles
-    - cron: '0,10,20,30,40,50 8-19 * 1,8-12 5,6'
-      timezone: America/Los_Angeles
-    - cron: '0 20 * 1,8-12 5,6'
-      timezone: America/Los_Angeles
 
-    # Sunday: every 5 minutes, 11:00 AM–3:55 PM
-    - cron: '*/5 11-15 * 1,8-12 0'
-      timezone: America/Los_Angeles
-
-    # Sunday: hourly outside that window, including 4:00 PM
-    - cron: '0 0-10,16-23 * 1,8-12 0'
-      timezone: America/Los_Angeles
-
-    # Monday–Thursday: every 30 minutes, all day
-    - cron: '0,30 * * 1,8-12 1-4'
-      timezone: America/Los_Angeles 
+    # Every 10 minutes, every day, year-round
+    - cron: '*/10 * * * *'
   
   workflow_dispatch:
 
