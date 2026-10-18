@@ -13,6 +13,10 @@ on:
     branches:
       - main 
   
+concurrency:
+  group: update-cfb-odds
+  cancel-in-progress: false
+
 jobs:
   update-data:
     runs-on: ubuntu-latest
@@ -43,6 +47,8 @@ jobs:
 
       - name: Check out repository
         uses: actions/checkout@v3
+        with:
+          ref: main
 
       - name: Import data
         run: Rscript -e 'source("CFB_Odds/R/cfb_odds.R"); source("CFB_Odds/R/cfb_totals.R")'
