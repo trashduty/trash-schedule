@@ -444,6 +444,7 @@
 
     const REFRESH_INTERVAL = 60000;
     const EDGE_THRESHOLD_PERCENT = 4;
+    const COVER_PROBABILITY_THRESHOLD = 0.564;
     const DROP_AFTER_START_MINUTES = 10;
 
     const SPREAD_EXCLUDED_COLUMNS = new Set([
@@ -639,6 +640,43 @@
       }
 
       setTimeout(notifyParentOfHeight, 100);
+    }
+
+    /*
+     * Adjust the displayed edge only; source CSV values remain intact.
+     * Cover probability is stored as a fraction (0.564 = 56.4%).
+     */
+    function getEdgeDisplay(row, csvKey) {
+      const rawEdge = row[csvKey];
+      if (rawEdge === null || rawEdge === undefined || rawEdge === '') {
+        return { value: rawEdge, qualifies: false };
+      }
+
+      const edge = Number(rawEdge);
+      if (!Number.isFinite(edge)) {
+        return { value: rawEdge, qualifies: false };
+      }
+
+      // Match a side-specific edge to its probability when present.
+      const probabilityKey = csvKey.replace(/edge$/i, 'cover_probability');
+      const rawProbability = row[probabilityKey] ?? row.cover_probability;
+      const probability = Number(rawProbability);
+      const qualifies = rawProbability !== null &&
+        rawProbability !== undefined && rawProbability !== '' &&
+        Number.isFinite(probability) &&
+        probability >= COVER_PROBABILITY_THRESHOLD;
+
+      return {
+        value: qualifies ? Math.max(edge, 0.04) : (edge >= 0.04 ? 0.039 : edge),
+        qualifies
+      };
+    }
+
+    function getEdgeCellColor(row, csvKey) {
+      const display = getEdgeDisplay(row, csvKey);
+      // Use the existing gradient, with the green/red branch controlled
+      // exclusively by cover probability.
+      return getEdgeGradientColor(display.value, EDGE_THRESHOLD_PERCENT);
     }
 
     function getEdgeGradientColor(value, thresholdPctPoints) {
@@ -1041,11 +1079,13 @@
           const tr = document.createElement('tr');
           activeCols.forEach(col => {
             const td = document.createElement('td');
-            const val = row[col.csv];
+            const val = col.type === 'spread_edge'
+              ? getEdgeDisplay(row, col.csv).value
+              : row[col.csv];
             td.textContent = formatValue(val, col.type, col.csv);
             if (col.type !== 'text') td.classList.add('numeric');
             if (typeof val === 'number' && col.type === 'spread_edge') {
-              td.style.backgroundColor = getEdgeGradientColor(val, EDGE_THRESHOLD_PERCENT);
+              td.style.backgroundColor = getEdgeCellColor(row, col.csv);
             }
             tr.appendChild(td);
           });
@@ -1103,7 +1143,9 @@
 
           activeCols.forEach(col => {
             const td = document.createElement('td');
-            const val = row[col.csv];
+            const val = col.type === 'spread_edge'
+              ? getEdgeDisplay(row, col.csv).value
+              : row[col.csv];
             const formatted = formatValue(val, col.type, col.csv);
 
             const hideGame = col.csv === 'game';
@@ -1171,7 +1213,7 @@
             if (col.type !== 'text') td.classList.add('numeric');
 
             if (!(hideGame || hideGameTime || hideWeekOnSecondRow) && typeof val === 'number' && col.type === 'spread_edge') {
-              td.style.backgroundColor = getEdgeGradientColor(val, EDGE_THRESHOLD_PERCENT);
+              td.style.backgroundColor = getEdgeCellColor(row, col.csv);
             }
 
             tr.appendChild(td);
