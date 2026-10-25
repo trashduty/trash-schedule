@@ -1,7 +1,1 @@
 week,game,team,bookmaker,spread,spread_price,median_spread,true_spread,cover_probability,implied_odds_spread,cover_edge,distance_from_median,median_line_row,highest_cover_row,last_update_api,commence_time
-8,Houston Cougars@Utah Utes,Houston Cougars,Caesars,7.5,172,7.5,9,0.50696508,0.36764705882352944,0.13931802117647052,0,FALSE,FALSE,2026-10-25T05:51:10Z,2026-10-25T02:30:28Z
-8,Houston Cougars@Utah Utes,Houston Cougars,DraftKings,7.5,112,7.5,9,0.50696508,0.4716981132075472,0.03526696679245278,0,FALSE,FALSE,2026-10-25T05:46:16Z,2026-10-25T02:30:28Z
-8,Houston Cougars@Utah Utes,Houston Cougars,FanDuel,7.5,920,7.5,9,0.50696508,0.09803921568627451,0.40892586431372546,0,TRUE,TRUE,2026-10-25T05:49:41Z,2026-10-25T02:30:28Z
-8,Houston Cougars@Utah Utes,Utah Utes,Caesars,-7.5,-230,-7.5,-9,0.49904778,0.696969696969697,-0.19792191696969702,0,FALSE,FALSE,2026-10-25T05:51:10Z,2026-10-25T02:30:28Z
-8,Houston Cougars@Utah Utes,Utah Utes,DraftKings,-7.5,-149,-7.5,-9,0.49904778,0.5983935742971888,-0.09934579429718876,0,TRUE,TRUE,2026-10-25T05:46:16Z,2026-10-25T02:30:28Z
-8,Houston Cougars@Utah Utes,Utah Utes,FanDuel,-7.5,-3500,-7.5,-9,0.49904778,0.9722222222222222,-0.4731744422222222,0,FALSE,FALSE,2026-10-25T05:49:41Z,2026-10-25T02:30:28Z
