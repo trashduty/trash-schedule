@@ -1,5 +1,5 @@
 week,game,model_prediction,median_over_line,median_over_price,median_over_cover_probability,median_over_edge,median_under_line,median_under_price,median_under_cover_probability,median_under_edge,best_over_book,best_over_line,best_over_price,best_over_cover_probability,best_over_edge,best_under_book,best_under_line,best_under_price,best_under_cover_probability,best_under_edge
-7,DAL@PHI,46.5,43.5,-120,0.57695205,0.031497504545454635,43.5,-108,0.42304795,-0.09618281923076927,DraftKings,43.5,-112,0.57695205,0.048650163207547226,FanDuel,43.5,-102,0.42304795,-0.08190254504950495
+7,DAL@PHI,46.5,43.5,-114,0.57695205,0.044241769626168326,43.5,-107,0.42304795,-0.09386026256038643,BetMGM,43.5,-110,0.57695205,0.053142526190476214,FanDuel,43.5,-102,0.42304795,-0.08190254504950495
 8,ARI@DAL,35,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
 8,ATL@TB,29.5,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
 8,BAL@BUF,35,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
