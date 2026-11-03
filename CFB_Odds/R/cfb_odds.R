@@ -194,6 +194,28 @@ safe_max_datetime <- function(x) {
   if (all(is.na(x))) as.POSIXct(NA, tz = "America/New_York") else max(x, na.rm = TRUE)
 }
 
+# Match the total bins used by the spread pricing lookup: <50, 50-<60, >=60.
+calculate_total_bin <- function(total_value) {
+  case_when(
+    is.na(total_value) ~ NA_real_,
+    total_value < 50 ~ 1,
+    total_value < 60 ~ 2,
+    TRUE ~ 3
+  )
+}
+
+# Use one Over quote per bookmaker so Over/Under outcomes are not counted twice.
+# This uses the same API response as the spreads and needs no totals CSV.
+api_game_totals <- api_data |>
+  filter(market == "totals", name == "Over", is.finite(point), point > 0) |>
+  mutate(game = paste0(away_team, "@", home_team)) |>
+  distinct(week, game, bookmaker_id, point) |>
+  summarise(
+    market_total_live = round(safe_median(point) * 2) / 2,
+    .by = c(week, game)
+  ) |>
+  mutate(total_bin_live = calculate_total_bin(market_total_live))
+
 api_spreads <- api_data |>
   filter(market == "spreads") |>
   mutate(game = paste0(away_team, "@", home_team)) |>
@@ -235,6 +257,12 @@ odds_lookup_joined <- model_raw |>
     relationship = "many-to-many"
   ) |>
   filter(!is.na(spread), !is.na(spread_price), !is.na(last_update_api), !is.na(logo)) |>
+  left_join(api_game_totals, by = c("week", "game"), relationship = "many-to-one") |>
+  mutate(
+    # Retain the saved bin only when this API response has no total for the game.
+    total_bin_source = if_else(is.na(total_bin_live), "model_fallback", "live_market"),
+    total_bin = coalesce(total_bin_live, total_bin)
+  ) |>
   mutate(
     median_spread_raw = safe_median(spread),
     .by = c(game, team),
@@ -267,6 +295,17 @@ odds_lookup_joined <- model_raw |>
     by = c("total_bin", "spread" = "market_spread", "true_spread"),
     suffix = c("_model", "")
   )
+
+missing_live_totals <- odds_lookup_joined |>
+  filter(total_bin_source == "model_fallback") |>
+  distinct(game) |>
+  pull(game)
+
+if (length(missing_live_totals) > 0) {
+  warning(glue(
+    "No live market total for: {paste(missing_live_totals, collapse = ', ')}. Using saved total_bin_close."
+  ))
+}
 
 odds_calculated <- odds_lookup_joined |>
   mutate(
@@ -303,6 +342,10 @@ cfb_sportsbook_odds_audit <- odds_calculated |>
     spread_price,
     median_spread,
     true_spread,
+    market_total_live,
+    total_bin_close,
+    total_bin,
+    total_bin_source,
     cover_probability,
     implied_odds_spread,
     cover_edge,
