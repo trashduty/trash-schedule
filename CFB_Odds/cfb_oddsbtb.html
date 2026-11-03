@@ -26,6 +26,17 @@
       font-size: 0.8rem;
     }
 
+    .backtesting-note {
+      margin: 0 0 14px;
+      padding: 10px 12px;
+      border-left: 3px solid #2c3e50;
+      background: #fff;
+      color: #444;
+      font-size: 0.82rem;
+      line-height: 1.5;
+      max-width: 1000px;
+    }
+
     .weather-link a {
       font-size: 1.1rem;
     }
@@ -294,6 +305,10 @@
 
   <!-- SPREADS -->
   <div class="subtab-content" id="spreads-content">
+    <p class="backtesting-note">
+      <strong>Backtesting guidance:</strong> Our best backtested model performance came from bets with a cover probability of at least 55.4%&mdash;approximately a 3% edge at &minus;110 odds. Price alone is not enough: a 54.3% cover probability at &minus;105 produces a 3%+ edge, but bets meeting the edge threshold solely through price did not hold up in our backtesting and are not recommended. Conversely, a 55.4% cover probability at &minus;120 still meets our probability criterion despite an edge below 3%. Edge cells show actual values; green requires <strong>both edge &ge;3% and cover probability &ge;55.4%</strong>. A qualifying probability can therefore have a non-green edge cell.
+    </p>
+
     <div class="controls">
       <div>
         <button
@@ -1116,7 +1131,7 @@
     }
 
     /*
-     * Adjust the displayed edge only; source CSV values remain intact.
+     * Show the actual edge; green requires both the edge and probability thresholds.
      * Cover probability is stored as a fraction (0.554 = 55.4%).
      */
     function getEdgeDisplay(row, csvKey) {
@@ -1137,24 +1152,25 @@
       const qualifies = rawProbability !== null &&
         rawProbability !== undefined && rawProbability !== '' &&
         Number.isFinite(probability) &&
-        probability >= COVER_PROBABILITY_THRESHOLD;
+        probability >= COVER_PROBABILITY_THRESHOLD &&
+        edge >= EDGE_THRESHOLD_PERCENT / 100;
 
       return {
-        value: qualifies ? Math.max(edge, 0.03) : (edge >= 0.03 ? 0.029 : edge),
+        value: edge,
         qualifies
       };
     }
 
     function getEdgeCellColor(row, csvKey) {
       const display = getEdgeDisplay(row, csvKey);
-      // Use the existing gradient, with the green/red branch controlled
-      // exclusively by cover probability.
-      return getEdgeGradientColor(display.value, EDGE_THRESHOLD_PERCENT);
+      // Keep the actual edge for the gradient; only qualifying cells can be green.
+      return getEdgeGradientColor(display.value, EDGE_THRESHOLD_PERCENT, display.qualifies);
     }
 
     function getEdgeGradientColor(
       value,
-      thresholdPctPoints
+      thresholdPctPoints,
+      qualifies = value * 100 >= thresholdPctPoints
     ) {
       const pct = value * 100;
 
@@ -1162,7 +1178,7 @@
         pct -
         thresholdPctPoints;
 
-      if (diff >= 0) {
+      if (qualifies) {
         const lightness =
           Math.max(
             95 - diff * 8,
