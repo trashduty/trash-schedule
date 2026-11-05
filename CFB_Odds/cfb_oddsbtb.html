@@ -1145,8 +1145,11 @@
         return { value: rawEdge, qualifies: false };
       }
 
-      // Match a side-specific edge to its probability when present.
-      const probabilityKey = csvKey.replace(/edge$/i, 'cover_probability');
+      // Totals use over/under probabilities, while spreads use cover probability.
+      const probabilityKey = csvKey.replace(
+        /(?:(over|under)_)?edge$/,
+        (_, side) => side ? `${side}_probability` : 'cover_probability'
+      );
       const rawProbability = row[probabilityKey] ?? row.cover_probability;
       const probability = Number(rawProbability);
       const qualifies = rawProbability !== null &&
