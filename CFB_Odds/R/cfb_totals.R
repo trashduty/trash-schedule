@@ -152,6 +152,17 @@ get_odds_api <- function(cfb_crosswalk = NULL,
   extracted_data <- httr::content(response, "text", encoding = "UTF-8")
   api_data <- jsonlite::fromJSON(extracted_data, flatten = TRUE)
 
+  if (!is.data.frame(api_data)) {
+    api_msg <- if (is.list(api_data) && !is.null(api_data$message)) api_data$message else paste("received object of class:", paste(class(api_data), collapse = ", "))
+    message("Odds API did not return valid game data. ", api_msg)
+    return(invisible(NULL))
+  }
+
+  if (nrow(api_data) == 0) {
+    message("Odds API returned an empty dataset. No games are currently available.")
+    return(invisible(NULL))
+  }
+
   api_unnested <- api_data |>
     unnest(bookmakers, names_repair = "unique") |>
     unnest(markets, names_repair = "unique") |>
@@ -183,6 +194,8 @@ get_odds_api <- function(cfb_crosswalk = NULL,
 }
 
 api_data <- get_odds_api(cfb_crosswalk = cfb_crosswalk)
+
+if (!is.null(api_data)) {
 
 calc_implied_odds <- function(odds) {
   ifelse(odds < 0, abs(odds) / (abs(odds) + 100), 100 / (odds + 100))
@@ -435,4 +448,7 @@ if (nrow(totals_summary) == 0) {
     nrow(totals_summary),
     " games to CFB_Odds/Data/totals_odds.csv."
   )
+}
+} else {
+  message("CFB totals update skipped: odds data unavailable. Existing output files were preserved.")
 }
