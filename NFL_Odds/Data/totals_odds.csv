@@ -1,5 +1,5 @@
 week,game,model_prediction,median_over_line,median_over_price,median_over_cover_probability,median_over_edge,median_under_line,median_under_price,median_under_cover_probability,median_under_edge,best_over_book,best_over_line,best_over_price,best_over_cover_probability,best_over_edge,best_under_book,best_under_line,best_under_price,best_under_cover_probability,best_under_edge
-9,BUF@MIN,47,45.5,-108,0.5323849,0.013154130769230776,45.5,-115,0.4676151,-0.0672686209302325,FanDuel,45.5,-105,0.53679657,0.024601448048780505,BetMGM,45.5,-110,0.4676151,-0.05619442380952383
+9,BUF@MIN,47,45.5,-108,0.53679657,0.017565800769230755,45.5,-114,0.4676151,-0.06509518037383172,FanDuel,45.5,-105,0.53679657,0.024601448048780505,DraftKings,45.5,-105,0.4676151,-0.04458002195121952
 10,BUF@NYJ,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
 10,CAR@NO,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
 10,HOU@CLE,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
