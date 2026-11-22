@@ -1,3 +1,3 @@
 week,game,model_prediction,median_over_line,median_over_price,median_over_cover_probability,median_over_edge,median_under_line,median_under_price,median_under_cover_probability,median_under_edge,best_over_book,best_over_line,best_over_price,best_over_cover_probability,best_over_edge,best_under_book,best_under_line,best_under_price,best_under_cover_probability,best_under_edge
 11,CIN@WAS,51.5,54.5,-115,0.41392363,-0.12096009093023252,54.5,-109,0.58607637,0.06454526952153117,BetRivers,54.5,-109,0.41392363,-0.10760747047846886,theScore Bet,54.5,100,0.58607637,0.08607637000000001
-11,MIN@SF,48.5,45,-110,0.57354761,0.04973808619047615,45,-106,0.40070794,-0.11385516679611651,theScore Bet,45.5,100,0.57354761,0.07354760999999999,DraftKings,45.5,-104,0.42645239,-0.0833515315686274
+11,MIN@SF,48,45,-110,0.55988549,0.03607596619047615,45,-108,0.41417204,-0.10505872923076925,theScore Bet,45.5,100,0.55988549,0.059885489999999986,DraftKings,45.5,-104,0.44011451,-0.0696894115686274
